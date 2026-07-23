@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plan Security Remediation"
+  short_description: "Turn security findings into a Codex-ready patch plan"
+  default_prompt: "Use $plan-security-remediation to turn this security audit into a safe, testable patch implementation plan."
