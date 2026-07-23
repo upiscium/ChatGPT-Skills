@@ -1,0 +1,13 @@
+interface:
+  display_name: "Handover"
+  short_description: "Create a copy-ready handover for a new chat"
+  icon_small: "assets/icon.svg"
+  icon_large: "assets/icon.svg"
+  default_prompt: "Use $handover to prepare this conversation for continuation in a new chat."
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
