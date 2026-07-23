@@ -1,0 +1,4 @@
+interface:
+  display_name: "Audit GitHub Branch Security"
+  short_description: "Threat-model and audit a GitHub branch for security flaws"
+  default_prompt: "Use $audit-github-branch-security to perform an evidence-backed security audit of this branch."
