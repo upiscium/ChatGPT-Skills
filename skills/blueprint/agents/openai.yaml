@@ -1,0 +1,12 @@
+interface:
+  display_name: Blueprint
+  short_description: Turn vague needs and pain points into an executable Codex plan
+  default_prompt: Use @blueprint to refine this idea and produce
+    a Codex-ready implementation plan.
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
