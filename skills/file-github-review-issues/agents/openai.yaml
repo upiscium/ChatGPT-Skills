@@ -1,4 +1,0 @@
-interface:
-  display_name: "File GitHub Review Issues"
-  short_description: "Turn validated branch-review findings into GitHub issues"
-  default_prompt: "Use $file-github-review-issues to create GitHub issues from selected review findings."
