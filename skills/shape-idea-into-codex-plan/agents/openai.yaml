@@ -1,4 +1,0 @@
-interface:
-  display_name: "Shape Idea into Codex Plan"
-  short_description: "Turn vague needs and pain points into an executable Codex plan"
-  default_prompt: "Use $shape-idea-into-codex-plan to refine this idea and produce a Codex-ready implementation plan."
