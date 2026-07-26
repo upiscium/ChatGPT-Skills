@@ -1,0 +1,4 @@
+interface:
+  display_name: "Patch Plan"
+  short_description: "Turn review issues into a Codex-ready plan"
+  default_prompt: "Use $patch-plan to turn these review findings and GitHub issues into an executable implementation plan."
