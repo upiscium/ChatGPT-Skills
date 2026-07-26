@@ -1,4 +1,0 @@
-interface:
-  display_name: "Review GitHub Branch"
-  short_description: "Review a branch and produce evidence-backed findings"
-  default_prompt: "Use $review-github-branch to review a repository branch against its base branch."
