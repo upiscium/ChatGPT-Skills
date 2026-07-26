@@ -1,0 +1,12 @@
+interface:
+  display_name: Security Audit
+  short_description: Threat-model and audit a GitHub branch for security flaws
+  default_prompt: Use @security-audit to perform an evidence-backed
+    security audit of this branch.
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
