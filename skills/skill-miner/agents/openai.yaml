@@ -1,0 +1,12 @@
+interface:
+  display_name: Skill Miner
+  short_description: Find reusable workflows and turn them into skills
+  default_prompt: Use @skill-miner to identify reusable skill candidates
+    from this conversation and help me create the best ones.
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
