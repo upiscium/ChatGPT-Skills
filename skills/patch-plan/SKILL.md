@@ -1,6 +1,6 @@
 ---
 name: patch-plan
-description: Convert evidence-backed branch-review findings and their GitHub Bug or Feature Request issues into a self-contained, Codex-executable implementation plan without changing code or issues. Use when the user wants the next implementation instructions, patch plan, work breakdown, or technical execution plan after @branch-review, @issue-filer, or a comparable structured review and issue set.
+description: Convert evidence-backed pull-request review findings and their GitHub Bug or Feature Request issues into a self-contained, Codex-executable implementation and delivery plan. Use when the user wants the next implementation instructions, patch plan, work breakdown, or technical execution plan after @branch-review, @issue-filer, or a comparable structured PR review and issue set, including a required follow-up PR with its number and URL reported.
 ---
 
 # Plan Review Patches
@@ -11,7 +11,7 @@ Read [references/patch-plan-template.md](references/patch-plan-template.md) befo
 
 ## Establish the target
 
-1. Identify the repository, implementation base branch or commit, selected `F-*` findings, and corresponding issue URLs or numbers.
+1. Identify the repository, source review PR number and URL, implementation base branch or commit, selected `F-*` findings, and corresponding issue URLs or numbers.
 2. Resolve the implementation base to an immutable commit SHA.
 3. Read repository instructions and re-inspect affected code, callers, tests, configuration, contracts, and relevant issues.
 4. Confirm each finding and issue still applies. Mark it `active`, `already-fixed`, `stale`, `duplicate`, `closed`, `blocked`, or `out-of-scope`.
@@ -58,12 +58,27 @@ Sequence work by dependency and risk:
 4. Integrations and callers
 5. Tests and documentation
 6. Rollout, monitoring, cleanup, and rollback
+7. Delivery through a follow-up pull request
 
-Keep independent implementation units separable so Codex can implement and validate them incrementally. Call out safe commit or PR boundaries when useful, without creating them.
+Keep independent implementation units separable so Codex can implement and validate them incrementally. Define safe commit boundaries and a single coherent follow-up PR unless the work cannot be reviewed or deployed safely as one PR.
+
+## Require implementation delivery
+
+Make the generated plan instruct the implementation executor to:
+
+1. Create a dedicated implementation branch from the verified base commit.
+2. Implement only the selected plan scope and run the required validation.
+3. Commit the completed changes and push the implementation branch.
+4. Create a follow-up GitHub pull request against the planned target branch.
+5. Link the source review PR and every addressed issue in the PR body without claiming automatic closure unless repository conventions support it.
+6. Include a concise change summary, validation evidence, compatibility or migration notes, known limitations, and rollback guidance in the PR body.
+7. Return the created PR number and canonical URL in the final implementation report. Treat missing PR number or URL as incomplete delivery.
+
+If PR creation is blocked by permissions, authentication, branch protection, or repository policy, require the executor to stop after preserving pushed work when safe and report the exact blocker, branch name, and next action. Never invent a PR number.
 
 ## Preserve boundaries
 
-- Produce instructions only. Do not edit code, issues, labels, pull requests, branches, or commits.
+- Produce instructions only. This planning skill must not edit code, issues, labels, pull requests, branches, or commits; the resulting plan must assign implementation and PR creation to the later executor.
 - Do not silently expand scope beyond selected findings and issues.
 - Do not treat an issue's suggested solution as verified architecture.
 - Do not reopen, close, comment on, or modify stale or duplicate issues.
@@ -81,4 +96,5 @@ Before responding, verify that:
 - Tests cover success, failure, regression, and integration behavior where applicable.
 - Compatibility, migration, rollout, observability, rollback, and documentation are addressed or explicitly unnecessary.
 - The plan states what Codex must not change.
+- The plan requires a follow-up PR and a final report containing its real number and canonical URL.
 - Another Codex instance can execute the plan without the review conversation.
