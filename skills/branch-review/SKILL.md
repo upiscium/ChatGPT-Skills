@@ -1,99 +1,95 @@
 ---
 name: branch-review
-description: Review a specific GitHub pull request and produce evidence-backed Bug and Feature Request candidates without creating issues or submitting a GitHub review. Use when the user asks to inspect, assess, audit, or review a PR, its changed files, proposed behavior, implementation quality, or regressions introduced by a pull request.
+description: Review a GitHub pull request as the quality gate before merge, producing evidence-backed blocking findings, non-blocking observations, and a merge recommendation without creating issues or changing the PR. Use when the user asks to review a PR, validate an issue implementation, assess whether a pull request is ready to merge, or inspect regressions introduced by a PR.
 ---
 
-# Review a GitHub Pull Request
+# Review a Pull Request
 
-Review the requested pull request and return a structured report that another skill can safely convert into GitHub issues.
+Review an issue-driven implementation before merge. Keep PR correction work separate from post-merge product review and future Issue generation.
 
-## Resolve the review target
+## Resolve the target
 
-1. Require a repository and pull request URL or number. If only a branch is supplied, ask for the PR; do not silently fall back to a branch review.
-2. Fetch the PR metadata, description, linked issues, changed-file inventory, patch, review state, and available check status.
-3. Record the PR number and URL, base and head branches, and immutable base and head commit SHAs.
-4. Detect draft, closed, merged, or superseded PRs and state how that limits the review.
-5. Read applicable repository instructions and context, including `AGENTS.md`, contribution guidance, manifests, tests, CI configuration, issue requirements, and documentation relevant to the changed area.
+1. Require a repository and PR URL or number. If only a branch is supplied, ask for its PR.
+2. Fetch the PR metadata, description, linked issues, changed files, complete patch, review state, comments, and available check status.
+3. Record the PR number and URL, state, base and head branches, and immutable base and head SHAs.
+4. Read repository instructions, contribution guidance, linked Issue acceptance criteria, manifests, tests, CI configuration, and relevant documentation.
+5. State whether the review is source-only or includes locally run validation.
 
-## Inspect the implementation
+## Review the implementation
 
-1. Review the PR's complete `base...head` change set and inventory changed files.
-2. Inspect the complete surrounding implementation for every material change. Do not review patches in isolation.
-3. Trace affected callers, data flow, state transitions, error paths, configuration, public interfaces, tests, and documentation.
-4. Run relevant tests or static checks when a local checkout is available and execution is safe. Otherwise state that validation was source-only.
-5. Compare behavior with the PR description, linked issues, acceptance criteria, documentation, tests, API contracts, and established project patterns.
-6. Attribute only findings introduced by the PR or required for its stated outcome. Record unrelated pre-existing problems separately as out-of-scope observations, not actionable PR findings.
-7. Inspect available CI and review signals, but verify claims against code rather than treating a passing check or prior approval as proof of correctness.
+1. Inspect the complete `base...head` change set and surrounding implementation.
+2. Trace affected callers, data flow, state transitions, error paths, public contracts, configuration, tests, and documentation.
+3. Check that the PR addresses its linked Issues completely without unrelated scope expansion.
+4. Verify tests protect the changed behavior and meaningful failure paths.
+5. Consider available CI and prior review signals, but verify claims against code.
+6. Attribute actionable findings only to the PR or to unmet acceptance criteria of its linked Issues.
+7. List unrelated pre-existing problems only as post-merge review leads; do not use them to block this PR unless the change makes them materially worse.
 
 ## Classify findings
 
-Use one of these classifications:
+Use:
 
-- `bug`: A PR change can produce incorrect, unsafe, inconsistent, regressive, or contract-violating behavior.
-- `feature-request`: A concrete capability required by the PR's stated outcome, linked issue, or acceptance criteria is absent or materially incomplete.
-- `non-issue`: A suggestion, preference, question, or weakly supported concern that should not become an issue yet.
+- `blocking`: Must be corrected before merge because the PR is incorrect, unsafe, incomplete against required scope, or lacks essential validation.
+- `non-blocking`: Worth improving but safe to defer without violating the linked Issue or contract.
+- `question`: A decision or missing fact prevents a reliable conclusion.
+- `post-merge-lead`: A pre-existing or broader product concern for `@repo-review`, not a PR defect.
 
-Do not label personal style preferences as bugs. Do not invent product requirements to justify feature requests.
-
-Assign:
-
-- Priority: `P0` critical, `P1` high, `P2` medium, or `P3` low.
-- Confidence: `high`, `medium`, or `low`.
-
-Require a precise code path, contract, test result, log, or reproducible reasoning chain for every `bug`. Require a documented objective, user workflow, or architectural need for every `feature-request`. Downgrade unsupported claims to `non-issue`.
+Assign priority `P0` through `P3` and confidence `high`, `medium`, or `low`. Require a precise code path, contract, test result, or reproducible reasoning chain. Do not report style preferences as findings.
 
 ## Produce the review contract
-
-Return Markdown with this structure:
 
 ```markdown
 # Pull Request Review
 
-## Review target
+## Target
 - Repository:
 - Pull request:
 - Pull request URL:
-- Base branch:
-- Base commit:
-- Head branch:
-- Head commit:
-- PR state: draft | open | closed | merged
+- State:
+- Base branch and commit:
+- Head branch and commit:
+- Linked issues:
 
 ## Scope and validation
-- PR intent and linked issues:
+- Intended outcome:
 - Inspected:
 - Checks run:
 - Existing CI/review signals:
 - Limitations:
 
-## Summary
+## Merge recommendation
+- Decision: ready | changes-required | blocked
+- Rationale:
 
 ## Findings
 
-### F-001: <short title>
-- Classification: bug | feature-request | non-issue
+### PR-001: <title>
+- Classification: blocking | non-blocking | question | post-merge-lead
 - Priority: P0 | P1 | P2 | P3
 - Confidence: high | medium | low
-- Location: <path and symbol or lines>
+- Location:
 - Evidence:
 - Impact:
-- Recommendation:
-- Acceptance criteria:
+- Required change:
+- Verification:
 ```
 
-Use stable, sequential finding IDs. Omit `Acceptance criteria` only for `non-issue`. Include exact commit URLs or file references when available.
+Use stable `PR-*` IDs. Omit `Required change` only for questions and post-merge leads.
 
-If no actionable issue candidates exist, state that explicitly. Never create, edit, label, or comment on GitHub issues, and never approve, request changes on, or comment on the PR while using this skill.
+## Preserve boundaries
+
+- Do not create Issues from PR findings.
+- Do not approve, request changes on, comment on, merge, close, or modify the PR unless the user explicitly requests that separate write action.
+- Do not treat `ready` as authorization to merge.
+- Send post-merge leads to `@repo-review` only after the implementation is merged.
 
 ## Quality gate
 
-Before responding, verify that:
+Verify that:
 
-- Every actionable finding is supported by inspected evidence.
-- Every actionable finding was introduced by the PR or blocks its stated acceptance criteria.
-- The report distinguishes existing defects from missing capabilities.
-- Multiple symptoms with one root cause are grouped.
-- Completed or intentionally excluded work is not requested again.
-- The PR number, URL, state, and base and head commit SHAs are recorded.
-- Linked issue requirements and available CI signals were considered.
-- Validation gaps and inaccessible files are disclosed.
+- Every blocking finding was introduced by the PR or violates a linked Issue's acceptance criteria.
+- The complete PR and relevant surrounding code were inspected.
+- Base and head SHAs make the report reproducible.
+- Required corrections and verification steps are executable.
+- The merge recommendation follows from the findings.
+- Broader product concerns remain separate from PR correction work.
