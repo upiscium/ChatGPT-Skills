@@ -1,4 +1,4 @@
 interface:
   display_name: "Patch Plan"
-  short_description: "Turn review issues into a Codex-ready plan"
-  default_prompt: "Use $patch-plan to turn these review findings and GitHub issues into an executable implementation plan."
+  short_description: "Plan fixes and require a follow-up pull request"
+  default_prompt: "Use $patch-plan to turn this PR review and its issues into an implementation plan that creates and reports a follow-up PR."
