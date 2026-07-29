@@ -1,23 +1,23 @@
 ---
 name: patch-plan
-description: Convert evidence-backed pull-request review findings and their GitHub Bug or Feature Request issues into a self-contained, Codex-executable implementation and delivery plan. Use when the user wants the next implementation instructions, patch plan, work breakdown, or technical execution plan after @branch-review, @issue-filer, or a comparable structured PR review and issue set, including a required follow-up PR with its number and URL reported.
+description: Convert selected GitHub Bug or Feature Request issues and their evidence into a self-contained, Codex-executable implementation and delivery plan that creates an issue-specific branch and follow-up pull request. Use when the user wants to start the next issue-driven development cycle, plan implementation from @issue-filer results, or require the implementation executor to create a PR and report its number and URL.
 ---
 
 # Plan Review Patches
 
-Turn selected review findings and their issue outcomes into an implementation plan that a new Codex instance can execute without the original conversation.
+Turn selected Issues into an implementation plan that a new Codex instance can execute without the original review conversation.
 
 Read [references/patch-plan-template.md](references/patch-plan-template.md) before writing the final plan.
 
 ## Establish the target
 
-1. Identify the repository, source review PR number and URL, implementation base branch or commit, selected `F-*` findings, and corresponding issue URLs or numbers.
+1. Identify the repository, selected Issue URLs or numbers, originating `F-*` findings when available, and the implementation base branch or commit.
 2. Resolve the implementation base to an immutable commit SHA.
 3. Read repository instructions and re-inspect affected code, callers, tests, configuration, contracts, and relevant issues.
 4. Confirm each finding and issue still applies. Mark it `active`, `already-fixed`, `stale`, `duplicate`, `closed`, `blocked`, or `out-of-scope`.
 5. Ask only for missing decisions that can materially change scope, architecture, compatibility, migration, or rollout.
 
-Accept a structured review without created issues when the user explicitly wants a draft plan. Record the issue as `not-filed`; never create it.
+Require filed Issues for an execution-ready plan. If the user supplies findings without Issues, produce only a draft and mark Issue creation as a blocker.
 
 If the inputs contain `SEC-*` findings, vulnerability details, containment, credential rotation, or exploit-sensitive work, exclude those items and use `@security-plan`. Do not copy restricted security details into this plan.
 
@@ -66,11 +66,11 @@ Keep independent implementation units separable so Codex can implement and valid
 
 Make the generated plan instruct the implementation executor to:
 
-1. Create a dedicated implementation branch from the verified base commit.
+1. Create a dedicated implementation branch from the verified base commit, named according to repository conventions and clearly associated with the primary Issue.
 2. Implement only the selected plan scope and run the required validation.
 3. Commit the completed changes and push the implementation branch.
 4. Create a follow-up GitHub pull request against the planned target branch.
-5. Link the source review PR and every addressed issue in the PR body without claiming automatic closure unless repository conventions support it.
+5. Link every addressed Issue and the originating repository review or merged PR when available. Use closing keywords only when the PR fully satisfies the Issue and repository conventions support them.
 6. Include a concise change summary, validation evidence, compatibility or migration notes, known limitations, and rollback guidance in the PR body.
 7. Return the created PR number and canonical URL in the final implementation report. Treat missing PR number or URL as incomplete delivery.
 
