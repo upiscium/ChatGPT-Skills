@@ -6,7 +6,8 @@ Use this structure and omit sections that are genuinely irrelevant. Preserve sou
 
 - Desired outcome:
 - Repository:
-- Source review PR:
+- Source repository review:
+- Related merged PRs:
 - Implementation branch or base:
 - Base commit SHA:
 - Follow-up PR target branch:
@@ -94,7 +95,7 @@ Use only commands verified in the repository. Otherwise describe the check and m
 - Implementation branch:
 - Commit boundaries:
 - Follow-up PR target:
-- Source PR and issues to link:
+- Issues and source review to link:
 - Required PR body:
   - Change summary
   - Validation evidence
