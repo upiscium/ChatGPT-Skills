@@ -1,0 +1,12 @@
+interface:
+  display_name: Repository Review
+  short_description: Review merged code and propose next issues
+  default_prompt: Use $repo-review to review the merged repository and produce evidence-backed
+    issue candidates.
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
