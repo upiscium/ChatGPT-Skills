@@ -1,0 +1,11 @@
+interface:
+  display_name: PR Merge
+  short_description: Safely merge a reviewed pull request
+  default_prompt: Use $pr-merge to verify and merge this reviewed pull request.
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
