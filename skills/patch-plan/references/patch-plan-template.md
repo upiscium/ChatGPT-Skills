@@ -6,8 +6,10 @@ Use this structure and omit sections that are genuinely irrelevant. Preserve sou
 
 - Desired outcome:
 - Repository:
+- Source review PR:
 - Implementation branch or base:
 - Base commit SHA:
+- Follow-up PR target branch:
 - Selected scope:
 - Non-goals:
 
@@ -87,9 +89,24 @@ Use only commands verified in the repository. Otherwise describe the check and m
 | Risk or blocker | Impact | Mitigation or owner decision |
 |---|---|---|
 
-## Suggested delivery boundaries
+## Delivery plan
 
-Describe safe incremental implementation, commit, or pull-request boundaries when useful. Do not create them.
+- Implementation branch:
+- Commit boundaries:
+- Follow-up PR target:
+- Source PR and issues to link:
+- Required PR body:
+  - Change summary
+  - Validation evidence
+  - Compatibility or migration notes
+  - Known limitations
+  - Rollback guidance
+- Final report must include:
+  - Created PR number
+  - Canonical PR URL
+  - Head branch and resulting commit SHA
+
+The implementation executor must create the follow-up PR after validation. If creation is blocked, it must report the exact blocker and pushed branch instead of inventing a PR number.
 
 ## Definition of done
 
@@ -97,4 +114,6 @@ Describe safe incremental implementation, commit, or pull-request boundaries whe
 - Required checks pass.
 - Compatibility, migration, documentation, rollout, and rollback work is complete or explicitly not applicable.
 - No excluded or security-routed work was implemented accidentally.
+- A follow-up PR was created against the planned target branch.
+- The final report names the actual PR number and canonical URL.
 - The final implementation summary can cite the base and resulting commit SHAs.
