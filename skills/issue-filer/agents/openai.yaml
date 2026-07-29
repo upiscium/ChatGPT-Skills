@@ -1,4 +1,4 @@
 interface:
   display_name: "Issue Filer"
-  short_description: "Turn PR review findings into GitHub issues"
-  default_prompt: "Use $issue-filer to create GitHub issues from selected pull-request review findings."
+  short_description: "Turn repository findings into GitHub issues"
+  default_prompt: "Use $issue-filer to create GitHub issues from selected repository-review findings."
