@@ -1,6 +1,6 @@
 ---
 name: issue-filer
-description: Convert selected, evidence-backed findings from a GitHub pull-request review into deduplicated Bug or Feature Request issues. Use only when the user explicitly asks to create, file, or open GitHub issues from PR review findings or a structured @branch-review report.
+description: Convert selected, evidence-backed findings from a merged GitHub repository review into deduplicated Bug or Feature Request issues. Use only when the user explicitly asks to create, file, or open GitHub issues from @repo-review findings or a comparable structured whole-repository review.
 ---
 
 # File GitHub Review Issues
@@ -15,11 +15,11 @@ Do not create issues when the user asked only for review, recommendations, draft
 
 ## Validate the input
 
-1. Require the repository and a structured review report, preferably from `@branch-review`.
-2. Require the source PR number and URL plus its head and base commit SHAs so the evidence is immutable.
+1. Require the repository and a structured review report, preferably from `@repo-review`.
+2. Require the reviewed branch and immutable merged commit SHA.
 3. Accept only findings classified as `bug` or `feature-request`.
 4. Reject or return for further review any finding without a location, evidence, impact, and recommendation.
-5. Re-check material evidence when the report is stale, the PR head moved, or the finding is low-confidence.
+5. Re-check material evidence when the report is stale, the reviewed branch moved, or the finding is low-confidence.
 6. Merge findings that share one root cause or represent one inseparable capability.
 
 ## Check repository conventions
@@ -67,7 +67,7 @@ For a feature request, include:
 ## Source review
 ```
 
-Under `Source review`, include the finding ID, source PR number and URL, head branch and commit, base branch and commit, and relevant file links. Clearly label inferred reproduction steps or proposed designs; never present them as confirmed facts.
+Under `Source review`, include the finding ID, reviewed branch and commit, related merged PRs when relevant, and commit-pinned file links. Clearly label inferred reproduction steps or proposed designs; never present them as confirmed facts.
 
 Create one issue at a time and capture its URL before continuing. If a write fails, stop creating dependent issues and report the failure.
 
@@ -86,7 +86,7 @@ Before each creation, verify that:
 
 - The user authorized this finding.
 - The finding is evidence-backed and still applicable.
-- The source PR and immutable head and base commits are recorded.
+- The reviewed branch and immutable merged commit are recorded.
 - No matching issue already exists.
 - The issue describes one root cause or capability.
 - Acceptance criteria are verifiable.
