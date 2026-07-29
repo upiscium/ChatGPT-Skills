@@ -1,12 +1,4 @@
 interface:
-  display_name: Branch Review
-  short_description: Review a branch and produce evidence-backed findings
-  default_prompt: Use @branch-review to review a repository branch against
-    its base branch.
-policy:
-  products:
-  - chatgpt
-  - codex
-  - api
-  - atlas
-  allow_implicit_invocation: true
+  display_name: "PR Review"
+  short_description: "Review a pull request for bugs and missing scope"
+  default_prompt: "Use $branch-review to review this GitHub pull request and produce evidence-backed findings."
