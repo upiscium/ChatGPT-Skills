@@ -1,0 +1,4 @@
+interface:
+  display_name: "Development Loop"
+  short_description: "Advance the Codex development loop by checkpoints"
+  default_prompt: "Use $dev-loop to prepare the next Codex instructions, then wait for my next prompt before continuing."
