@@ -1,4 +1,4 @@
 interface:
   display_name: "PR Review"
-  short_description: "Review a pull request for bugs and missing scope"
-  default_prompt: "Use $branch-review to review this GitHub pull request and produce evidence-backed findings."
+  short_description: "Review a pull request before merge"
+  default_prompt: "Use $branch-review to review this pull request and decide whether it is ready to merge."
