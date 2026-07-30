@@ -16,11 +16,19 @@ Use this structure and omit sections that are genuinely irrelevant. Preserve sou
 
 ## Source map
 
-| Implementation unit | Finding | Issue | Type | Status | Reason |
-|---|---|---|---|---|---|
-| IMP-001 | F-001 | #123 or not-filed | bug or feature-request | active | |
+| Workstream | Wave | Implementation unit | Finding | Issue | Type | Status |
+|---|---:|---|---|---|---|---|
+| WS-001 | 1 | IMP-001 | F-001 | #123 | bug | active |
 
 List excluded, stale, duplicate, closed, already-fixed, blocked, and security-routed inputs after the table.
+
+## Dependency and conflict matrix
+
+| Workstream | Depends on | Expected write boundaries | Relationship | Rationale |
+|---|---|---|---|---|
+| WS-001 | none | verified paths/modules | parallel | |
+
+Use `parallel`, `ordered`, `combined`, or `blocked`. Mark unverified boundaries explicitly.
 
 ## Verified current state
 
@@ -34,13 +42,28 @@ List excluded, stale, duplicate, closed, already-fixed, blocked, and security-ro
 
 Record each decision, its rationale, alternatives rejected, and compatibility consequences. If a decision cannot yet be made, convert it into a Phase 0 task with a concrete output.
 
-## Implementation phases
+## Workstream execution
 
-### Phase 0: Discovery and blocking decisions
+### Wave 1
+
+Run independent workstreams in this wave concurrently, bounded by available SubAgent slots.
+
+### WS-001: <Issue outcome>
+
+- Issues:
+- Base SHA:
+- Dedicated branch:
+- Isolated worktree or checkout:
+- Expected files/modules:
+- Must not touch:
+- Dependencies:
+- Assigned SubAgent:
+
+#### Phase 0: Discovery and blocking decisions
 
 Omit when unnecessary.
 
-#### Task P0-T1: <decision or investigation>
+##### Task WS1-P0-T1: <decision or investigation>
 
 - Purpose:
 - Inspect:
@@ -48,9 +71,9 @@ Omit when unnecessary.
 - Required output:
 - Completion criteria:
 
-### Phase 1: <cohesive change boundary>
+#### Phase 1: <cohesive change boundary>
 
-#### Task P1-T1: <imperative task title>
+##### Task WS1-P1-T1: <imperative task title>
 
 - Implementation unit:
 - Source findings and issues:
@@ -64,7 +87,7 @@ Omit when unnecessary.
 - Validation:
 - Completion criteria:
 
-Repeat phases and tasks in dependency order. Keep optional follow-ups clearly separate from required work.
+Repeat phases and tasks in dependency order. Repeat the workstream section for every Issue or inseparable Issue group. Put dependent work in later waves and require a refreshed base SHA.
 
 ## Test strategy
 
@@ -90,9 +113,11 @@ Use only commands verified in the repository. Otherwise describe the check and m
 | Risk or blocker | Impact | Mitigation or owner decision |
 |---|---|---|
 
-## Delivery plan
+## Delivery plan by workstream
 
-- Implementation branch:
+### WS-001
+
+- Implementation branch and isolated worktree:
 - Commit boundaries:
 - Follow-up PR target:
 - Issues and source review to link:
@@ -102,12 +127,20 @@ Use only commands verified in the repository. Otherwise describe the check and m
   - Compatibility or migration notes
   - Known limitations
   - Rollback guidance
-- Final report must include:
+- Workstream report must include:
+  - Workstream ID
   - Created PR number
   - Canonical PR URL
   - Head branch and resulting commit SHA
 
-The implementation executor must create the follow-up PR after validation. If creation is blocked, it must report the exact blocker and pushed branch instead of inventing a PR number.
+Each workstream executor must create its own follow-up PR after validation. If creation is blocked, it must report the workstream ID, exact blocker, and pushed branch instead of inventing a PR number.
+
+## Wave integration
+
+- Concurrent PRs:
+- Cross-workstream checks:
+- Merge order:
+- Later waves requiring replanning:
 
 ## Definition of done
 
@@ -115,6 +148,8 @@ The implementation executor must create the follow-up PR after validation. If cr
 - Required checks pass.
 - Compatibility, migration, documentation, rollout, and rollback work is complete or explicitly not applicable.
 - No excluded or security-routed work was implemented accidentally.
-- A follow-up PR was created against the planned target branch.
-- The final report names the actual PR number and canonical URL.
+- Every completed workstream created its own PR against the planned target branch.
+- Every workstream report names the actual PR number and canonical URL.
+- Concurrent work used isolated branches or worktrees and did not modify another workstream.
+- Cross-workstream checks and merge ordering are recorded.
 - The final implementation summary can cite the base and resulting commit SHAs.
