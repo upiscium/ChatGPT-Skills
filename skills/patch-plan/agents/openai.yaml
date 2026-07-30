@@ -1,4 +1,4 @@
 interface:
   display_name: "Patch Plan"
-  short_description: "Plan an issue branch and follow-up pull request"
-  default_prompt: "Use $patch-plan to turn these GitHub issues into an implementation plan that creates and reports a follow-up PR."
+  short_description: "Plan parallel issue workstreams and pull requests"
+  default_prompt: "Use $patch-plan to turn these GitHub issues into dependency-aware parallel Codex workstreams with separate PRs."
