@@ -1,7 +1,10 @@
 interface:
-  display_name: PR Merge
-  short_description: Safely merge a reviewed pull request
-  default_prompt: Use $pr-merge to verify and merge this reviewed pull request.
+  display_name: PR Merge Commands
+  short_description: Generate guarded gh commands for reviewed PRs
+  default_prompt: Use $pr-merge to generate safe gh commands that mark this reviewed
+    PR ready and merge it.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
 policy:
   products:
   - chatgpt
