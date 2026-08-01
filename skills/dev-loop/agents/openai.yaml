@@ -1,4 +1,4 @@
 interface:
   display_name: "Development Loop"
-  short_description: "Run parallel issue work through Codex checkpoints"
-  default_prompt: "Use $dev-loop to advance these independent issues as parallel Codex workstreams, then wait for my next prompt."
+  short_description: "Run parallel issue work through command checkpoints"
+  default_prompt: "Use $dev-loop to advance these parallel workstreams and hand off guarded PR merge commands at the merge checkpoint."
