@@ -1,4 +1,14 @@
 interface:
-  display_name: "Patch Plan"
-  short_description: "Plan parallel issue workstreams and pull requests"
-  default_prompt: "Use $patch-plan to turn these GitHub issues into dependency-aware parallel Codex workstreams with separate PRs."
+  display_name: Patch Plan
+  short_description: Plan issue work in local worktrees and PRs
+  default_prompt: Use $patch-plan to turn these GitHub issues into parallel Codex
+    workstreams under the repository-local .worktrees directory.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
