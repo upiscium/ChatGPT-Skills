@@ -1,6 +1,6 @@
 ---
 name: dev-loop
-description: Coordinate a checkpoint-based, issue-driven GitHub development loop with dependency-aware parallel Codex SubAgent workstreams across @repo-review, @issue-filer, @patch-plan, external implementation, @branch-review, and @pr-merge. Use when the user asks to start, continue, resume, track, or advance multiple independent Issues concurrently while still waiting for a `next` prompt at each verified checkpoint.
+description: Coordinate a checkpoint-based, issue-driven GitHub development loop with dependency-aware parallel Codex SubAgent workstreams across @repo-review, @issue-filer, @patch-plan, external implementation, @branch-review, and manual @pr-merge command handoffs. Use when the user asks to start, continue, resume, track, or advance multiple independent Issues concurrently while waiting for `next` at each verified checkpoint.
 ---
 
 # Run the Development Loop
@@ -11,7 +11,7 @@ Coordinate the existing skills as a checkpointed state machine. Advance only thr
 
 Complete at most one substantive stage per response, present its artifact and the exact next action, then stop.
 
-- Treat `next`, `continue`, or an equivalent reply as authorization for only the single next action named in the previous loop ledger.
+- Treat `next`, `continue`, or an equivalent reply as authorization for only the single next action named in the previous loop ledger. It never authorizes Codex to execute ready or merge writes.
 - Before acting on `next`, re-read live GitHub state and verify that repository, Issue, PR, branch, and SHAs still match the announced action.
 - If the target changed or the previous checkpoint is ambiguous, do not act; show the updated state and request confirmation.
 - Never interpret `next` as permission for an unannounced action, a different PR, or multiple loop iterations.
@@ -87,13 +87,15 @@ Use `@branch-review` against each exact PR head SHA. Independent PR reviews may 
 
 Re-run `@branch-review` for any workstream whose head changed. Do not invalidate unchanged workstreams.
 
-### 6. `merge`
+### 6. `merge-command`
 
-Use `@pr-merge` only for PRs explicitly named in the preceding ready checkpoint and authorized by `next`. Revalidate every PR separately.
+Use `@pr-merge` only for PRs explicitly named in the preceding ready checkpoint. Revalidate every PR separately, then produce its guarded `gh` Draft-to-Ready-to-Merge command block. Never execute the block.
 
-Merge in the dependency and conflict-safe order. After each merge, re-check remaining PR mergeability and base-sensitive review assumptions. A prior `ready` decision remains valid only when the reviewed head and relevant base assumptions remain valid.
+Present commands in dependency and conflict-safe order. Stop after the command handoff and tell the user to run only the stated block, then reply `next` or provide its output. Do not emit later dependent blocks until earlier merges are verified. Independent blocks may be presented together only when base-sensitive review assumptions cannot invalidate one another.
 
-Output transition: per-workstream merged PR URLs and resulting target-branch commit SHAs.
+On the following `next`, read live GitHub state and verify the PR is merged or entered the required merge queue. Record the resulting target-branch commit SHA when merged. Re-check remaining PR mergeability and base-sensitive review assumptions after each verified merge; require a fresh `@branch-review` when they no longer hold.
+
+Output transition: per-workstream verified merged PR URLs and resulting target-branch commit SHAs.
 
 ### 7. `integrated-review`
 
@@ -136,7 +138,7 @@ Use canonical URLs and immutable SHAs. Mark absent artifacts as `not-created`, n
 ## Preserve safety boundaries
 
 - Review-only stages never imply permission to create Issues, change code, create a PR, or merge.
-- Issue creation and merge retain their own explicit write requirements. A `next` reply satisfies them only when the immediately preceding ledger named the exact write target and action.
+- Issue creation retains its explicit write requirement. Draft-to-ready and merge are user-executed commands; `next` requests command generation or post-run verification, never those writes themselves.
 - Implementation delivery belongs to the external Codex run instructed by this skill.
 - A SubAgent may own only its assigned workstream. It must not edit another workstream's branch or worktree.
 - Never convert PR correction findings directly into Issues; resolve them in the same PR or defer them to a post-merge `@repo-review`.
@@ -153,7 +155,7 @@ Verify that:
 - Every workstream has stable identity, Issue mapping, branch, ownership, and status.
 - Parallel workstreams have verified non-overlapping write boundaries or an explicit integration strategy.
 - Dependent work is assigned to later waves and rebased on verified merged commits.
-- No write occurred without the authorization required by the responsible skill.
+- No write occurred without the authorization required by the responsible skill, and no Draft-to-Ready-to-Merge write was executed by `@dev-loop` or `@pr-merge`.
 - Every response completed no more than one substantive stage.
 - Implementation and correction instructions are self-contained for a separate Codex run.
 - `next` applies only to the previously announced action.
