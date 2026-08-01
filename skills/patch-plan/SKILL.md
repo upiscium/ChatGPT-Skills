@@ -1,6 +1,6 @@
 ---
 name: patch-plan
-description: Convert one or more selected GitHub Bug or Feature Request issues into self-contained, Codex-executable implementation workstreams with dependency-aware parallelization, isolated branches or worktrees, and follow-up pull requests. Use when the user wants to start the next issue-driven development cycle, exploit Codex SubAgents safely, plan concurrent work from @issue-filer results, or require every workstream to create and report its PR.
+description: Convert one or more selected GitHub Bug or Feature Request issues into self-contained, Codex-executable implementation workstreams with dependency-aware parallelization, repository-local .worktrees isolation, and follow-up pull requests. Use when the user wants to start the next issue-driven development cycle, exploit Codex SubAgents safely, plan concurrent work from @issue-filer results, or require every workstream to create and report its PR.
 ---
 
 # Plan Review Patches
@@ -94,11 +94,26 @@ For every parallel workstream, produce a separate self-contained instruction pac
 Require the implementation coordinator to:
 
 1. Allocate at most one active SubAgent per workstream, bounded by available concurrency.
-2. Give each SubAgent a unique branch and isolated Git worktree or separate checkout from the same verified base SHA.
-3. Prevent SubAgents from editing the coordinator's working tree or another workstream's branch.
-4. Preserve workstream scope and report unexpected overlap before continuing.
-5. Collect results, validation evidence, branch names, head SHAs, and PR URLs without merging branches locally.
-6. Run cross-workstream integration checks after all PRs in a wave exist, when a safe combined test surface is available.
+2. Before creating the first worktree, resolve the repository root with `git rev-parse --show-toplevel` and inspect the root `.gitignore`.
+3. Require the exact anchored entry `/.worktrees/`. Verify it with `git check-ignore .worktrees/`. If it is absent, stop normal implementation, add it through a minimal setup PR, merge that PR, refresh the common base SHA, and only then create worktrees.
+4. Create every worktree inside `<repository-root>/.worktrees/<workstream-id>` from the refreshed verified base SHA. Do not use a sibling directory, `/tmp`, a workspace-global directory, or another external path.
+5. Give each SubAgent a unique branch and its assigned repository-local worktree.
+6. Prevent SubAgents from editing the coordinator's working tree or another workstream's branch.
+7. Preserve workstream scope and report unexpected overlap before continuing.
+8. Collect results, validation evidence, branch names, head SHAs, and PR URLs without merging branches locally.
+9. Run cross-workstream integration checks after all PRs in a wave exist, when a safe combined test surface is available.
+
+Use worktree commands equivalent to:
+
+```bash
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+grep -qxF '/.worktrees/' .gitignore
+git check-ignore .worktrees/
+git worktree add ".worktrees/WS-001" -b '<unique-branch>' '<verified-base-sha>'
+```
+
+Do not let `mkdir`, `git worktree add`, or a SubAgent silently create worktrees before the ignore prerequisite passes.
 
 If fewer SubAgent slots are available than parallel workstreams, queue the remaining workstreams within the same wave rather than combining their scope.
 
@@ -139,5 +154,6 @@ Before responding, verify that:
 - The plan requires a follow-up PR and a final report containing its real number and canonical URL.
 - Parallel workstreams have no unresolved dependencies or likely shared write boundaries.
 - Every workstream has an isolated branch or worktree, bounded scope, and separate PR.
+- Every worktree path is under the repository root's `.worktrees/` directory, and the committed root `.gitignore` contains `/.worktrees/` before worktrees are created.
 - Ordered work is divided into waves and later-wave base SHAs are refreshed after prerequisite merges.
 - Another Codex instance can execute the plan without the review conversation.
