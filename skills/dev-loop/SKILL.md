@@ -60,10 +60,12 @@ Present a `Parallel Codex execution packet` containing:
 - One self-contained `Codex implementation instructions — WS-*` block per workstream
 - Dependencies and wave membership
 - Unique branch and isolated worktree requirements
+- A repository-local worktree root at `<repository-root>/.worktrees/`
+- Initial proof that the committed root `.gitignore` contains `/.worktrees/`, or a prerequisite setup PR when it does not
 - Expected write boundaries and explicit `must not touch` boundaries
 - Per-workstream validation, commit, PR, and reporting requirements
 
-Instruct the external Codex coordinator to spawn one SubAgent per runnable workstream, up to available concurrency. Excess workstreams remain queued in the same wave. Never make multiple SubAgents share a writable checkout or branch.
+Instruct the external Codex coordinator to resolve the repository root first. Before spawning implementation SubAgents or creating any worktree, require it to verify the exact root `.gitignore` entry `/.worktrees/` with `git check-ignore .worktrees/`. If missing, remain in planning and produce a minimal setup-PR instruction; after that PR is merged, refresh the base SHA and resume. Then spawn one SubAgent per runnable workstream, up to available concurrency. Excess workstreams remain queued in the same wave. Never make multiple SubAgents share a writable checkout or branch.
 
 Stop after presenting the packet. Tell the user to submit it to Codex and reply `next` after Codex has created the wave's PRs or reported a blocked workstream.
 
@@ -126,7 +128,7 @@ Use canonical URLs and immutable SHAs. Mark absent artifacts as `not-created`, n
 
 - Prefer one primary Issue or one inseparable Issue group per workstream and PR.
 - Schedule all independent workstreams in the same wave concurrently, bounded by available SubAgent slots.
-- Use distinct branches and isolated worktrees or checkouts for concurrent SubAgents.
+- Use distinct branches and isolated worktrees under `<repository-root>/.worktrees/<workstream-id>` for concurrent SubAgents. Never place managed worktrees in sibling, temporary, or workspace-global directories.
 - Classify pairwise relationships as `parallel`, `ordered`, `combined`, or `blocked`.
 - Serialize work that shares mutable schemas, migrations, public contracts, generated artifacts, lockfiles, or likely overlapping files unless safe ownership boundaries are verified.
 - Do not start dependent work before its prerequisite merge is present on the chosen base.
@@ -153,6 +155,7 @@ Verify that:
 - The current stage follows from live artifacts, not assumptions.
 - Every transition records immutable SHAs and canonical URLs.
 - Every workstream has stable identity, Issue mapping, branch, ownership, and status.
+- The committed root `.gitignore` contains `/.worktrees/` before any repository-local worktree is created.
 - Parallel workstreams have verified non-overlapping write boundaries or an explicit integration strategy.
 - Dependent work is assigned to later waves and rebased on verified merged commits.
 - No write occurred without the authorization required by the responsible skill, and no Draft-to-Ready-to-Merge write was executed by `@dev-loop` or `@pr-merge`.
