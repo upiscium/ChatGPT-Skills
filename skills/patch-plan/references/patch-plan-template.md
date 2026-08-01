@@ -11,6 +11,8 @@ Use this structure and omit sections that are genuinely irrelevant. Preserve sou
 - Implementation branch or base:
 - Base commit SHA:
 - Follow-up PR target branch:
+- Repository-local worktree root: `<repository-root>/.worktrees/`
+- `.gitignore` prerequisite: verified | setup PR required
 - Selected scope:
 - Non-goals:
 
@@ -44,6 +46,8 @@ Record each decision, its rationale, alternatives rejected, and compatibility co
 
 ## Workstream execution
 
+Before Wave 1, resolve the repository root, verify that its committed `.gitignore` contains the exact entry `/.worktrees/`, and confirm it with `git check-ignore .worktrees/`. If missing, create and merge a minimal setup PR first, refresh the common base SHA, and stop until that prerequisite is complete.
+
 ### Wave 1
 
 Run independent workstreams in this wave concurrently, bounded by available SubAgent slots.
@@ -53,7 +57,7 @@ Run independent workstreams in this wave concurrently, bounded by available SubA
 - Issues:
 - Base SHA:
 - Dedicated branch:
-- Isolated worktree or checkout:
+- Isolated worktree: `<repository-root>/.worktrees/WS-001`
 - Expected files/modules:
 - Must not touch:
 - Dependencies:
@@ -117,7 +121,7 @@ Use only commands verified in the repository. Otherwise describe the check and m
 
 ### WS-001
 
-- Implementation branch and isolated worktree:
+- Implementation branch and repository-local worktree:
 - Commit boundaries:
 - Follow-up PR target:
 - Issues and source review to link:
@@ -150,6 +154,7 @@ Each workstream executor must create its own follow-up PR after validation. If c
 - No excluded or security-routed work was implemented accidentally.
 - Every completed workstream created its own PR against the planned target branch.
 - Every workstream report names the actual PR number and canonical URL.
-- Concurrent work used isolated branches or worktrees and did not modify another workstream.
+- Concurrent work used isolated branches and repository-local `.worktrees/<workstream-id>` worktrees and did not modify another workstream.
+- The committed root `.gitignore` contains `/.worktrees/`, verified before the first worktree was created.
 - Cross-workstream checks and merge ordering are recorded.
 - The final implementation summary can cite the base and resulting commit SHAs.
