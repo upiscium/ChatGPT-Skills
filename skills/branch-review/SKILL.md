@@ -1,6 +1,6 @@
 ---
 name: branch-review
-description: Review a GitHub pull request against authoritative intent and acceptance contracts as the quality gate before merge, producing traceable findings, human decision escalations, and a merge recommendation without changing the PR. Use to review a PR, validate an Issue implementation, assess merge readiness, or inspect PR regressions.
+description: Review one GitHub pull request against authoritative intent and acceptance contracts as an isolated, batch-safe quality gate, producing traceable findings, human decision escalations, base-sensitivity evidence, and a merge recommendation without changing the PR. Use individually or concurrently to validate Issue implementation, merge readiness, or PR regressions.
 ---
 
 # Review a Pull Request
@@ -14,6 +14,16 @@ Review an issue-driven implementation before merge. Treat intent as authority, t
 3. Record the PR number and URL, state, base and head branches, and immutable base and head SHAs.
 4. Read repository instructions, contribution guidance, linked Issue acceptance criteria, manifests, tests, CI configuration, and relevant documentation.
 5. State whether the review is source-only or includes locally run validation.
+
+## Preserve batch isolation
+
+Review exactly one PR per invocation, including when several independent PRs are reviewed concurrently.
+
+- Record the review batch ID and workstream ID when supplied, the shared base SHA, and every sibling PR head SHA known at dispatch time.
+- Pin all findings and the recommendation to this PR's exact head. Never let another PR's implementation or tests satisfy this PR's acceptance criteria.
+- Use read-only source access or a dedicated isolated checkout. Concurrent reviewers must not share a writable checkout, branch, generated outputs, or test state.
+- Inspect declared dependencies and likely overlap with sibling PRs. Classify the recommendation as `base-stable` when it remains valid after independent sibling merges, or `base-sensitive` when merge order, shared contracts, or overlap can invalidate it.
+- Report cross-PR concerns to the batch coordinator for integration analysis. Do not expand this review into a combined multi-PR verdict.
 
 ## Establish the review contract
 
@@ -57,12 +67,14 @@ Assign priority `P0` through `P3` and confidence `high`, `medium`, or `low`. Req
 
 ## Target
 - Repository:
+- Review batch and workstream:
 - Pull request:
 - Pull request URL:
 - State:
 - Base branch and commit:
 - Head branch and commit:
 - Linked issues:
+- Sibling PR heads at dispatch:
 
 ## Scope and validation
 - Authoritative intent:
@@ -78,6 +90,7 @@ Assign priority `P0` through `P3` and confidence `high`, `medium`, or `low`. Req
 - Decision: ready | changes-required | blocked
 - Rationale:
 - Human review mode: summary-only | focused-review | decision-required
+- Base sensitivity: base-stable | base-sensitive
 
 ## Decision interface
 - Intent alignment: pass | fail | decision-needed
@@ -87,6 +100,7 @@ Assign priority `P0` through `P3` and confidence `high`, `medium`, or `low`. Req
 - Critical findings:
 - Human decisions required:
 - Focused review locations:
+- Cross-PR concerns:
 
 ## Requirement traceability
 
@@ -120,6 +134,8 @@ Use stable `PR-*` IDs. Omit `Required change` only for questions and post-merge 
 
 For low-risk PRs with no unresolved authority question, `summary-only` may be recommended. Use `focused-review` for medium or high risk and name the exact contract, file, or trade-off the human should inspect. Use `decision-required` whenever project direction, architecture, public API, migration, security boundary, compatibility policy, material scope, or risk acceptance is unresolved.
 
+`ready` means ready only at the reviewed base and head. A base-sensitive PR remains conditional on the stated merge order or a fresh review after its base changes.
+
 ## Preserve boundaries
 
 - Do not create Issues from PR findings.
@@ -138,6 +154,7 @@ Verify that:
 - Green tests were not treated as proof when the tests encode a derived or incorrect interpretation.
 - The complete PR and relevant surrounding code were inspected.
 - Base and head SHAs make the report reproducible.
+- Concurrent review evidence is isolated per PR, and known sibling heads and base sensitivity are recorded.
 - Required corrections and verification steps are executable.
 - The merge recommendation follows from the findings.
 - Human-owned choices are escalated with focused evidence and a safe fallback, not silently resolved.
