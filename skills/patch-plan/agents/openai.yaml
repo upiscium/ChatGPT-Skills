@@ -1,14 +1,13 @@
 interface:
-  display_name: Patch Plan
-  short_description: Plan issue work in local worktrees and PRs
-  default_prompt: Use $patch-plan to turn these GitHub issues into parallel Codex
-    workstreams under the repository-local .worktrees directory.
-  icon_small: assets/icon.svg
-  icon_large: assets/icon.svg
+  display_name: "Patch Plan"
+  short_description: "Plan parallel Issues through the repository lifecycle"
+  default_prompt: "Use $patch-plan to turn these GitHub Issues into backend-aware parallel workstreams with one traceable PR each."
+  icon_small: "assets/icon.svg"
+  icon_large: "assets/icon.svg"
 policy:
   products:
-  - chatgpt
-  - codex
-  - api
-  - atlas
+  - "chatgpt"
+  - "codex"
+  - "api"
+  - "atlas"
   allow_implicit_invocation: true
