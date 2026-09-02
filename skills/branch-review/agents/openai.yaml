@@ -1,4 +1,13 @@
 interface:
   display_name: "PR Review"
-  short_description: "Review a pull request before merge"
-  default_prompt: "Use $branch-review to review this pull request and decide whether it is ready to merge."
+  short_description: "Review one PR safely within a concurrent batch"
+  default_prompt: "Use $branch-review to review this exact pull request head as an isolated member of its review batch."
+  icon_small: "assets/icon.svg"
+  icon_large: "assets/icon.svg"
+policy:
+  products:
+  - "chatgpt"
+  - "codex"
+  - "api"
+  - "atlas"
+  allow_implicit_invocation: true
