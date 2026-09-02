@@ -1,4 +1,13 @@
 interface:
   display_name: "Development Loop"
-  short_description: "Run parallel issue work through command checkpoints"
-  default_prompt: "Use $dev-loop to advance these parallel workstreams and hand off guarded PR merge commands at the merge checkpoint."
+  short_description: "Coordinate parallel Tasks and isolated PR reviews"
+  default_prompt: "Use $dev-loop to advance these Issues through the repository lifecycle, concurrent PR review, and guarded merge checkpoints."
+  icon_small: "assets/icon.svg"
+  icon_large: "assets/icon.svg"
+policy:
+  products:
+  - "chatgpt"
+  - "codex"
+  - "api"
+  - "atlas"
+  allow_implicit_invocation: true
