@@ -34,6 +34,17 @@ Assess the integrated product against authoritative intent after merge and produ
 7. Run appropriate tests and static checks when a local checkout is available and safe.
 8. Check open and closed Issues and recent PRs so completed, accepted, duplicate, or intentionally excluded work is not proposed again.
 
+## Parallelize inspection safely
+
+When the repository is large enough to benefit from parallel review, create a read-only review batch over the same immutable commit and authority set.
+
+- Partition by coherent product area or end-to-end workflow, not arbitrary file counts.
+- Give every review shard a stable ID, explicit scope, relevant `O-*` objectives, shared commit SHA, and exclusions.
+- Keep cross-component workflows in one shard or assign them to a dedicated integration shard; do not let boundary behavior fall between owners.
+- Require each shard to return evidence and candidate findings only. The coordinating reviewer owns final classification, priority, deduplication, root-cause grouping, and `D-*` escalation.
+- Do not make parallel reviewers share a writable checkout or mutate repository state. Use read-only source access or isolated checkouts when local validation is necessary.
+- Consolidate all shards before issuing the repository verdict. A partial shard result is a disclosed limitation, not implicit coverage.
+
 ## Classify findings
 
 Use:
@@ -62,6 +73,7 @@ Keep `D-*` decision requests outside `F-*` findings. They identify authority tha
 
 ## Scope and validation
 - Intent sources and authority:
+- Review batch and shards:
 - Product areas inspected:
 - Workflows traced:
 - Checks run:
@@ -127,6 +139,7 @@ Verify that:
 - Tests support or weaken a claim but never create its requirement.
 - Existing Issues and completed work were checked for duplication.
 - Multiple symptoms with one root cause are grouped.
+- Parallel review shards used the same immutable snapshot and authority, and the final report reconciles overlaps and cross-boundary gaps rather than concatenating shard outputs.
 - Bugs and missing capabilities are distinguished.
 - Material direction, architecture, compatibility, scope, or risk choices are isolated as `D-*` requests rather than decided implicitly.
 - Acceptance criteria are testable and outcome-oriented.
