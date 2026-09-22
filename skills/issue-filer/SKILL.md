@@ -35,7 +35,7 @@ Before each write:
 1. Search open and closed issues using the proposed title, behavior, symbols, file paths, error text, and finding ID where useful.
 2. Treat an issue as a duplicate when it describes the same root cause or requested capability, even if its wording differs.
 3. Do not create a duplicate. Report the existing issue URL and why it matches.
-4. Do not reopen, comment on, or modify the existing issue unless the user explicitly asks.
+4. Do not reopen, add non-marker comments to, or modify the existing issue unless the user explicitly asks. The marked `codex-repo-state:v1` continuation update performed by `@repo-handoff` is the automatic-recording exception.
 
 ## Write the issue
 
@@ -69,7 +69,7 @@ For a feature request, include:
 
 Under `Source review`, include the finding ID, reviewed branch and commit, related merged PRs when relevant, and commit-pinned file links. Clearly label inferred reproduction steps or proposed designs; never present them as confirmed facts.
 
-When a caller supplies a `@repo-handoff` workflow ID or canonical carrier, preserve that durable reference in `Source review` and return the created Issue URL as the new workstream carrier. Do not post a state comment here unless the user explicitly authorized that separate write; the returned Issue identity is enough for the coordinator to record the next checkpoint.
+When a caller supplies a `@repo-handoff` workflow ID or canonical carrier, preserve that durable reference in `Source review` and return the created Issue URL as the new workstream carrier. After each created or deduplicated Issue is identified, automatically persist the latest issue-filing state marker on the new or existing carrier and read it back. This marker records the result and next gate; it does not expand the user's authorization to create additional Issues or change their content.
 
 If the source finding contains an action-binding constraint, preserve it as an explicit issue section with target action, status, unresolved prerequisite, clearing authority, admissible fallback, evidence snapshot, and required revalidation. Use `none` or `unknown` for missing fields. Do not weaken it into a note, suggestion, deferred owner task, or precedent-based exception.
 
@@ -97,3 +97,4 @@ Before each creation, verify that:
 - Every source constraint either survives with its complete operational role or is explicitly marked incomplete and returned for clarification.
 - The body contains no credentials, private logs, or irrelevant review commentary.
 - Any supplied workflow/carrier reference is preserved so a later `@repo-handoff restore` can connect the Issue to its originating review and workstream.
+- The issue-filing result is automatically recorded and read back on an existing carrier; if no carrier or write path exists, return `bootstrap`/`pending-write` explicitly rather than claiming durable recovery.
