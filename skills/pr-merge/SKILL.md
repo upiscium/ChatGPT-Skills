@@ -16,6 +16,8 @@ Require:
 - The exact reviewed head SHA and intended base branch
 - A merge method selected by the user or unambiguously required by repository policy
 
+Also require the preceding review's complete merge gate contract: target action, status, unresolved prerequisite, clearing authority, admissible fallback, evidence snapshot, and required live revalidation. Generate commands only when the contract is `allowed` and every prerequisite is resolved by its named authority. A `ready` label or prior review summary is not a substitute for this contract.
+
 If the review is missing, stale, blocked, or tied to another head SHA, stop and request a fresh `@branch-review`. Ask when multiple merge methods remain materially different.
 
 ## Generate the guarded command block
@@ -31,6 +33,8 @@ Substitute literal values for `OWNER/REPO`, `NUMBER`, `REVIEWED_HEAD_SHA`, `BASE
 7. Re-reads and re-compares the head SHA immediately before merge.
 8. Runs exactly one `gh pr merge` command using `--match-head-commit REVIEWED_HEAD_SHA` and exactly one of `--merge`, `--squash`, or `--rebase`.
 9. Reads back `state`, `mergedAt`, `mergeCommit`, and `url` for verification.
+
+These live checks are endpoint containment. Keep them even when the handoff artifact appears complete; do not infer current permission from an old artifact.
 
 Use this structure:
 
@@ -96,6 +100,10 @@ Return:
 - Expected base branch:
 - Merge method:
 - Review decision: ready
+- Gate status: allowed
+- Cleared prerequisite and authority:
+- Evidence snapshot:
+- Revalidation performed by command:
 - Action: run the command block locally
 
 ```bash
@@ -108,6 +116,8 @@ Return:
 
 For multiple PRs, emit separately labeled blocks in dependency-safe order. Never imply that concurrent execution is safe when one merge can change another PR's base assumptions.
 
+Also emit a `codex-repo-state:v1` checkpoint for `@repo-handoff` containing the reviewed PR, exact head SHA, command-generation gate, expected post-command state, and the next verification action. This payload is not saved by this skill and is not a merge approval. After the user runs the command, `@dev-loop` or `@repo-handoff audit` must read the live PR and record the resulting merge SHA.
+
 ## Quality gate
 
 Verify that:
@@ -116,4 +126,6 @@ Verify that:
 - The exact repository, PR, reviewed head SHA, base branch, and merge method are literal and unambiguous.
 - The command aborts on stale review, changed base, closed PR, or failing required checks.
 - The merge command contains `--match-head-commit` and no bypass flag.
+- The upstream gate contract is complete, `allowed`, and pinned to the same target and head SHA.
 - Draft-to-ready is conditional and verification follows the merge command.
+- The output contains a durable-state checkpoint without implying that it was posted or that the command was executed.
