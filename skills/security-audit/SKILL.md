@@ -16,6 +16,7 @@ Read [references/security-review-guide.md](references/security-review-guide.md) 
 3. Determine whether to review a diff, the full target snapshot, or both.
 4. Read repository instructions, architecture documentation, manifests, lockfiles, tests, CI/CD configuration, deployment files, and security policy.
 5. Record inaccessible components and external systems as coverage limitations.
+6. For GitHub-backed audits, automatically persist a sanitized continuation checkpoint through `@repo-handoff` on an existing carrier before returning. Include only repository/ref/commit, audit stage, finding IDs or counts, gates, and next action; never place vulnerability details, exploit paths, secrets, or private evidence in the public marker. If no carrier exists, return `bootstrap` rather than inventing a tracking Issue.
 
 Do not claim a whole system is secure from a source-only or branch-limited review.
 
@@ -89,6 +90,11 @@ Use this structure:
 - Security impact:
 - Remediation:
 - Validation:
+- Execution constraint: none | <action that must stop or remain conditional>
+- Unresolved prerequisite: none | <condition that must be satisfied>
+- Clearing authority: none | <person, system, or evidence that can clear it>
+- Admissible fallback: none | <safe action while unresolved>
+- Evidence snapshot and revalidation: <commit/config/time and what must be checked before action>
 
 ## Defense-in-depth improvements
 ## Positive security controls
@@ -101,8 +107,10 @@ Use stable sequential IDs. Distinguish exploitable defects from hardening opport
 
 - Do not pass security findings automatically to `@issue-filer`.
 - Do not create a regular GitHub issue containing vulnerability details without the user's explicit decision about repository visibility and audience.
+- The automatic `codex-repo-state:v1` marker is permitted only as a sanitized metadata record on an existing carrier; it is not a security disclosure, Issue, advisory, or remediation authorization.
 - Redact credentials, tokens, personal data, and unnecessary exploit details.
 - For likely critical or high findings, lead with containment and private remediation guidance.
+- Do not let urgency, team agreement, delegated ownership, or a prior exception weaken an active execution constraint.
 
 ## Quality gate
 
@@ -114,3 +122,5 @@ Before responding, verify that:
 - Suggested fixes address the root cause.
 - Validation steps can demonstrate that the vulnerability is closed.
 - The report states what was not reviewed.
+- Every action-binding security finding preserves its status, prerequisite, clearing authority, fallback, evidence snapshot, and execution-time revalidation for `@security-plan`.
+- The latest sanitized audit stage is automatically saved and read back, or explicitly marked `bootstrap`/`pending-write` without exposing restricted details.
