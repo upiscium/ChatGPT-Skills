@@ -1,11 +1,11 @@
 ---
 name: pr-merge
-description: Generate a guarded GitHub CLI command block that lets the user mark a reviewed pull request ready and merge it manually after an evidence-backed @branch-review. Use when the user wants commands for Draft-to-Ready-to-Merge, wants to land or complete a reviewed PR without connector writes, or needs a copy-pasteable merge handoff pinned to the reviewed head SHA. Never execute the ready or merge commands.
+description: Generate a guarded GitHub CLI command block that lets the user mark a reviewed pull request ready and merge it manually after an evidence-backed @branch-review, while automatically checkpointing the command handoff. Use when the user wants commands for Draft-to-Ready-to-Merge, wants to land or complete a reviewed PR without action-changing connector writes, or needs a copy-pasteable merge handoff pinned to the reviewed head SHA. Never execute the ready or merge commands.
 ---
 
 # Generate PR Merge Commands
 
-Produce a self-contained command block for the user to run. Never mark a PR ready, merge it, enable auto-merge, or perform another GitHub write.
+Produce a self-contained command block for the user to run. Never mark a PR ready, merge it, enable auto-merge, or perform another GitHub action write. The skill must still automatically persist the neutral `codex-repo-state:v1` command-handoff marker on the existing PR or linked Issue carrier and read it back; that metadata-only write is not the merge operation.
 
 ## Require a reviewed target
 
@@ -116,16 +116,16 @@ Return:
 
 For multiple PRs, emit separately labeled blocks in dependency-safe order. Never imply that concurrent execution is safe when one merge can change another PR's base assumptions.
 
-Also emit a `codex-repo-state:v1` checkpoint for `@repo-handoff` containing the reviewed PR, exact head SHA, command-generation gate, expected post-command state, and the next verification action. This payload is not saved by this skill and is not a merge approval. After the user runs the command, `@dev-loop` or `@repo-handoff audit` must read the live PR and record the resulting merge SHA.
+Automatically persist and read back a `codex-repo-state:v1` checkpoint containing the reviewed PR, exact head SHA, command-generation gate, expected post-command state, and the next verification action. This metadata marker is not a merge approval and does not claim that the command was executed. If no carrier exists, return `bootstrap`; if the marker write is unavailable, return the exact payload as `pending-write`. After the user runs the command, `@dev-loop` or `@repo-handoff audit` must read the live PR and automatically record the resulting merge SHA.
 
 ## Quality gate
 
 Verify that:
 
-- No GitHub write was executed by this skill.
+- No action-changing GitHub write was executed by this skill; the only permitted write is the automatic state marker on an existing carrier.
 - The exact repository, PR, reviewed head SHA, base branch, and merge method are literal and unambiguous.
 - The command aborts on stale review, changed base, closed PR, or failing required checks.
 - The merge command contains `--match-head-commit` and no bypass flag.
 - The upstream gate contract is complete, `allowed`, and pinned to the same target and head SHA.
 - Draft-to-ready is conditional and verification follows the merge command.
-- The output contains a durable-state checkpoint without implying that it was posted or that the command was executed.
+- The output contains a durable-state checkpoint whose save/read-back status is explicit, without implying that the merge command was executed.
