@@ -1,6 +1,6 @@
 ---
 name: repo-status
-description: Produce an evidence-backed snapshot of a software repository's current product and development state, including implemented, partial, planned, and absent capabilities; active Issues and pull requests; blockers; and the repository's position within its documented architecture or roadmap. Use when the user asks what exists now, what remains, what is being worked on, where the project currently stands, or requests a comprehensive repository status summary. Do not use as a defect-finding review or a conversation handover.
+description: Produce an evidence-backed snapshot of a software repository's current product and development state, including implemented, partial, planned, and absent capabilities; active Issues and pull requests; blockers; and the repository's position within its documented architecture or roadmap, while automatically checkpointing the latest state. Use when the user asks what exists now, what remains, what is being worked on, where the project currently stands, or requests a comprehensive repository status summary. Do not use as a defect-finding review or a conversation handover.
 ---
 
 # Summarize Repository Status
@@ -15,6 +15,7 @@ Build a current, read-only map of the repository. Explain what the product can d
 4. Inspect relevant open and recently closed Issues, open and recently merged pull requests, and repository-native task state when available.
 5. State inaccessible sources and freshness limitations. Do not fill gaps from memory or infer live status from stale conversation text.
 6. Search the canonical Issue/PR carriers for the latest `codex-repo-state:v1` record. Revalidate it against the inspected commit and mark it `fresh`, `stale`, `conflicted`, `incomplete`, or `reconstructed`; never treat the record alone as live authority.
+7. Before returning, automatically persist the observed repository-status snapshot and its exact next checkpoint through `@repo-handoff` on an existing canonical carrier. This is a metadata-only state-marker update; if no carrier exists, return `bootstrap` instead of inventing a hidden Issue.
 
 ## Reconstruct intended architecture
 
@@ -133,11 +134,10 @@ Keep the executive status short; put detail in the matrices. Rank next checkpoin
 
 ## Preserve boundaries
 
-- Do not modify code, Issues, pull requests, branches, labels, projects, or releases.
+- Do not modify code, Issue/PR content, branches, labels, projects, or releases. The only exception is the automatic update of the marked `codex-repo-state:v1` record on an already selected Issue/PR carrier; it must be read back and must never be treated as an approval.
 - Do not perform a general defect hunt; use `@repo-review` when the goal is finding Bugs or Feature Requests.
 - Do not generate an implementation plan; use `@patch-plan` or `@blueprint` after the user selects work.
 - Do not replace `@handover` or `@repo-handoff`: this skill reports state and consumes durable records; it does not write a handoff or preserve private conversation context.
-- Do not replace `@handover`: this skill summarizes repository state, not conversation decisions or personal context unless they are represented in repository evidence.
 - Route security-sensitive details to `@security-audit`; summarize only the existence and handling status of restricted work.
 
 ## Quality gate
@@ -148,8 +148,8 @@ Verify that:
 - Implemented claims trace through the intended production path.
 - Planned, partial, absent, and unknown states are not collapsed together.
 - Active work is supported by live artifacts rather than open-Issue count alone.
+- Durable continuation records are located, pinned to a carrier, checked for drift, and automatically refreshed with the latest snapshot; missing carriers are reported as `bootstrap` rather than invented.
 - The architecture map distinguishes documented intent from inference.
-- Durable continuation records are located, pinned to a carrier, and checked for drift; missing records are reported rather than invented.
 - Every active gate preserves its prerequisite, authority, fallback, evidence, and revalidation.
 - Completed work is not presented as pending, and merged-but-unverified work is not overstated.
 - A reader can identify the current architectural position and next decision without reading the entire repository history.
