@@ -1,273 +1,192 @@
 ---
 name: dev-loop
-description: Coordinate an intent-driven, checkpoint-based GitHub development loop with human-owned decisions, repository-aware Agent Core or generic execution, parallel Issue workstreams, concurrent isolated PR reviews, and user-owned Draft-to-Ready-to-Merge actions. Use to start, continue, resume, track, or advance one or more issue-driven workstreams while waiting for `next` at each verified checkpoint.
+description: Coordinate a checkpoint-based, issue-driven GitHub development loop with dependency-aware parallel Codex SubAgent workstreams across @repo-review, @issue-filer, @patch-plan, external implementation, @branch-review, and manual @pr-merge command handoffs. Use when the user asks to start, continue, resume, track, or advance multiple independent Issues concurrently while waiting for `next` at each verified checkpoint.
 ---
 
 # Run the Development Loop
 
-Coordinate the existing development skills as a checkpointed state machine. Advance only through validated artifacts. Do not implement product code in this skill, do not mark PRs ready, do not merge PRs, and do not display merge command blocks unless the user explicitly invokes `@pr-merge` separately.
+Coordinate the existing skills as a checkpointed state machine. Advance only through validated artifacts; do not implement the plan inside this skill.
 
-## Authority model
+## Use checkpoint mode
 
-Keep project authority with the human and use AI for bounded verification and execution planning.
+Complete at most one substantive stage per response, present its artifact and the exact next action, then stop.
 
-- Human authority: product direction, approved intent, architecture, scope, public API policy, compatibility, migration, destructive behavior, security-boundary choices, material trade-offs, risk acceptance, and merge action.
-- Skill authority: reconstruct explicit contracts, inspect relevant code and GitHub state, model failure modes, assess tests/CI, review implementation and scope, prepare Codex instructions, and compress evidence into a decision interface.
-- Never let implementation + tests + review silently redefine an ambiguous requirement. Escalate material ambiguity instead.
-
-## Checkpoint mode
-
-Complete at most one substantive stage per response, present its artifact, record the exact next gate, then stop.
-
-- `next`, `continue`, or equivalent authorizes only the single next action named in the previous ledger.
-- Before acting on `next`, re-read live GitHub state and verify repository, Issue, PR, branch, base SHA, and head SHA.
-- The previous ledger is routing context, not authority.
-- If live state changed or the previous checkpoint became ambiguous, report the new state and stop before write-producing or externally delegated work.
+- Treat `next`, `continue`, or an equivalent reply as authorization for only the single next action named in the previous loop ledger. It never authorizes Codex to execute ready or merge writes.
+- Before acting on `next`, re-read live GitHub state and verify that repository, Issue, PR, branch, and SHAs still match the announced action.
+- Treat the previous ledger as a routing artifact, not authority to act. Re-establish the live execution gate before every write-producing or externally delegated action.
+- If the target changed or the previous checkpoint is ambiguous, do not act; show the updated state and request confirmation.
+- Never interpret `next` as permission for an unannounced action, a different PR, or multiple loop iterations.
 - Never run continuously until no Issues remain.
+At the beginning of a GitHub-backed loop, restore `@repo-handoff` state from the canonical Issue/PR carrier. At every substantive checkpoint, prepare a `codex-repo-state:v1` update containing the stage, workstream mappings, immutable SHAs, open gates, human decisions, and the exact next action. Record it on the carrier only when the user has authorized that state write; otherwise present the exact block and mark the state `not-saved`. A chat-only ledger is never sufficient for resumption.
 
-## Resolve live context
 
-Track at least:
+## Resolve loop context
 
-- repository and default/integration branch;
-- execution backend: `agent-core` or `generic-worktree`;
-- immutable reviewed/implementation base SHA;
-- authoritative goal, `AC-*` criteria, non-goals, compatibility/invariants, risk tier, and contract provenance;
-- unresolved human `D-*` decisions;
-- workstream IDs, dependency waves, overlap/conflict classification;
-- Task IDs/worktrees/lifecycle state for Agent Core repositories;
-- implementation branches and head SHAs;
-- PR numbers/URLs/base/head;
-- `@branch-review` verdict and base sensitivity;
-- verified merge commit SHA after the user merges.
+Identify:
 
-Always reconstruct these from live repository/GitHub state when resuming.
+- Repository and default or integration branch
+- Current immutable base or merged commit SHA
+- Active review report and `F-*` findings
+- Selected Issue numbers and URLs
+- Workstream IDs, dependency waves, and conflict classifications
+- Per-workstream implementation plans
+- Per-workstream branches and head SHAs
+- Per-workstream PR numbers, URLs, bases, and head SHAs
+- Per-workstream `@branch-review` decisions
+- Per-workstream merge commit SHAs
+- Canonical Issue/PR carrier for each workstream and any aggregate carrier
+- Latest `codex-repo-state:v1` sequence, update time, and status: `fresh` | `stale` | `conflicted` | `incomplete` | `reconstructed` | `none-found`
 
-## State machine
+Read current GitHub state instead of trusting stale conversation text. When resuming, locate the latest valid artifact and continue from the first incomplete stage.
+If a durable record disagrees with live GitHub state, preserve both facts, stop the affected transition, and require `@repo-handoff audit` or a fresh live review. Never let an old record authorize a new PR, review, command, merge, or Issue update.
+
+
+## Use the state machine
 
 ### 1. `merged-review`
 
-Run `@repo-review` on the integrated branch or a specified merged commit.
+Use `@repo-review` on the integrated branch or merged commit. Require a commit-pinned repository review before proposing new work.
 
-Require commit-pinned, intent-first review. Findings must trace to authoritative objectives/contracts. Keep human `D-*` decisions separate from actionable `F-*` findings.
-
-Transition: selected actionable findings.
+Output transition: actionable `F-*` findings selected for filing.
 
 ### 2. `issue-filing`
 
-Use `@issue-filer` only after explicit authorization for the displayed findings.
+Use `@issue-filer`. Creating Issues requires explicit user authorization for the selected findings.
 
-Approval to file a finding approves the stated goal/acceptance criteria only. It does not approve unstated architecture, compatibility, migration, security, destructive, or risk choices.
-
-Transition: canonical Issue numbers/URLs.
+Output transition: created or deduplicated Issue numbers and URLs.
 
 ### 3. `planning`
 
-Use `@patch-plan`.
+Use `@patch-plan` for the selected filed Issues.
 
-Require a `Workstream Contract` for each runnable unit:
+Require `@patch-plan` to construct a dependency and conflict graph, combine only inseparable Issues, and partition independent work into waves and workstreams.
 
-- authoritative goal/source;
-- stable `AC-*` criteria;
-- invariants and compatibility requirements;
-- explicit non-goals;
-- risk tier: low/medium/high;
-- provenance: human-authored, human-approved, or derived-unconfirmed;
-- delegated design latitude;
-- unresolved human decisions.
+Present a `Parallel Codex execution packet` containing:
 
-Stop for human direction when planning requires architecture, public API, migration, security boundary, destructive behavior, non-trivial compatibility, material scope, or risk-acceptance decisions.
+- The coordinator instructions and verified common base SHA
+- One self-contained `Codex implementation instructions — WS-*` block per workstream
+- Dependencies and wave membership
+- Unique branch and isolated worktree requirements
+- A repository-local worktree root at `<repository-root>/.worktrees/`
+- Initial proof that the committed root `.gitignore` contains `/.worktrees/`, or a prerequisite setup PR when it does not
+- Expected write boundaries and explicit `must not touch` boundaries
+- Per-workstream validation, commit, PR, and reporting requirements
 
-#### Agent Core backend
+Instruct the external Codex coordinator to resolve the repository root first. Before spawning implementation SubAgents or creating any worktree, require it to verify the exact root `.gitignore` entry `/.worktrees/` with `git check-ignore .worktrees/`. If missing, remain in planning and produce a minimal setup-PR instruction; after that PR is merged, refresh the base SHA and resume. Then spawn one SubAgent per runnable workstream, up to available concurrency. Excess workstreams remain queued in the same wave. Never make multiple SubAgents share a writable checkout or branch.
 
-When the repository exposes a guarded Agent Core lifecycle:
-
-- use repository-owned lifecycle APIs as the sole authority for Task creation, worktree allocation, Task State, commit/publication, integration, and cleanup;
-- map each workstream to exactly one authoritative numeric Issue-backed Task;
-- use one Task, one lifecycle-owned worktree, one Task Orchestrator, and one PR per workstream;
-- run the repository batch-safety API before parallel Task launch;
-- use resume readiness for existing resumable Tasks;
-- never substitute raw `git worktree`, direct Task State edits, generic SubAgent writes, or raw publication commands.
-
-#### Generic worktree backend
-
-Only when no repository-owned lifecycle applies:
-
-- use repository-local `<repo>/.worktrees/<workstream-id>`;
-- verify the committed root `.gitignore` contains `/.worktrees/` before creating worktrees;
-- if missing, create a prerequisite setup workstream/PR first;
-- never use sibling, temporary, or workspace-global managed worktrees;
-- one writable branch/worktree per implementation agent.
-
-Produce self-contained Codex implementation instructions per workstream. Stop and wait for external implementation.
+Stop after presenting the packet. Tell the user to submit it to Codex and reply `next` after Codex has created the wave's PRs or reported a blocked workstream.
 
 ### 4. `implementation`
 
-`@dev-loop` does not implement code.
+Do not execute implementation in `@dev-loop`. On `next`, inspect GitHub for every PR expected from the active wave:
 
-On `next`, inspect live GitHub state for the expected PRs and map them back to their workstreams/contracts.
-
-For each workstream verify:
-
-- linked Issue/Task;
-- expected base;
-- branch and exact head SHA;
-- goal and `AC-*` coverage;
-- lifecycle identity/status in Agent Core mode;
-- real PR number and canonical URL.
-
-Track workstreams independently as `queued`, `running`, `pr-open`, `blocked`, or `failed`. Preserve completed PRs when siblings are blocked or incomplete.
+- Match each PR by workstream, linked Issue, expected base branch, and implementation branch.
+- Require a real PR number, canonical URL, head branch, and head SHA for every completed workstream.
+- Track workstreams independently as `queued`, `running`, `pr-open`, `blocked`, or `failed`.
+- If some workstreams are incomplete, preserve completed PRs and remain at the active wave rather than discarding progress.
+- If multiple PRs match one workstream, ask the user to resolve only that ambiguity.
 
 ### 5. `pr-review`
 
-Run one isolated `@branch-review` per exact PR head. Independent reviews may run concurrently.
+Use `@branch-review` against each exact PR head SHA. Independent PR reviews may run concurrently.
 
-Required review order:
+- `changes-required`: produce a self-contained `Codex correction instructions — WS-*` block containing only that PR's verified blocking findings, required changes, validation, and PR number. Independent correction packets may be sent to separate SubAgents.
+- `blocked`: stop and report the external decision or dependency required.
+- `ready`: present the exact PR, reviewed head SHA, checks, approvals, merge method if known, and proposed merge action. Stop before merging.
 
-`Intent → Acceptance Contract → Failure Model → Test Evidence → Implementation → Scope`
+Re-run `@branch-review` for any workstream whose head changed. Do not invalidate unchanged workstreams.
 
-For a parallel wave, pin a `Review Batch Manifest` containing shared base SHA, PR/head per workstream, sibling heads, declared dependencies, overlap expectations, and merge constraints.
+### 6. `merge-command`
 
-After per-PR reviews, perform a coordinator-level cross-PR interference check. A collection of isolated `ready` verdicts is not automatically joint merge safety.
+Use `@pr-merge` only for PRs explicitly named in the preceding ready checkpoint. Revalidate every PR separately, then produce its guarded `gh` Draft-to-Ready-to-Merge command block. Never execute the block.
 
-Outcomes:
+Present commands in dependency and conflict-safe order. Stop after the command handoff and tell the user to run only the stated block, then reply `next` or provide its output. Do not emit later dependent blocks until earlier merges are verified. Independent blocks may be presented together only when base-sensitive review assumptions cannot invalidate one another.
 
-- `changes-required`: emit a self-contained Codex correction packet for that exact PR/head and stop;
-- `blocked`: present the exact human decision/dependency, options/trade-offs, evidence, and safe fallback;
-- `ready`: present a concise merge decision interface pinned to the reviewed head.
+On the following `next`, read live GitHub state and verify the PR is merged or entered the required merge queue. Record the resulting target-branch commit SHA when merged. Re-check remaining PR mergeability and base-sensitive review assumptions after each verified merge; require a fresh `@branch-review` when they no longer hold.
 
-Risk-based human review:
-
-- low: summary-only unless ambiguity exists;
-- medium: focused review of named contracts/files/trade-offs;
-- high: explicit human confirmation of named architecture/API/migration/security/compatibility/destructive/risk points before merge readiness.
-
-Re-review only PRs whose head changed or whose base-sensitive assumptions were invalidated by sibling merges.
-
-### 6. `human-merge-wait`
-
-This stage replaces automatic merge-command handoff.
-
-When a PR is `ready`:
-
-- do not invoke `@pr-merge` automatically;
-- do not print `gh pr ready`, `gh pr merge`, merge scripts, or equivalent Draft-to-Ready-to-Merge commands;
-- do not execute any Ready/Merge write;
-- present only the exact PR URL/number, reviewed head SHA, expected base, review result, checks/evidence state, required merge order, and any remaining human gate;
-- state that the user owns Draft → Ready → Merge in their normal workflow;
-- stop.
-
-If the user explicitly asks for merge commands or explicitly invokes `@pr-merge`, that separate skill may generate them. This is opt-in and is not part of the normal `@dev-loop` path.
-
-On the following `next`:
-
-1. fresh-read the PR and target branch;
-2. verify the expected PR actually merged (or entered a required merge queue);
-3. verify the merged head/base relationship and record the resulting merge commit SHA;
-4. re-check remaining PR mergeability, dependencies, and base-sensitive review assumptions;
-5. request fresh review only for affected PRs.
-
-If the PR is still open, report that state and remain in `human-merge-wait`; do not re-display merge commands.
-
-Transition: verified merged PR URL and target-branch commit SHA.
+Output transition: per-workstream verified merged PR URLs and resulting target-branch commit SHAs.
 
 ### 7. `integrated-review`
 
-After the relevant wave is merged, run `@repo-review` on the resulting merged commit or requested merge window.
+Use `@repo-review` on the resulting merged commit or a user-defined merge window. This begins the next cycle; it does not automatically authorize new Issues.
 
-Verify integrated behavior against the same objectives/acceptance contracts, including cross-PR effects that isolated reviews could miss.
+## Maintain the loop ledger
 
-This begins the next cycle but does not automatically authorize Issue creation.
-
-## Parallelism and scope control
-
-- Prefer one primary Issue (or inseparable Issue group) per workstream/PR.
-- Preserve the same Workstream Contract and `AC-*` IDs through planning, implementation, correction, PR review, and integrated review.
-- Run independent workstreams in the same wave concurrently when the repository's safety gate permits it.
-- Classify pairwise relationships as `parallel`, `ordered`, `combined`, or `blocked`.
-- Serialize shared schemas, migrations, public contracts, generated artifacts, lockfiles, or likely overlapping files unless safe ownership boundaries are demonstrated.
-- Do not start dependent work until the prerequisite merge is present on the chosen base.
-- Preserve partial progress; one blocked Task/PR must not erase independent completed work.
-
-## Worktree/session safety
-
-Before any external Codex instruction that assumes a specific checkout, require verification of:
-
-- `pwd` / repository root;
-- current branch;
-- exact HEAD;
-- `git worktree list`;
-- expected Task/workstream identity.
-
-If the active Codex sandbox is pinned to a stale or different worktree, stop. Do not edit a sibling worktree indirectly and do not create a replacement worktree merely to escape sandbox authority. Resume in a fresh session rooted at the already prepared canonical worktree.
-
-## Handover threshold
-
-Long development/review sessions must not be driven into context exhaustion.
-
-When conversation history is becoming dense enough that exact SHAs, Task identities, review evidence, or the next `next` action may be lost or conflated:
-
-- stop at the nearest safe checkpoint before starting another substantial stage;
-- tell the user that `@handover` + New Chat is safer;
-- produce/retain a precise loop ledger so the handover can preserve the next action;
-- prefer warning early enough to create a complete handover, not after the next `next` fails from context loss.
-
-Do not hand over in the middle of a write-producing lifecycle transition when the current chat can safely finish and record the terminal evidence first.
-
-## Loop ledger
-
-Every response should preserve a concise ledger:
+At every response, report the common ledger and a workstream table:
 
 ```markdown
 # Development Loop
 - Repository:
 - Stage:
 - Base or merged commit:
-- Execution backend/version:
+- Findings:
+- Durable state carrier:
+- Durable state status:
+- Durable state sequence / updated at:
 - Active wave:
-- Contract authority:
-- Risk tier:
-- Human decisions required:
 - Next gate:
 - Next action on `next`:
 - Authorization needed:
 - Gate status: stop | conditional | allowed
+- Unresolved prerequisite:
+- Clearing authority:
+- Admissible fallback:
 - Evidence snapshot:
 - Reverify before action:
 
-| Workstream | Issues | Task | Contract | Risk | Depends on | Status | Branch | PR | Head SHA | Review | Base sensitivity | Merge SHA |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Workstream | Issues | Depends on | Status | Branch | PR | Head SHA | Review | Merge SHA |
+|---|---|---|---|---|---|---|---|---|
 ```
 
-Use canonical URLs and immutable SHAs. Mark absent artifacts `not-created`; do not infer them.
+Use canonical URLs and immutable SHAs. Mark absent artifacts as `not-created`, not inferred.
+At each checkpoint, append or update the carrier's state marker through `@repo-handoff` and read it back. Include the carrier URL and read-back result in the ledger. If no write was authorized, include the proposed marker and say `not-saved`; do not imply that the next chat can recover from the conversation alone.
 
-## Safety boundaries
 
-- Review-only stages do not authorize Issue creation, code changes, PR writes, Ready, or Merge.
-- `next` never authorizes Ready/Merge writes.
-- Implementation belongs to the external Codex run instructed by this skill.
-- In Agent Core repositories, implementation must enter through Main and the guarded Task lifecycle.
-- A SubAgent owns only its assigned workstream.
-- PR correction findings stay in that PR; broader issues wait for post-merge `@repo-review`.
-- Route `SEC-*` findings through `@security-audit` / `@security-plan`.
-- Never bypass CI, approvals, branch protection, repository policy, or release gates.
+The gate fields are mandatory whenever the next action is constrained. `Next action on next` must remain subordinate to them. Use `none` or `unknown` explicitly rather than dropping a field. Do not rewrite a blocker as a caveat because work is already planned, other workstreams agree, responsibility moved to an executor, a deadline exists, or a similar PR previously succeeded.
+
+## Control scope and concurrency
+
+- Prefer one primary Issue or one inseparable Issue group per workstream and PR.
+- Schedule all independent workstreams in the same wave concurrently, bounded by available SubAgent slots.
+- Use distinct branches and isolated worktrees under `<repository-root>/.worktrees/<workstream-id>` for concurrent SubAgents. Never place managed worktrees in sibling, temporary, or workspace-global directories.
+- Classify pairwise relationships as `parallel`, `ordered`, `combined`, or `blocked`.
+- Serialize work that shares mutable schemas, migrations, public contracts, generated artifacts, lockfiles, or likely overlapping files unless safe ownership boundaries are verified.
+- Do not start dependent work before its prerequisite merge is present on the chosen base.
+- Detect overlapping active PRs and shared files before planning parallel work.
+- Rebase or update branches only when explicitly authorized and repository policy permits it.
+- Never run an unbounded loop. Complete the requested stage, report the next gate, and stop when authorization or human judgment is required.
+- Never implement code while using this skill. Produce Codex-ready implementation or correction instructions and wait for externally created GitHub artifacts.
+
+## Preserve safety boundaries
+
+- Review-only stages never imply permission to create Issues, change code, create a PR, or merge.
+- Issue creation retains its explicit write requirement. Draft-to-ready and merge are user-executed commands; `next` requests command generation or post-run verification, never those writes themselves.
+- Implementation delivery belongs to the external Codex run instructed by this skill.
+- A SubAgent may own only its assigned workstream. It must not edit another workstream's branch or worktree.
+- Never convert PR correction findings directly into Issues; resolve them in the same PR or defer them to a post-merge `@repo-review`.
+- Route `SEC-*` findings through `@security-audit` and `@security-plan`; do not expose them in the ordinary loop.
+- Do not bypass CI, approvals, branch protection, or repository policy.
 - Do not mark Issues complete merely because a PR exists.
+- Do not treat a state marker as approval, a review verdict, a CI result, or merge authorization. State records preserve facts and routing only.
+- Do not edit a state carrier during a read-only stage unless the user separately authorized that exact comment/body write; emit the marker for later application instead.
 
 ## Quality gate
 
-Before reporting a transition, verify:
+Verify that:
 
-- live artifacts, not conversation assumptions, determine the current stage;
-- repository/backend contracts are re-read when versions change;
-- Agent Core and generic-worktree commands are never mixed;
-- every workstream has authoritative intent, stable acceptance criteria, non-goals, provenance, risk, and delegated design latitude;
-- tests are evidence against the contract, not the source of requirements;
-- reviews are pinned to immutable head SHAs and follow the required review order;
-- concurrent review results include a cross-PR interference pass;
-- generic worktrees are repository-local and `/.worktrees/` is ignored;
-- Agent Core worktrees remain lifecycle-owned;
-- human-owned decisions are explicitly escalated;
-- normal `@dev-loop` never emits Draft/Ready/Merge commands;
-- after user merge, `next` performs fresh merge/base verification before advancing;
-- long-session handover is proposed before context quality becomes unsafe;
-- no response advances more than one substantive stage.
+- The current stage follows from live artifacts, not assumptions.
+- Every transition records immutable SHAs and canonical URLs.
+- Every constrained transition preserves target action, status, unresolved prerequisite, clearing authority, admissible fallback, evidence snapshot, and execution-time verification.
+- Every workstream has stable identity, Issue mapping, branch, ownership, and status.
+- Every substantive checkpoint has a canonical carrier, state status, immutable evidence, and either a verified read-back or an explicit `not-saved` marker.
+- Resume starts by restoring and revalidating the durable state; stale, conflicted, incomplete, or reconstructed state cannot authorize a write or transition.
+- The committed root `.gitignore` contains `/.worktrees/` before any repository-local worktree is created.
+- Parallel workstreams have verified non-overlapping write boundaries or an explicit integration strategy.
+- Dependent work is assigned to later waves and rebased on verified merged commits.
+- No write occurred without the authorization required by the responsible skill, and no Draft-to-Ready-to-Merge write was executed by `@dev-loop` or `@pr-merge`.
+- Every response completed no more than one substantive stage.
+- Implementation and correction instructions are self-contained for a separate Codex run.
+- `next` applies only to the previously announced action.
+- Changed PR heads trigger a fresh review.
+- Merge completion is verified before integrated review.
+- The next action and blocking gate are explicit.
