@@ -65,6 +65,7 @@ The machine-readable part must be a small JSON object inside an HTML comment. Ke
 Required semantic fields:
 
 - immutable repository, carrier, workflow, branch, base, and head identifiers where applicable;
+- recording mode/status/source (`automatic|manual|none` and `saved|pending-write|bootstrap`);
 - stage and per-workstream status (`planned`, `running`, `pr-open`, `review-pending`, `changes-required`, `merge-ready`, `merged`, `blocked`, or `completed`);
 - Issue, Task, branch, PR, and head SHA mappings for every workstream;
 - stable acceptance/contract IDs and risk tier when supplied by `@patch-plan`, `@dev-loop`, or `@branch-review`;
@@ -104,6 +105,7 @@ For `restore`, `bootstrap`, or `audit`, return:
 - Repository:
 - Canonical carrier:
 - State status: `fresh` | `stale` | `conflicted` | `incomplete` | `reconstructed`
+- Recording: `automatic|manual|none` / `saved|pending-write|bootstrap`
 - Observed commit:
 - Observed at:
 
