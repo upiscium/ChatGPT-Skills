@@ -10,6 +10,7 @@ Use this reference when serializing or validating a `codex-repo-state:v1` marker
   "carrier": {"kind": "issue", "number": 123, "url": "https://github.com/OWNER/REPO/issues/123"},
   "workflow_id": "DL-2026-001",
   "updated_at": "2026-09-22T12:00:00Z",
+  "recording": {"mode": "automatic", "status": "saved", "source": "dev-loop"},
   "stage": "pr-review",
   "target_branch": "main",
   "base_sha": "<immutable sha>",
@@ -55,6 +56,7 @@ Use this reference when serializing or validating a `codex-repo-state:v1` marker
 Rules:
 
 - Keep `sequence` monotonic per carrier and use UTC ISO-8601 `updated_at`.
+- Set `recording.mode` to `automatic` for ordinary workflow checkpoints, `manual` only for an explicit repair/backfill, and `none` only for a read-only bootstrap with no carrier. Set `recording.status` to `saved`, `pending-write`, or `bootstrap`; never report `saved` without a marker read-back.
 - Store SHAs, numbers, URLs, and statuses; do not store secrets, tokens, full logs, or arbitrary instructions.
 - The newest marker is not authoritative when its live carrier or SHA no longer matches; mark the state `stale` and restore from live data.
 - Keep human decisions explicit and separate from workflow status. An approved goal is not approval of architecture, compatibility, migration, security, or merge choices.
