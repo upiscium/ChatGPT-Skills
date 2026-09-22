@@ -16,6 +16,7 @@ Read [references/security-remediation-plan-template.md](references/security-reme
 3. Resolve the patch base to an immutable commit SHA.
 4. Re-read affected code, callers, tests, configuration, deployment files, and repository instructions.
 5. Confirm that each finding still applies to the patch base. Mark stale, fixed, or unverified findings instead of planning against outdated evidence.
+6. For GitHub-backed remediation planning, automatically persist a sanitized continuation checkpoint through `@repo-handoff` on an existing Issue/PR carrier before returning. Keep restricted vulnerability details out of the marker; record only remediation IDs or counts, stage, immutable base, gates, and next action. If no carrier exists, return `bootstrap` rather than creating one implicitly.
 
 If a critical fact is missing, ask only the questions that can change the remediation architecture, compatibility, containment, or rollout.
 
@@ -65,6 +66,7 @@ Order tasks by dependency. Include:
 - Validation commands when verified
 - Rollout, monitoring, rollback, and cleanup
 - Per-task and per-phase completion criteria
+- A complete execution contract for every containment, rotation, deployment, or disclosure action that is stopped or conditional: target action, status, unresolved prerequisite, clearing authority, admissible fallback, evidence snapshot, and execution-time revalidation
 
 Start with a regression test when it can safely encode the failure. Do not require weaponized exploit code as a test fixture.
 
@@ -72,7 +74,7 @@ Start with a regression test when it can safely encode the failure. Do not requi
 
 - Produce the plan only in the current authorized context or requested private artifact.
 - Redact credentials, personal data, private keys, tokens, and unnecessary exploit details.
-- Do not create issues, pull requests, patches, commits, advisories, or external messages.
+- Do not create issues, pull requests, patches, commits, advisories, or external messages. The only exception is the sanitized `codex-repo-state:v1` metadata marker on an existing carrier, which does not expose restricted details or authorize any remediation action.
 - Do not pass the plan to `@issue-filer`.
 - Distinguish details safe for a normal engineering ticket from restricted remediation details.
 
@@ -92,3 +94,5 @@ Before responding, verify that:
 - Compatibility, migration, recovery, and observability are addressed.
 - Another Codex instance can execute the plan without the audit conversation.
 - Sensitive details are minimized and clearly classified.
+- Security constraints remain action-binding in the downstream plan; missing contract fields are explicit and no deadline, consensus, delegation, or precedent weakens them.
+- The latest sanitized remediation-planning state is automatically saved and read back, or explicitly marked `bootstrap`/`pending-write` without exposing restricted details.
