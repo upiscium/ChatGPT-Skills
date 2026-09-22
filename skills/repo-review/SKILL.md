@@ -1,11 +1,11 @@
 ---
 name: repo-review
-description: Review the merged state of a GitHub repository as a whole and produce evidence-backed Bug and Feature Request candidates for the next development loop without creating issues. Use after pull requests are merged, or when the user asks for a repository-wide product, architecture, implementation, integration, test, documentation, or completeness review of the current default branch or a specified merged commit.
+description: Review the merged state of a GitHub repository against documented product intent and produce evidence-backed Bug and Feature Request candidates plus explicit human decision requests, without creating issues. Use after pull requests are merged, or for a repository-wide product, architecture, implementation, integration, test, documentation, or completeness review of a default branch or specified merged commit.
 ---
 
 # Review the Merged Repository
 
-Assess the integrated product after merge and produce structured candidates that `@issue-filer` can safely turn into the next Issues.
+Assess the integrated product against authoritative intent after merge and produce structured candidates that `@issue-filer` can safely turn into the next Issues. Treat tests as evidence of behavior, never as the source of product requirements.
 
 ## Resolve the snapshot
 
@@ -15,14 +15,35 @@ Assess the integrated product after merge and produce structured candidates that
 4. Read repository instructions, product goals, architecture documents, roadmaps, issue history, manifests, tests, CI configuration, and user-facing documentation.
 5. Define the review scope and disclose inaccessible components or validation limitations.
 
+## Establish review authority
+
+1. Derive the product intent from, in descending authority: explicit human-approved decisions for this review, versioned product or architecture contracts, documented supported workflows, and accepted Issue or PR outcomes.
+2. Record stable `O-*` objectives and the behaviors, invariants, compatibility requirements, and non-goals needed to satisfy them.
+3. Mark each objective or contract as `confirmed` when directly supported by an authoritative source or `derived` when reconstructed from multiple sources. Cite that provenance.
+4. Do not infer requirements from implementation structure, existing tests, or what would merely improve the repository.
+5. When ambiguity, contradiction, architecture direction, scope choice, compatibility policy, or risk acceptance would materially change the finding, create a `D-*` human decision request instead of silently choosing or filing speculative work.
+
 ## Inspect the integrated product
 
 1. Inventory major components, public interfaces, workflows, persistence boundaries, integrations, deployment configuration, tests, and documentation.
 2. Trace important end-to-end user and operator workflows across component boundaries.
-3. Compare implemented behavior with documented goals, existing contracts, supported configurations, and current product expectations.
-4. Inspect integration gaps, regressions, inconsistent invariants, missing failure handling, obsolete paths, and incomplete capabilities.
-5. Run appropriate tests and static checks when a local checkout is available and safe.
-6. Check open and closed Issues and recent PRs so completed, accepted, duplicate, or intentionally excluded work is not proposed again.
+3. For each reviewed objective, define the observable acceptance contract before inspecting whether tests pass.
+4. Identify failure modes that could violate the contract, then map each objective or invariant to implementation evidence and test evidence.
+5. Compare implemented behavior with the contract and distinguish `satisfied`, `partial`, `violated`, `unverified`, and `decision-needed` outcomes.
+6. Inspect integration gaps, regressions, inconsistent invariants, missing failure handling, obsolete paths, incomplete capabilities, and unintended scope.
+7. Run appropriate tests and static checks when a local checkout is available and safe.
+8. Check open and closed Issues and recent PRs so completed, accepted, duplicate, or intentionally excluded work is not proposed again.
+
+## Parallelize inspection safely
+
+When the repository is large enough to benefit from parallel review, create a read-only review batch over the same immutable commit and authority set.
+
+- Partition by coherent product area or end-to-end workflow, not arbitrary file counts.
+- Give every review shard a stable ID, explicit scope, relevant `O-*` objectives, shared commit SHA, and exclusions.
+- Keep cross-component workflows in one shard or assign them to a dedicated integration shard; do not let boundary behavior fall between owners.
+- Require each shard to return evidence and candidate findings only. The coordinating reviewer owns final classification, priority, deduplication, root-cause grouping, and `D-*` escalation.
+- Do not make parallel reviewers share a writable checkout or mutate repository state. Use read-only source access or isolated checkouts when local validation is necessary.
+- Consolidate all shards before issuing the repository verdict. A partial shard result is a disclosed limitation, not implicit coverage.
 
 ## Classify findings
 
@@ -35,6 +56,8 @@ Use:
 Assign priority `P0` through `P3` and confidence `high`, `medium`, or `low`.
 
 Require a precise code path, contract, test result, log, or reproducible reasoning chain for every bug. Require a documented objective, user workflow, architectural dependency, or explicitly validated need for every feature request. Do not invent roadmap requirements.
+
+Keep `D-*` decision requests outside `F-*` findings. They identify authority that only a human should exercise; they are not Issue candidates until resolved.
 
 ## Produce the review contract
 
@@ -49,13 +72,34 @@ Require a precise code path, contract, test result, log, or reproducible reasoni
 - Merge window or related PRs:
 
 ## Scope and validation
+- Intent sources and authority:
+- Review batch and shards:
 - Product areas inspected:
 - Workflows traced:
 - Checks run:
 - Existing issues searched:
 - Limitations:
 
-## Summary
+## Decision summary
+- Product intent alignment: aligned | partial | violated | decision-needed
+- Contract coverage:
+- Test evidence: strong | partial | insufficient | not-run
+- Highest risk areas:
+- Human attention required:
+
+## Objective traceability
+
+| Objective / contract | Authority | Implementation evidence | Test evidence | Status |
+|---|---|---|---|---|
+| O-001 / AC-001 | confirmed \| derived | | | satisfied \| partial \| violated \| unverified \| decision-needed |
+
+## Human decisions required
+
+### D-001: <decision>
+- Why human authority is required:
+- Affected objectives or scope:
+- Options and trade-offs:
+- Safe fallback while unresolved:
 
 ## Findings
 
@@ -63,8 +107,11 @@ Require a precise code path, contract, test result, log, or reproducible reasoni
 - Classification: bug | feature-request | non-issue
 - Priority: P0 | P1 | P2 | P3
 - Confidence: high | medium | low
+- Objective or contract:
 - Location:
-- Evidence:
+- Observed gap:
+- Implementation evidence:
+- Test evidence:
 - Impact:
 - Recommendation:
 - Acceptance criteria:
@@ -76,14 +123,14 @@ Use stable `F-*` IDs. Omit acceptance criteria only for non-issues. Include comm
 
 ## Emit a durable checkpoint
 
-Include a coordinator-ready `codex-repo-state:v1` payload (or all of its required fields) pinned to the reviewed commit, merge window, active `F-*` and `D-*` items, and the next action. This is a proposed record for `@repo-handoff`; the repository review remains read-only and must not create or comment on Issues. If no canonical carrier exists, mark the state `bootstrap` and ask the coordinator to choose one rather than inventing a tracking Issue.
+Include a coordinator-ready `codex-repo-state:v1` payload (or all of its required fields) pinned to the reviewed commit, merge window, active `F-*` and `D-*` items, and the next action. Before returning, automatically persist this marker on the existing linked Issue, merged PR, or designated tracking carrier and read it back. This is a metadata-only checkpoint: the repository review must not create Issues, change Issue/PR content, or turn findings into work. If no canonical carrier exists, mark the state `bootstrap` and ask the coordinator to choose one rather than inventing a tracking Issue. If the marker write is unavailable, return the exact payload as `pending-write` and disclose that durable recovery is not yet verified.
 
 ## Preserve boundaries
 
 - Do not reclassify unresolved PR feedback as a repository finding until the relevant code is merged.
-- Do not create, edit, label, or comment on Issues.
+- Do not create, edit, label, or add non-marker comments to Issues. The existing carrier's marked `codex-repo-state:v1` continuation update is the automatic-recording exception and must be read back.
 - Do not modify code, branches, commits, or PRs.
-- Do not treat the checkpoint payload as a durable save until `@repo-handoff` records and reads it back from a carrier.
+- Do not treat a proposed payload as durable until `@repo-handoff` records and reads it back from a carrier. Automatic recording is expected whenever an existing carrier is available, but it is not approval to file Issues or execute implementation.
 - Route selected actionable findings to `@issue-filer`.
 - Route security-sensitive findings to `@security-audit` rather than exposing vulnerability details in ordinary Issue candidates.
 
@@ -92,10 +139,14 @@ Include a coordinator-ready `codex-repo-state:v1` payload (or all of its require
 Verify that:
 
 - Every actionable finding exists in the reviewed merged commit.
+- Every actionable finding traces to a confirmed objective or clearly labels derived authority.
 - Findings reflect integrated behavior, not patch aesthetics.
+- Tests support or weaken a claim but never create its requirement.
 - Existing Issues and completed work were checked for duplication.
 - Multiple symptoms with one root cause are grouped.
+- Parallel review shards used the same immutable snapshot and authority, and the final report reconciles overlaps and cross-boundary gaps rather than concatenating shard outputs.
 - Bugs and missing capabilities are distinguished.
+- Material direction, architecture, compatibility, scope, or risk choices are isolated as `D-*` requests rather than decided implicitly.
 - Acceptance criteria are testable and outcome-oriented.
 - Any action-binding finding preserves its prerequisite, clearing authority, and safe fallback instead of reducing them to advisory prose.
 - The reviewed commit SHA and validation gaps are recorded.
