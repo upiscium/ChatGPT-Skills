@@ -1,6 +1,6 @@
 ---
 name: human-review
-description: Inspect the current state of a software repository or development workflow and list only unresolved decisions, approvals, risk acceptances, or focused inspections that require human authority. Use when the user asks what they need to review, whether any human review remains, what is waiting for their judgment, or wants a Japanese human-review queue across Issues, Tasks, pull requests, plans, and blockers. Return an explicit no-review result when nothing qualifies. Do not perform a general code review or invent human gates for routine engineering work.
+description: Inspect the current state of a software repository or development workflow and list only unresolved decisions, approvals, risk acceptances, or focused inspections that require human authority, while automatically checkpointing the review queue. Use when the user asks what they need to review, whether any human review remains, what is waiting for their judgment, or wants a Japanese human-review queue across Issues, Tasks, pull requests, plans, and blockers. Return an explicit no-review result when nothing qualifies. Do not perform a general code review or invent human gates for routine engineering work.
 ---
 
 # Identify Human Review
@@ -15,6 +15,7 @@ Produce a concise, evidence-backed decision queue in Japanese. Surface only work
 4. Prefer live repository state over conversation summaries. Mark inaccessible or stale evidence.
 5. Restore and validate any `codex-repo-state:v1` marker on the relevant Issue/PR. Treat stale, conflicted, incomplete, and reconstructed records as evidence limitations, not as approvals.
 5. Preserve separate review items when they have different authorities or can be decided independently. Combine repeated symptoms that require one underlying decision.
+6. Before returning, automatically persist the current human-gate snapshot and any open review items through `@repo-handoff` on the existing carrier, then read it back. This records the queue without approving, rejecting, or changing the underlying work.
 
 ## Decide what requires a human
 
@@ -36,8 +37,8 @@ Do not include:
 - Decisions already resolved by an authoritative source for the current artifact revision.
 - Speculative future choices that do not block or materially affect current work.
 - Low-risk `summary-only` review when there is no unresolved judgment; report it only if the user explicitly asks to inspect that PR.
-Durable-state drift alone is not a human decision. List it only when the user must choose a carrier, resolve conflicting records, accept a risk, or decide whether to proceed despite the drift.
 
+Durable-state drift alone is not a human decision. List it only when the user must choose a carrier, resolve conflicting records, accept a risk, or decide whether to proceed despite the drift.
 
 The purpose is to reduce human review load. Do not manufacture a review queue to appear thorough.
 
@@ -138,7 +139,7 @@ Order items by blocking dependency, then risk and leverage. Do not use urgency a
 - Consume the durable decisions and gate fields from `@repo-handoff`; do not invent a review item merely because a record is missing.
 - Use `@repo-status` evidence to locate active work, but re-evaluate whether each blocker truly requires human authority.
 - Direct code-quality investigation to `@branch-review` or `@repo-review`; include only their unresolved human-owned decisions here.
-- After the user decides, report the decision and its exact scope. Do not modify code, Issues, PRs, or gates unless the user separately asks for that action.
+- After the user decides, report the decision and its exact scope. Do not modify code, Issue/PR content, or gates unless the user separately asks for that action. The automatic `codex-repo-state:v1` marker update on an existing carrier is the sole recording exception; if unavailable, mark it `pending-write`.
 
 ## Quality gate
 
@@ -152,3 +153,4 @@ Verify that:
 - The safe fallback does not bypass the unresolved decision.
 - Duplicate manifestations of one decision are consolidated.
 - If no item qualifies, the response contains only the required no-review result.
+- The latest human-review snapshot is automatically saved and read back, or is explicitly marked `bootstrap`/`pending-write` with the recovery consequence.
