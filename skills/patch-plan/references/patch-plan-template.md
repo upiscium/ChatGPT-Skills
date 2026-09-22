@@ -11,8 +11,10 @@ Use this structure and omit sections that are genuinely irrelevant. Preserve sou
 - Implementation branch or base:
 - Base commit SHA:
 - Follow-up PR target branch:
-- Repository-local worktree root: `<repository-root>/.worktrees/`
-- `.gitignore` prerequisite: verified | setup PR required
+- Execution backend: agent-core | generic-worktree
+- Backend evidence and version:
+- Repository-local worktree contract: guarded Agent Core assignment | `<repository-root>/.worktrees/`
+- Generic `.gitignore` prerequisite: not-applicable | verified | setup PR required
 - Selected scope:
 - Non-goals:
 - Durable state carrier(s): existing Issue/PR URL(s) | bootstrap required
@@ -21,9 +23,9 @@ Use this structure and omit sections that are genuinely irrelevant. Preserve sou
 
 ## Source map
 
-| Workstream | Wave | Implementation unit | Finding | Issue | Type | Status |
-|---|---:|---|---|---|---|---|
-| WS-001 | 1 | IMP-001 | F-001 | #123 | bug | active |
+| Workstream | Wave | Implementation unit | Finding | Issue | Agent Core Task | Type | Status |
+|---|---:|---|---|---|---|---|---|
+| WS-001 | 1 | IMP-001 | F-001 | #123 | #123 or not-applicable | bug | active |
 
 ## Workstream execution contracts
 
@@ -74,7 +76,24 @@ Record each decision, its rationale, alternatives rejected, and compatibility co
 
 ## Workstream execution
 
-Before Wave 1, resolve the repository root, verify that its committed `.gitignore` contains the exact entry `/.worktrees/`, and confirm it with `git check-ignore .worktrees/`. If missing, create and merge a minimal setup PR first, refresh the common base SHA, and stop until that prerequisite is complete.
+Before Wave 1, follow only the selected backend:
+
+- `agent-core`: initialize Main, create or resume explicitly selected Issue-backed Tasks only through guarded lifecycle APIs, retain exact readiness evidence, and run the repository batch safety check before concurrent Task launch. Do not create branches or worktrees manually.
+- `generic-worktree`: resolve the repository root, verify that its committed `.gitignore` contains the exact entry `/.worktrees/`, and confirm it with `git check-ignore .worktrees/`. If missing, create and merge a minimal setup PR first, refresh the common base SHA, and stop until that prerequisite is complete.
+
+### Agent Core batch launch
+
+Omit for `generic-worktree` mode.
+
+| Workstream | Issue | Task | New or resume | Readiness mode | Worktree | Contract checksum | Batch-plan result |
+|---|---|---|---|---|---|---|---|
+| WS-001 | #123 | #123 | new | initial | guarded assignment | | parallel-safe |
+
+- Main initialization evidence:
+- Explicit Task set passed to batch planning:
+- Conflicting pairs to serialize:
+- Available Task Orchestrator slots:
+- Partial-progress policy:
 
 ### Wave 1
 
@@ -83,13 +102,15 @@ Run independent workstreams in this wave concurrently, bounded by available SubA
 ### WS-001: <Issue outcome>
 
 - Issues:
+- Agent Core Task and lifecycle status:
 - Base SHA:
 - Dedicated branch:
-- Isolated worktree: `<repository-root>/.worktrees/WS-001`
+- Isolated worktree: guarded Agent Core assignment | `<repository-root>/.worktrees/WS-001`
 - Expected files/modules:
 - Must not touch:
 - Dependencies:
 - Assigned SubAgent:
+- Assigned Task Orchestrator:
 
 #### Phase 0: Discovery and blocking decisions
 
@@ -150,6 +171,7 @@ Use only commands verified in the repository. Otherwise describe the check and m
 ### WS-001
 
 - Implementation branch and repository-local worktree:
+- Agent Core Task ID, readiness evidence, and lifecycle status:
 - Commit boundaries:
 - Follow-up PR target:
 - Issues and source review to link:
@@ -161,6 +183,7 @@ Use only commands verified in the repository. Otherwise describe the check and m
   - Rollback guidance
 - Workstream report must include:
   - Workstream ID
+  - Agent Core Task ID and lifecycle status when applicable
   - Created PR number
   - Canonical PR URL
   - Head branch and resulting commit SHA
@@ -183,8 +206,8 @@ Each workstream executor must create its own follow-up PR after validation. If c
 - No excluded or security-routed work was implemented accidentally.
 - Every completed workstream created its own PR against the planned target branch.
 - Every workstream report names the actual PR number and canonical URL.
-- Concurrent work used isolated branches and repository-local `.worktrees/<workstream-id>` worktrees and did not modify another workstream.
-- The committed root `.gitignore` contains `/.worktrees/`, verified before the first worktree was created.
+- Concurrent work used backend-owned isolated branches and worktrees and did not modify another workstream.
+- Agent Core mode used guarded Task lifecycle plus batch planning; generic mode verified the committed root `.gitignore` contains `/.worktrees/` before the first worktree was created.
 - Cross-workstream checks and merge ordering are recorded.
 - The final implementation summary can cite the base and resulting commit SHAs.
 - Each workstream's durable carrier can reconstruct its stage, dependencies, gates, decisions, and next action without the planning conversation.
