@@ -7,7 +7,7 @@ description: Create a self-contained handover for continuing the current convers
 
 Produce a copy-ready handover that lets a new chat continue the work without access to the original conversation.
 
-For GitHub-backed repository work, prefer `@repo-handoff` as the durable source of truth. A handover may still be useful for private context, but it should link to the canonical Issue or PR state record rather than duplicating repository state. If the user asks to continue a GitHub workflow without a handover, restore from `@repo-handoff` and live repository artifacts.
+For GitHub-backed repository work, prefer `@repo-handoff` as the durable source of truth. A handover may still be useful for private context, but it should link to the canonical Issue or PR state record rather than duplicating repository state. `@repo-handoff` automatically records the latest verified repository state during the workflow; do not wait for an explicit handover request. If the user asks to continue a GitHub workflow without a handover, restore from `@repo-handoff` and live repository artifacts.
 
 ## Build the handover
 
@@ -23,6 +23,7 @@ For GitHub-backed repository work, prefer `@repo-handoff` as the durable source 
 7. Never invent missing context. Label material uncertainty explicitly.
 8. Exclude secrets and authentication material. Replace any necessary mention with a description such as `[credential omitted]`.
 9. Write in the language primarily used by the user unless they request another language.
+10. When the work is GitHub-backed, restore the canonical carrier and automatically update its `codex-repo-state:v1` marker before returning. Keep the handover text focused on private context and link to the carrier; do not create a new tracking Issue solely for the handover.
 
 ## Preserve action-binding state
 
