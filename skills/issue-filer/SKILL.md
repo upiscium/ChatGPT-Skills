@@ -69,6 +69,10 @@ For a feature request, include:
 
 Under `Source review`, include the finding ID, reviewed branch and commit, related merged PRs when relevant, and commit-pinned file links. Clearly label inferred reproduction steps or proposed designs; never present them as confirmed facts.
 
+When a caller supplies a `@repo-handoff` workflow ID or canonical carrier, preserve that durable reference in `Source review` and return the created Issue URL as the new workstream carrier. Do not post a state comment here unless the user explicitly authorized that separate write; the returned Issue identity is enough for the coordinator to record the next checkpoint.
+
+If the source finding contains an action-binding constraint, preserve it as an explicit issue section with target action, status, unresolved prerequisite, clearing authority, admissible fallback, evidence snapshot, and required revalidation. Use `none` or `unknown` for missing fields. Do not weaken it into a note, suggestion, deferred owner task, or precedent-based exception.
+
 Create one issue at a time and capture its URL before continuing. If a write fails, stop creating dependent issues and report the failure.
 
 ## Report results
@@ -90,4 +94,6 @@ Before each creation, verify that:
 - No matching issue already exists.
 - The issue describes one root cause or capability.
 - Acceptance criteria are verifiable.
+- Every source constraint either survives with its complete operational role or is explicitly marked incomplete and returned for clarification.
 - The body contains no credentials, private logs, or irrelevant review commentary.
+- Any supplied workflow/carrier reference is preserved so a later `@repo-handoff restore` can connect the Issue to its originating review and workstream.
