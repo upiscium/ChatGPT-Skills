@@ -1,11 +1,11 @@
 ---
 name: issue-filer
-description: Convert selected, evidence-backed findings from a merged GitHub repository review into deduplicated Bug or Feature Request issues. Use only when the user explicitly asks to create, file, or open GitHub issues from @repo-review findings or a comparable structured whole-repository review.
+description: Create deduplicated Bug or Feature Request Issues from explicitly selected merged-repository findings or human-approved blueprint design units. Use only when the user asks to file those Issues; preserve design revision, acceptance criteria and approval boundaries without authorizing execution.
 ---
 
 # File GitHub Review Issues
 
-Create high-quality GitHub issues from selected review findings while preventing duplicates and unsupported claims.
+Create high-quality GitHub Issues from selected review findings or approved design units while preventing duplicates and unsupported claims. Do not turn PR/prepublication correction findings into new Issues; keep them with the active change.
 
 ## Require explicit write intent
 
@@ -15,10 +15,10 @@ Do not create issues when the user asked only for review, recommendations, draft
 
 ## Validate the input
 
-1. Require the repository and a structured review report, preferably from `@repo-review`.
-2. Require the reviewed branch and immutable merged commit SHA.
+1. Require the repository and either a structured merged-state review (`F-*`) or human-approved `@blueprint` design units (`DES-*`) with a stable brief revision and approval source.
+2. For review findings, require reviewed branch and immutable merged SHA. For design units, require approved outcome, scope, non-goals, stable ACs, dependencies and current repository snapshot. Never fabricate a bug finding or merged-review origin for a new capability.
 3. Accept only findings classified as `bug` or `feature-request`.
-4. Reject or return for further review any finding without a location, evidence, impact, and recommendation.
+4. Reject findings missing location/evidence/impact/recommendation, and design units missing approval provenance or testable acceptance. Keep unresolved material choices as blockers or separately approved discovery scope, not executable assumptions.
 5. Re-check material evidence when the report is stale, the reviewed branch moved, or the finding is low-confidence.
 6. Merge findings that share one root cause or represent one inseparable capability.
 
@@ -67,7 +67,7 @@ For a feature request, include:
 ## Source review
 ```
 
-Under `Source review`, include the finding ID, reviewed branch and commit, related merged PRs when relevant, and commit-pinned file links. Clearly label inferred reproduction steps or proposed designs; never present them as confirmed facts.
+Under `Source review` or `Source design`, include the F/DES ID, source revision/approval scope, inspected branch/SHA, related artifacts and pinned evidence. Preserve stable AC IDs. Clearly label proposed designs and inferred reproduction; never present them as confirmed facts. Filing permission is not dispatch, implementation, commit, push or PR permission.
 
 When a caller supplies a `@repo-handoff` workflow ID or canonical carrier, preserve that durable reference in `Source review` and return the created Issue URL as the new workstream carrier. After each created or deduplicated Issue is identified, automatically persist the latest issue-filing state marker on the new or existing carrier and read it back. This marker records the result and next gate; it does not expand the user's authorization to create additional Issues or change their content.
 
@@ -79,7 +79,7 @@ Create one issue at a time and capture its URL before continuing. If a write fai
 
 Return a table containing:
 
-| Finding | Result | Issue | Notes |
+| Finding / Design unit | Result | Issue | Notes |
 |---|---|---|---|
 
 Use `created`, `duplicate`, `skipped`, or `failed` as the result. Finish with counts for each result and disclose any labels or templates that could not be applied.
@@ -90,7 +90,7 @@ Before each creation, verify that:
 
 - The user authorized this finding.
 - The finding is evidence-backed and still applicable.
-- The reviewed branch and immutable merged commit are recorded.
+- The appropriate source is recorded: merged review SHA, or approved design revision and current repository snapshot.
 - No matching issue already exists.
 - The issue describes one root cause or capability.
 - Acceptance criteria are verifiable.

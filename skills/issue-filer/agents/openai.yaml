@@ -1,4 +1,14 @@
 interface:
-  display_name: "Issue Filer"
-  short_description: "Turn repository findings into GitHub issues"
-  default_prompt: "Use $issue-filer to create GitHub issues from selected repository-review findings."
+  display_name: Issue Filer
+  short_description: File selected review findings or approved design units
+  default_prompt: Use $issue-filer to deduplicate and file the selected approved findings
+    or design units.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

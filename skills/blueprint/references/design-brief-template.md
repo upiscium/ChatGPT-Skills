@@ -1,9 +1,15 @@
-# Design and Codex Implementation Plan Template
+# Design brief and Issue candidate template
 
 Adapt this template to the task. Omit sections that do not apply.
 
 ```markdown
 # <Project or Change Name>
+
+- Brief ID / revision:
+- Design status: draft | decision-required | human-approved
+- Approval source and exact scope:
+- Repository snapshot / evidence date:
+- Execution or publication permission: not implied
 
 ## 1. Executive summary
 - Problem:
@@ -56,54 +62,63 @@ Adapt this template to the task. Omit sections that do not apply.
 ### Open
 ### Rejected
 
-## 10. Codex implementation plan
+## 10. Execution contracts
 
-### Phase 0: Discovery or prerequisite work
-#### Task 0.1: <task>
-- Objective:
-- Inspect:
-- Deliverable:
-- Completion criteria:
+Repeat for each decision, approval, dependency, or safety condition that constrains implementation.
 
-### Phase 1: <coherent implementation milestone>
-#### Task 1.1: <task>
-- Objective:
-- Files and symbols:
-- Changes:
+### <contract ID>
+- Target action:
+- Status: stop | conditional | allowed
+- Unresolved prerequisite:
+- Clearing authority:
+- Admissible fallback:
+- Evidence snapshot:
+- Reverify before action:
+
+Use `none` or `unknown` explicitly. Omit this section only when no action-binding state exists.
+
+## 11. Issue candidates, not execution instructions
+
+### DES-001: <coherent outcome>
+- Source requirement / design revision:
+- Type: bug | feature-request
+- Desired outcome and evidence:
+- Scope / non-goals / invariants:
+- Stable AC IDs and observable acceptance:
 - Dependencies:
-- Failure handling:
-- Tests:
-- Validation commands:
-- Completion criteria:
-- Do not change:
+- Material decisions still open:
+- Design approval status:
+- Issue filing authorization: granted for this unit | not granted
 
-## 11. Test strategy
+Use bounded discovery candidates when an unknown blocks design. Never hide an unresolved human choice in an implementation task. Hand selected authorized candidates to issue-filer; execution steps belong to patch-plan after Issues exist.
+
+## 12. Test strategy
 ### Unit
 ### Integration
 ### End-to-end or system
 ### Security and abuse cases
 ### Performance and reliability
 
-## 12. Deployment, migration, and rollback
+## 13. Deployment, migration, and rollback
 
-## 13. Observability and operations
+## 14. Observability and operations
 
-## 14. Risks and mitigations
+## 15. Risks and mitigations
 | Risk | Likelihood | Impact | Mitigation | Validation |
 |---|---|---|---|---|
 
-## 15. Future extensions
+## 16. Future extensions
 
-## 16. Definition of done
+## 17. Definition of done
 ```
 
-## Task-writing rules
+## Candidate-writing rules
 
-- Make each task independently understandable and bounded.
+- Make each candidate independently understandable and bounded.
 - Describe behavior and responsibility before implementation mechanics.
 - Use exact paths and symbols only after inspecting them.
 - Pair schema or API changes with compatibility and migration tasks.
 - Pair background or distributed work with retries, idempotency, and observability.
 - Pair privileged operations with authorization and audit requirements.
-- Put tests in the same phase as the behavior they verify.
-- End every phase with a runnable or inspectable validation checkpoint.
+- Pair acceptance criteria with testable behavior, without inventing exact commands.
+- End with the design decision and next authorized handoff, not automatic dispatch.

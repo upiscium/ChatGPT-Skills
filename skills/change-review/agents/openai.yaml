@@ -1,0 +1,14 @@
+interface:
+  display_name: Change Review
+  short_description: Review frozen changes or PRs against approved intent
+  default_prompt: Use $change-review to independently review this frozen change or
+    pull request against its acceptance contract.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

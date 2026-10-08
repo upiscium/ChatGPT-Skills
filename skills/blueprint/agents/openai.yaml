@@ -1,8 +1,10 @@
 interface:
   display_name: Blueprint
-  short_description: Turn vague needs and pain points into an executable Codex plan
-  default_prompt: Use @blueprint to refine this idea and produce
-    a Codex-ready implementation plan.
+  short_description: Define approved design and traceable Issue candidates
+  default_prompt: Use $blueprint to refine this need into a design brief, stable acceptance
+    criteria and Issue candidates.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
 policy:
   products:
   - chatgpt

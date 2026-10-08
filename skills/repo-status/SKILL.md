@@ -47,6 +47,7 @@ For each current workstream, record:
 - Branch, PR, and head SHA when they exist
 - Dependencies and relationship to other workstreams
 - Latest verified result and remaining acceptance gap
+- OpenCode run/revision, delivery/acknowledgement/execution/collection/independent verification, authorized stop point, and evidence time when available; keep executor claims distinct from verified results
 - Next concrete action and who or what can authorize it
 
 Do not treat an open Issue as active work without branch, PR, task-state, or explicit ownership evidence. Do not treat a merged PR as fully complete until its intended integration and acceptance conditions are satisfied.
@@ -137,7 +138,8 @@ Keep the executive status short; put detail in the matrices. Rank next checkpoin
 - Do not modify code, Issue/PR content, branches, labels, projects, or releases. The only exception is the automatic update of the marked `codex-repo-state:v1` record on an already selected Issue/PR carrier; it must be read back and must never be treated as an approval.
 - Do not perform a general defect hunt; use `@repo-review` when the goal is finding Bugs or Feature Requests.
 - Do not generate an implementation plan; use `@patch-plan` or `@blueprint` after the user selects work.
-- Do not replace `@handover` or `@repo-handoff`: this skill reports state and consumes durable records; it does not write a handoff or preserve private conversation context.
+- Use `@repo-handoff` for automatic persistence of the owned snapshot fields without overwriting coordinator runs or next actions. Do not replace `@handover` or preserve private conversation context in a public record.
+- Ask monitoring/notification belongs to SwitchBoard, not this status snapshot. Do not infer a run failed because the connection is unavailable, or claim monitoring is configured without evidence.
 - Route security-sensitive details to `@security-audit`; summarize only the existence and handling status of restricted work.
 
 ## Quality gate

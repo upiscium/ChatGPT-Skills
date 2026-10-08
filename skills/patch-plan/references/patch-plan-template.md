@@ -1,4 +1,4 @@
-# Codex Implementation Plan
+# OpenCode Execution Packet
 
 Use this structure and omit sections that are genuinely irrelevant. Preserve source traceability and verified facts.
 
@@ -19,6 +19,14 @@ Use this structure and omit sections that are genuinely irrelevant. Preserve sou
 - Non-goals:
 - Durable state carrier(s): existing Issue/PR URL(s) | bootstrap required
 - Workflow ID:
+- Run ID / instruction revision:
+- Immutable packet reference / actual digest:
+- Design source / approved revision / approval scope:
+- Operation allowlist: investigate / edit / test / commit / push / Draft PR / executor report
+- Approval source and prerequisites per operation:
+- Exact stop point:
+- Connection/session reference and Main/Task/generic role:
+- Ask monitoring owner: SwitchBoard
 - State status at planning: fresh | stale | conflicted | incomplete | reconstructed | none-found
 
 ## Source map
@@ -29,7 +37,7 @@ Use this structure and omit sections that are genuinely irrelevant. Preserve sou
 
 ## Workstream execution contracts
 
-Repeat for every workstream whose execution is blocked or conditional. Omit this section only when no action-binding state exists.
+Repeat for every workstream, including allowed ones. Unknown authority never means permission.
 
 ### WS-001
 - Target action:
@@ -65,10 +73,11 @@ Use `parallel`, `ordered`, `combined`, or `blocked`. Mark unverified boundaries 
 - Carrier for each workstream:
 - Aggregate carrier, if any:
 - Latest `codex-repo-state:v1` sequence and update time:
-- State write authorization: explicit | announced checkpoint | not granted
+- Coordinator writer / ownership:
+- Recording: automatic / saved | pending-write | bootstrap
 - Restore/revalidation required before implementation:
 
-At every substantive checkpoint, update the workstream's canonical Issue or PR with the state marker through `@repo-handoff`, or return the exact marker block as `not-saved` when write authorization is absent. Never use this plan or the chat ledger as the only recovery source.
+At every substantive checkpoint, the coordinator updates the existing carrier through `@repo-handoff`, preserving unrelated fields and reading back its event. A missing marker is created automatically on an existing carrier. Executors append only authorized run-scoped reports, not coordinator markers. Never claim durable recovery from a chat-only packet. Save dispatch intent before sending; reconcile uncertain delivery instead of retrying.
 
 ## Design decisions
 
@@ -79,7 +88,7 @@ Record each decision, its rationale, alternatives rejected, and compatibility co
 Before Wave 1, follow only the selected backend:
 
 - `agent-core`: initialize Main, create or resume explicitly selected Issue-backed Tasks only through guarded lifecycle APIs, retain exact readiness evidence, and run the repository batch safety check before concurrent Task launch. Do not create branches or worktrees manually.
-- `generic-worktree`: resolve the repository root, verify that its committed `.gitignore` contains the exact entry `/.worktrees/`, and confirm it with `git check-ignore .worktrees/`. If missing, create and merge a minimal setup PR first, refresh the common base SHA, and stop until that prerequisite is complete.
+- `generic-worktree`: verify the committed root `.gitignore` entry `/.worktrees/` and `git check-ignore .worktrees/`. If absent, stop for separately authorized setup-PR work; the human executes Ready/Merge. Verify the merge and refresh the base before creating worktrees.
 
 ### Agent Core batch launch
 
@@ -104,6 +113,9 @@ Run independent workstreams in this wave concurrently, bounded by available SubA
 - Issues:
 - Agent Core Task and lifecycle status:
 - Base SHA:
+- Run / approved instruction revision / packet digest:
+- Allowed operations and their authority:
+- Exact stop point and fallback:
 - Dedicated branch:
 - Isolated worktree: guarded Agent Core assignment | `<repository-root>/.worktrees/WS-001`
 - Expected files/modules:
@@ -184,12 +196,12 @@ Use only commands verified in the repository. Otherwise describe the check and m
 - Workstream report must include:
   - Workstream ID
   - Agent Core Task ID and lifecycle status when applicable
-  - Created PR number
-  - Canonical PR URL
+  - Actual PR number and URL if authorized/created; otherwise not-created and reason
+  - Frozen manifest/digest and exact validation snapshot
   - Head branch and resulting commit SHA
-  - Durable state carrier URL, marker sequence, and read-back result (or `not-saved`)
+  - Executor report reference; coordinator carrier/read-back status or pending-write
 
-Each workstream executor must create its own follow-up PR after validation. If creation is blocked, it must report the workstream ID, exact blocker, and pushed branch instead of inventing a PR number.
+Each executor stops at its granted boundary. Implementation-only delivery ends with frozen evidence for independent change-review, not publication. Commit/push/Draft PR require individual authority and repository gates. If authorized publication is blocked, report the exact blocker and preserved snapshot/branch; never invent a PR. Never invoke standalone Codex CLI or install Ask monitoring.
 
 ## Wave integration
 
@@ -204,8 +216,8 @@ Each workstream executor must create its own follow-up PR after validation. If c
 - Required checks pass.
 - Compatibility, migration, documentation, rollout, and rollback work is complete or explicitly not applicable.
 - No excluded or security-routed work was implemented accidentally.
-- Every completed workstream created its own PR against the planned target branch.
-- Every workstream report names the actual PR number and canonical URL.
+- Every workstream reached its authorized stop point and reports run/revision, actual scope and immutable evidence.
+- Every authorized completed PR delivery names its actual number/URL; prepublication-only delivery explicitly has no PR.
 - Concurrent work used backend-owned isolated branches and worktrees and did not modify another workstream.
 - Agent Core mode used guarded Task lifecycle plus batch planning; generic mode verified the committed root `.gitignore` contains `/.worktrees/` before the first worktree was created.
 - Cross-workstream checks and merge ordering are recorded.

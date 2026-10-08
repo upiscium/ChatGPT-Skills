@@ -1,0 +1,14 @@
+interface:
+  display_name: OpenCode Bridge
+  short_description: Delegate bounded work to OpenCode and collect evidence
+  default_prompt: Use $opencode-bridge to send this authorized packet to the selected
+    OpenCode session and return after receipt.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

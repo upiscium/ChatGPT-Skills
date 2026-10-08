@@ -1,13 +1,14 @@
 interface:
-  display_name: "PR Review"
-  short_description: "Review one PR safely within a concurrent batch"
-  default_prompt: "Use $branch-review to review this exact pull request head as an isolated member of its review batch."
-  icon_small: "assets/icon.svg"
-  icon_large: "assets/icon.svg"
+  display_name: Branch Review (Legacy)
+  short_description: Explicit alias to the current change-review workflow
+  default_prompt: Use $branch-review to route this named PR to the current change-review
+    skill.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
 policy:
   products:
-  - "chatgpt"
-  - "codex"
-  - "api"
-  - "atlas"
-  allow_implicit_invocation: true
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: false

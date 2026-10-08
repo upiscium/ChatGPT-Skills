@@ -1,8 +1,8 @@
 interface:
-  display_name: PR Merge Commands
-  short_description: Generate guarded gh commands for reviewed PRs
-  default_prompt: Use $pr-merge to generate safe gh commands that mark this reviewed
-    PR ready and merge it.
+  display_name: PR Merge (Legacy)
+  short_description: Explicit alias to dev-loop merge-command-only mode
+  default_prompt: Use $pr-merge to generate user-run commands through dev-loop merge-command-only
+    mode.
   icon_small: assets/icon.svg
   icon_large: assets/icon.svg
 policy:
@@ -11,4 +11,4 @@ policy:
   - codex
   - api
   - atlas
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

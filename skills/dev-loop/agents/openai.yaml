@@ -1,13 +1,14 @@
 interface:
-  display_name: "Development Loop"
-  short_description: "Coordinate parallel Tasks and isolated PR reviews"
-  default_prompt: "Use $dev-loop to advance these Issues through the repository lifecycle, concurrent PR review, and guarded merge checkpoints."
-  icon_small: "assets/icon.svg"
-  icon_large: "assets/icon.svg"
+  display_name: Development Loop
+  short_description: Coordinate OpenCode runs, reviews and human merge gates
+  default_prompt: Use $dev-loop to advance the current authorized OpenCode checkpoint
+    and record its verified state.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
 policy:
   products:
-  - "chatgpt"
-  - "codex"
-  - "api"
-  - "atlas"
+  - chatgpt
+  - codex
+  - api
+  - atlas
   allow_implicit_invocation: true

@@ -14,8 +14,8 @@ Produce a concise, evidence-backed decision queue in Japanese. Surface only work
 3. Inspect current repository instructions, accepted product and architecture contracts, Issues, Tasks, open pull requests, review reports, CI, development-loop ledgers, and blockers that are relevant to the target.
 4. Prefer live repository state over conversation summaries. Mark inaccessible or stale evidence.
 5. Restore and validate any `codex-repo-state:v1` marker on the relevant Issue/PR. Treat stale, conflicted, incomplete, and reconstructed records as evidence limitations, not as approvals.
-5. Preserve separate review items when they have different authorities or can be decided independently. Combine repeated symptoms that require one underlying decision.
-6. Before returning, automatically persist the current human-gate snapshot and any open review items through `@repo-handoff` on the existing carrier, then read it back. This records the queue without approving, rejecting, or changing the underlying work.
+6. Preserve separate review items when they have different authorities or can be decided independently. Combine repeated symptoms that require one underlying decision.
+7. Before returning, automatically persist the owned human-gate fields through `@repo-handoff`, preserving unrelated runs and pending actions; batch workers return a delta to the coordinator. Read back any write. Recording the queue never approves or changes the underlying work.
 
 ## Decide what requires a human
 
@@ -135,11 +135,12 @@ Order items by blocking dependency, then risk and leverage. Do not use urgency a
 
 ## Integrate with related skills
 
-- Consume `Human decisions required`, `Human review mode`, risk tier, gate contracts, and focused review locations from `@branch-review` and `@dev-loop` when available, but verify them against the current PR head and repository state.
+- Consume decisions, risk, gate contracts and focused locations from `@change-review` and `@dev-loop`; bind each item to the current frozen snapshot or PR head and instruction revision.
 - Consume the durable decisions and gate fields from `@repo-handoff`; do not invent a review item merely because a record is missing.
 - Use `@repo-status` evidence to locate active work, but re-evaluate whether each blocker truly requires human authority.
-- Direct code-quality investigation to `@branch-review` or `@repo-review`; include only their unresolved human-owned decisions here.
+- Direct code-quality investigation to `@change-review` or `@repo-review`; include only unresolved human-owned decisions here. Include observed OpenCode questions only when authoritative contracts cannot resolve them; SwitchBoard owns monitoring, and a notice alone is not a new human gate or approval.
 - After the user decides, report the decision and its exact scope. Do not modify code, Issue/PR content, or gates unless the user separately asks for that action. The automatic `codex-repo-state:v1` marker update on an existing carrier is the sole recording exception; if unavailable, mark it `pending-write`.
+- Preserve an exact no-review final response. If recording is unavailable, disclose `bootstrap`/`pending-write` and its consequence in commentary before that final response; do not invent a review item to carry the storage failure.
 
 ## Quality gate
 

@@ -1,0 +1,14 @@
+interface:
+  display_name: Repository Handoff
+  short_description: Persist runs, authority and verified continuation state
+  default_prompt: Use $repo-handoff to restore this repository workflow and record
+    its latest verified checkpoint.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

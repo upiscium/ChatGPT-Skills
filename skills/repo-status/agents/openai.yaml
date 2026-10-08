@@ -1,0 +1,14 @@
+interface:
+  display_name: Repository Status
+  short_description: Map and checkpoint implementation, work, and architecture
+  default_prompt: Use $repo-status to summarize and checkpoint where this repository
+    currently stands.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

@@ -1,13 +1,13 @@
 ---
 name: patch-plan
-description: Convert selected GitHub Bug or Feature Request Issues into self-contained, dependency-aware parallel implementation workstreams using the repository's guarded Agent Core lifecycle when available or isolated generic worktrees otherwise, with one traceable follow-up PR per workstream. Use to plan an issue-driven development cycle or concurrent Codex execution.
+description: Convert selected filed GitHub Issues into dependency-aware OpenCode execution packets with explicit operation grants and stop points. Use to plan parallel implementation through the live repository Agent Core lifecycle or isolated generic worktrees, including prepublication delivery without assuming commit, push or PR authorization.
 ---
 
 # Plan Review Patches
 
-Turn selected Issues into an implementation plan that a new Codex instance can execute without the original review conversation.
+Turn selected filed Issues into self-contained OpenCode execution packets. `@blueprint` owns approved design and ACs; this skill owns how the selected Issue is executed. `@opencode-bridge` transports packets; it does not decide scope or grant operations.
 
-Read [references/patch-plan-template.md](references/patch-plan-template.md) before writing the final plan.
+Read [references/patch-plan-template.md](references/patch-plan-template.md) and `@repo-handoff`'s `references/execution-contract.md` before writing the plan. Copy resolved contract fields into the packet; an executor must not need these installed skills.
 
 ## Select the execution backend
 
@@ -29,9 +29,22 @@ Inspect repository instructions before prescribing branches, worktrees, agents, 
 
 Require filed Issues for an execution-ready plan. If the user supplies findings without Issues, produce only a draft and mark Issue creation as a blocker.
 
-Before emitting workstreams, restore any `codex-repo-state:v1` record on the selected Issue/PR with `@repo-handoff` and revalidate its base SHA. Include the chosen carrier, workflow ID, current state status, and the state-record update points in the plan. Automatically persist the planning snapshot and read it back before returning. If no carrier or marker exists, produce a bootstrap block and record it as `bootstrap`; do not invent a hidden tracking Issue. A missing marker is repaired automatically when an existing carrier is available.
+Before emitting workstreams, restore any `codex-repo-state:v1` record on the selected Issue/PR with `@repo-handoff` and revalidate its base SHA. Include the chosen carrier, workflow ID, current state status, and the state-record update points in the plan. Automatically persist the planning snapshot and read it back before returning. If no carrier exists, return `bootstrap`; never invent a hidden tracking Issue. A missing marker on an existing carrier is bootstrapped automatically.
 
 If the inputs contain `SEC-*` findings, vulnerability details, containment, credential rotation, or exploit-sensitive work, exclude those items and use `@security-plan`. Do not copy restricted security details into this plan.
+
+## Define authority and stop point
+
+Every packet must include workflow/workstream/run ID, approved instruction revision, immutable packet reference/digest, exact target/session role, operation allowlist and approval source. Use OpenCode only; never instruct it to launch standalone Codex CLI.
+
+Choose the requested delivery scope, never a blanket default:
+- Investigation only: bounded questions/evidence; no code or publication.
+- Implementation and tests: deliver a frozen manifest/diff and evidence, stop before unapproved commit/push/Draft PR.
+- Publication: only specifically authorized operations and reviewed snapshot, through repository guards; stop at the named Draft PR or earlier artifact.
+
+Planning approval is not dispatch authority. Goal approval is not architecture/risk or publication permission. Unknown operations remain not-authorized. Ready/Merge stays user-executed outside the packet. Include the seven-field execution gate even for an allowed stream, and retain the exact unresolved human decisions.
+
+Require run-correlated receipt and result formats. Arca coordinates and independently verifies; OpenCode implements; SwitchBoard owns Ask monitoring/notifications. Do not add monitoring loops to Arca or OpenCode or require a new monitoring service before otherwise authorized work. Connection configuration is separate from this generic skill.
 
 ## Form implementation units
 
@@ -96,7 +109,7 @@ Within each workstream, sequence work by dependency and risk:
 4. Integrations and callers
 5. Tests and documentation
 6. Rollout, monitoring, cleanup, and rollback
-7. Delivery through a follow-up pull request
+7. Delivery at the authorized stop point: frozen prepublication evidence or separately authorized Draft PR
 
 Run workstreams in the same wave concurrently. Start a later wave only after its prerequisite PRs are merged and its base SHA is refreshed.
 
@@ -111,7 +124,7 @@ In `agent-core` mode, produce one self-contained Main Orchestrator batch packet 
 3. For an existing already-launched resumable Task, use only the repository's resume readiness path. Never recreate, rehydrate, reset, or replace it to manufacture readiness. Treat non-resumable or post-publication states through the Main-owned lifecycle instead of starting a replacement Task.
 4. When at least two explicit Tasks are ready, run the repository's batch safety check, such as `just agent::batch-plan <task...>`. Treat its dependency, scope, coordination-surface, and external-resource conflicts as serialization constraints. Do not auto-discover additional Tasks.
 5. Launch exactly one Task Orchestrator per parallel-safe Task, up to available concurrency, with that Task's complete readiness handoff. Do not launch generic implementation SubAgents in place of Task Orchestrators.
-6. Keep each Task Orchestrator inside its assigned Task worktree. It may delegate its own bounded Work Units only according to the repository call graph and must prepare exactly its own Draft PR.
+6. Keep each Task Orchestrator inside its assigned Task worktree. It may delegate its own bounded Work Units only according to the repository call graph, then stop at the packet's authorized boundary. Draft PR preparation/publication is not automatic.
 7. Preserve partial progress: one blocked, failed, or decision-waiting Task does not cancel or rewrite independent Tasks. Continue only work that the batch plan still marks parallel-safe.
 8. Leave merge, post-merge finalization, and cleanup with the Main/human authorities defined by the repository.
 
@@ -125,20 +138,21 @@ Require the implementation coordinator to:
 
 1. Allocate at most one active SubAgent per workstream, bounded by available concurrency.
 2. Before creating the first worktree, resolve the repository root with `git rev-parse --show-toplevel` and inspect the root `.gitignore`.
-3. Require the exact anchored entry `/.worktrees/`. Verify it with `git check-ignore .worktrees/`. If it is absent, stop normal implementation, add it through a minimal setup PR, merge that PR, refresh the common base SHA, and only then create worktrees.
+3. Require the exact anchored entry `/.worktrees/` in the committed root `.gitignore`. Verify it with `git check-ignore .worktrees/`. If absent, stop and propose a separately authorized minimal setup PR. Ready/Merge is user-executed; verify the merge, refresh the base SHA, and only then create worktrees.
 4. Create every worktree inside `<repository-root>/.worktrees/<workstream-id>` from the refreshed verified base SHA. Do not use a sibling directory, `/tmp`, a workspace-global directory, or another external path.
 5. Give each SubAgent a unique branch and its assigned repository-local worktree.
 6. Prevent SubAgents from editing the coordinator's working tree or another workstream's branch.
 7. Preserve workstream scope and report unexpected overlap before continuing.
 8. Collect results, validation evidence, branch names, head SHAs, and PR URLs without merging branches locally.
-9. Run cross-workstream integration checks after all PRs in a wave exist, when a safe combined test surface is available.
+9. Run authorized cross-workstream integration checks on pinned frozen results or PRs when a safe isolated combined test surface exists; do not require unauthorized PR publication just to test.
 
 Use worktree commands equivalent to:
 
 ```bash
 repo_root="$(git rev-parse --show-toplevel)"
 cd "$repo_root"
-grep -qxF '/.worktrees/' .gitignore
+rg -xF '/.worktrees/' .gitignore
+git show '<verified-base-sha>:.gitignore' | rg -xF '/.worktrees/'
 git check-ignore .worktrees/
 git worktree add ".worktrees/WS-001" -b '<unique-branch>' '<verified-base-sha>'
 ```
@@ -147,23 +161,20 @@ Do not let `mkdir`, `git worktree add`, or a SubAgent silently create worktrees 
 
 If fewer SubAgent slots are available than parallel workstreams, queue the remaining workstreams within the same wave rather than combining their scope.
 
-## Require implementation delivery
+## Require scoped implementation delivery
 
-Make the generated plan instruct each workstream executor to:
+Instruct the executor to:
+1. Revalidate the grant and live repository gate before any mutation. With a stop/conditional gate, perform only the named admissible fallback.
+2. Acquire the dedicated branch/worktree only through the selected backend. Preserve existing tasks and dirty work; do not recreate a Task to manufacture readiness.
+3. Implement and validate only authorized scope. Report scope drift and human-owned choices instead of deciding them silently.
+4. Deliver the exact frozen snapshot/manifest and test/environment evidence for independent `@change-review`. Do not create a commit just to obtain an immutable reference without commit authority.
+5. Commit, push or create/prepare a Draft PR only when individually permitted and repository lifecycle gates are satisfied. A passed review is not publication permission.
+6. If a PR is authorized and created, report real number, canonical URL, branch and head SHA, Issue/Task mapping, goal/AC coverage, non-goals, risk, validation and limitations. Never invent an identity.
+7. If no publication was authorized, report `not-created; outside grant` and the reached prepublication stop. This is successful scoped delivery, not a missing-PR failure.
+8. Return a run/revision/digest-bound executor report. The coordinator automatically records verified state through `@repo-handoff`; an executor may append only its own immutable report when authorized, never overwrite coordinator state. Preserve claims versus verified facts.
+9. Stop at the exact granted boundary. Do not run Ready/Merge, release, cleanup, host reconfiguration or Ask monitoring.
 
-0. Read the workstream execution contract before changing code. If its status is `stop` or `conditional`, perform only the admissible fallback until the named authority clears the prerequisite; never reinterpret the constraint from surrounding prose.
-
-1. Acquire its dedicated branch and worktree through the selected execution backend. In `agent-core` mode, use the Task already created by the guarded lifecycle; in `generic-worktree` mode, create them from the verified base according to repository conventions.
-2. Implement only the selected plan scope and run the required validation.
-3. Commit and push only through repository-owned guarded APIs when `agent-core` mode applies; otherwise use the permitted generic workflow.
-4. Create or prepare a follow-up Draft PR through the selected backend against the planned target branch.
-5. Link every addressed Issue and the originating repository review or merged PR when available. Use closing keywords only when the PR fully satisfies the Issue and repository conventions support them.
-6. Include a concise change summary, validation evidence, compatibility or migration notes, known limitations, and rollback guidance in the PR body.
-7. Return the workstream ID, Agent Core Task ID and lifecycle status when applicable, created PR number, canonical URL, head branch, and head SHA. Treat any missing required identity as incomplete delivery.
-
-8. At every substantive checkpoint, automatically prepare and persist a `codex-repo-state:v1` update on the workstream's canonical Issue or PR, including the new SHA, status, gate, decision, and next action, then read it back. This is a metadata-only continuation record and does not authorize implementation, push, PR creation, Ready/Merge, or Issue close. If the carrier write path is unavailable, return the exact block as `pending-write` and mark the workstream incomplete until it is saved.
-
-If PR creation is blocked by permissions, authentication, branch protection, or repository policy, require the executor to stop after preserving pushed work when safe and report the exact blocker, branch name, and next action. Never invent a PR number.
+For blocked publication, preserve permitted work and report exact blocker, branch/snapshot and next gate. A marker write failure is `pending-write`, not permission to change the carrier or claim durable recovery.
 
 ## Preserve boundaries
 
@@ -190,11 +201,11 @@ Before responding, verify that:
 - Tests cover success, failure, regression, and integration behavior where applicable.
 - Compatibility, migration, rollout, observability, rollback, and documentation are addressed or explicitly unnecessary.
 - The plan states what Codex must not change.
-- The plan requires a follow-up PR and a final report containing its real number and canonical URL.
+- Delivery matches the operation grant and stop point; actual PR number/URL are required only when PR creation was authorized and completed.
 - Parallel workstreams have no unresolved dependencies or likely shared write boundaries.
-- Every workstream has an isolated branch or worktree, bounded scope, and separate PR.
+- Every workstream has isolated ownership and bounded scope, with one separate eventual PR when publication is authorized.
 - Agent Core worktrees are created only by its guarded lifecycle; generic worktrees are under the repository root's `.worktrees/` directory and require the committed root `.gitignore` entry `/.worktrees/` before creation.
 - Ordered work is divided into waves and later-wave base SHAs are refreshed after prerequisite merges.
-- Another Codex instance can execute the plan without the review conversation.
+- OpenCode can execute the resolved packet without the review conversation or Arca's installed skills, without launching a separate Codex CLI.
 - The plan identifies the durable carrier and records how a later chat restores each workstream and its dependency wave.
 - The latest planning state was automatically saved and read back, or is explicitly marked `bootstrap`/`pending-write` with the recovery consequence.

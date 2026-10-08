@@ -1,13 +1,13 @@
 ---
 name: blueprint
-description: Turn a vague idea, desired capability, unmet need, workflow pain point, or dissatisfaction with an existing product into a validated design brief and a Codex-ready implementation plan through an adaptive interview. Use when the user wants help discovering requirements, challenging a proposed solution, defining an MVP, writing a technical design, or preparing an actionable implementation specification before coding.
+description: Turn a vague idea, desired capability or workflow pain into a human-approved design brief, stable acceptance criteria and bounded Issue candidates through an adaptive interview. Use to discover requirements, challenge a proposed solution, define an MVP or decide technical design before issue-filer and patch-plan prepare execution.
 ---
 
 # Build a Blueprint
 
-Guide the user from an incomplete signal to an implementation-ready plan. Do not assume that the user's first proposed feature is the correct solution to the underlying problem.
+Guide the user from an incomplete signal to a decision-ready design. Own what and why; leave filed-Issue execution instructions to `@patch-plan`. Do not assume that the user's first proposed feature is the correct solution to the underlying problem.
 
-Read [references/implementation-plan-template.md](references/implementation-plan-template.md) before producing the final document.
+Read [references/design-brief-template.md](references/design-brief-template.md) before producing the final design brief.
 
 ## Identify the starting signal
 
@@ -77,26 +77,31 @@ Do not finalize the plan until:
 - MVP boundaries and non-goals are explicit.
 - Material actors, data, integrations, and failure modes are understood.
 - Acceptance criteria can be tested.
-- Architectural decisions are either confirmed or clearly labeled assumptions.
+- Material architectural decisions are confirmed by their proper authority or retained as explicit blocking questions; assumptions do not authorize implementation.
 - Remaining unknowns do not prevent safe implementation.
 
-If the user asks to proceed despite open questions, convert each one into an explicit assumption, risk, or discovery task. Never hide uncertainty with false precision.
+If the user asks to proceed despite open questions, retain material human-owned gates and propose only bounded discovery or another admissible fallback. Do not convert an unresolved approval into an executable assumption.
 
-## Produce the design and plan
+## Produce the design contract and Issue candidates
 
-Use the structure in `references/implementation-plan-template.md`. Adapt it to the project and omit irrelevant sections.
+Use `references/design-brief-template.md`. Give the brief a stable ID and revision, approval status and source. Distinguish design approval from authorization to file Issues, dispatch, implement or publish.
 
-Make the Codex plan executable:
+Make the approved design traceable:
 
-- Order tasks by dependency.
-- Name concrete files, modules, symbols, interfaces, migrations, and commands when verified.
-- Separate discovery tasks from implementation tasks.
+- Identify coherent capability/change units and their dependencies, not a second executable task plan.
+- Name components and interfaces when verified; leave exact execution steps/commands to `@patch-plan` after Issue selection.
+- Separate discovery questions from approved implementation scope.
 - Include tests alongside the behavior they validate.
 - Include security, failure handling, observability, compatibility, rollout, and rollback where relevant.
-- Give each phase verifiable completion criteria.
-- State what Codex must not change.
+- Assign stable `AC-*` criteria and `DES-*` candidate IDs with desired outcome, scope, non-goals, dependencies and evidence.
+- State invariants and what later implementers must not change.
+- Preserve every action-binding decision or unresolved dependency as an execution contract: target action, status, prerequisite, clearing authority, admissible fallback, evidence snapshot, and execution-time revalidation. Use `none` or `unknown` explicitly when needed.
+
+Do not let an existing implementation plan, deadline, apparent agreement, delegated ownership, or precedent turn an unresolved prerequisite into optional guidance.
 
 Do not write implementation code or modify the repository unless the user separately asks.
+
+Offer `@issue-filer` for explicitly selected approved candidates, then `@patch-plan` for the resulting filed Issues. Do not create Issues or an OpenCode execution packet inside this skill. For an existing canonical carrier, automatically persist the brief revision, decision provenance and next gate through `@repo-handoff`; if no carrier exists, return a bootstrap reference without creating one.
 
 ## Quality gate
 
@@ -109,4 +114,5 @@ Before delivering the final plan, verify that:
 - Acceptance criteria are externally observable or mechanically testable.
 - Dependencies, migrations, and failure paths are covered.
 - Assumptions and unresolved risks are visible to Codex.
-- A new agent could begin work without access to the interview transcript.
+- Action-binding decisions retain their operational force and cannot be bypassed by the first implementation task.
+- A new agent can reconstruct the design and approval boundaries without the interview transcript, then route through Issue filing and execution planning.

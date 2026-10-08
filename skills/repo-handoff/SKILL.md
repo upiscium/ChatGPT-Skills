@@ -1,6 +1,6 @@
 ---
 name: repo-handoff
-description: Automatically persist and restore a verifiable continuation state for GitHub repository work using Issue or pull-request records. Use when starting, pausing, resuming, or checkpointing dev-loop, review, planning, implementation, merge, or post-merge work so another chat or agent can recover the work from the repository without relying on conversation history.
+description: Automatically persist and restore verified GitHub work state on existing Issues or PRs, including OpenCode runs, instruction revisions, authority, evidence and next gates. Use at repository-work checkpoints and when resuming in another chat or agent without relying on conversation history.
 ---
 
 # Persist or Restore Repository State
@@ -16,7 +16,7 @@ Infer one operation from the request and state it explicitly:
 - `restore`: read the latest durable record and reconstruct the current stage, workstreams, gates, decisions, and next action.
 - `record`: explicitly repair, backfill, or inspect a checkpoint; routine workflow checkpoints use automatic recording instead.
 - `bootstrap`: reconstruct state when no durable record exists, without pretending it has been saved.
-- `audit`: compare the durable record with live Issues, pull requests, branches, tasks, and the target commit, reporting drift without changing anything.
+- `audit`: compare recorded and live facts, reporting drift without substantive actions; automatically record only the observation under the metadata policy.
 
 Restore, bootstrap, and audit do not change product, Issue, PR, branch, or task content. Automatic state recording is a narrowly-scoped metadata write to an already selected canonical carrier and is enabled for every GitHub-backed workflow by default. It does not require a separate user prompt, and `next` does not authorize any business or repository action beyond the one previously announced. Creating a new carrier or changing Issue/PR content, labels, status, reviewers, branches, code, or merge state still requires the responsible workflow's explicit authorization.
 
@@ -31,9 +31,22 @@ For every repository-workflow response that observes or changes state, record th
 
 `@btw` side questions and non-repository conversations are exempt because they must not advance or mutate the main workflow. They may report the last visible stage, but they do not create or update a repository state marker.
 
-Use the existing canonical Issue or PR and update only the marked `codex-repo-state:v1` record (prefer editing that marker comment; otherwise append a new marked comment). Read it back and report the sequence, timestamp, and canonical URL. If no carrier exists, return a `bootstrap` packet and do not create a hidden tracking Issue. If the connector or user-run command path is unavailable, return the exact marker as `pending-write`, state the reason, and keep the workstream blocked from claiming durable recovery; retry on the next repository interaction.
+Use the existing canonical Issue or PR and update only neutral continuation metadata and its human summary. Prefer append-only successor records with event and predecessor IDs. Edit only an exclusively owned marker with a supported compare-and-swap guard; never use blind last-writer-wins. Read back the exact event and report its sequence, timestamp and URL. On an existing unambiguous carrier, the first marker is also automatic and needs no additional recording approval. Without a carrier, return `bootstrap`; never create a hidden tracking Issue. On write failure, return the exact sanitized marker as `pending-write` and do not claim durable recovery.
 
 Automatic recording is not approval. It must never execute or imply Issue creation, PR creation, code publication, Ready/Merge/Close, cleanup, release, security disclosure, or risk acceptance.
+
+An ordinary progress comment is not a protected repository publication checkpoint, Task State mutation, contract approval or readiness attestation. If repository policy restricts the marker itself, obey it and return `pending-write`; never relabel a protected action as metadata. `audit` does no substantive actions but may record its observation under this policy.
+
+## Own the record without clobbering concurrent work
+
+- Nominate one coordinator writer per workflow. Concurrent review workers return pinned deltas to that coordinator, not shared-marker writes. A standalone observer preserves unrelated runs, authority and pending next actions.
+- Executors may append immutable run-scoped `codex-executor-report:v1` reports only when that report write is authorized. They must not edit the coordinator marker or mark their own output independently verified.
+- Read immediately before writing; include a unique event ID and predecessor ID. Divergent successors, duplicate sequence numbers or conflicting writers are `conflicted`, not ordered by timestamp alone. Stop affected write-producing transitions and reconcile instead of overwriting either record.
+- Before external dispatch, save and read back the exact run's dispatch intent. If this cannot be established, do not send automatically. A manual packet may be returned as not sent and not durable.
+- Reconcile an uncertain event/request ID before retrying any write or dispatch. Network failure does not prove the original action did not happen.
+- Preserve predecessor/successor carrier links when moving Issue → PR → Issue. Store only safe opaque connection/session references in public records, never host coordinates, private paths, tokens or terminal transcripts.
+
+Read [references/execution-contract.md](references/execution-contract.md) for planning, dispatch, collection or review of delegated work. This shared format supplements, and never replaces, repository-owned lifecycle contracts.
 
 ## Locate the canonical carrier
 
@@ -46,7 +59,7 @@ Use one canonical carrier for each workstream and identify it in the output:
 
 For a parallel wave, keep per-workstream records on their own Issue/PR carriers and optionally maintain one aggregate record only when a parent/tracking Issue already exists or its creation is explicitly approved. Do not use an unrelated PR or Issue as an aggregate carrier.
 
-Prefer a single editable comment containing the marker below. If comment editing is unavailable, append a new marked comment with a monotonically increasing `sequence` and identify the newest valid one; never silently overwrite an unmarked human comment. Do not place credentials, tokens, private logs, or full conversation transcripts in a public record.
+Keep a valid predecessor chain and a monotonically increasing sequence per carrier; identify the newest non-conflicting record, not merely the newest comment. Never overwrite an unmarked human comment. Do not place credentials, tokens, private logs, or full conversation transcripts in a public record.
 
 ## State record contract
 
@@ -68,7 +81,7 @@ Required semantic fields:
 - recording mode/status/source (`automatic|manual|none` and `saved|pending-write|bootstrap`);
 - stage and per-workstream status (`planned`, `running`, `pr-open`, `review-pending`, `changes-required`, `merge-ready`, `merged`, `blocked`, or `completed`);
 - Issue, Task, branch, PR, and head SHA mappings for every workstream;
-- stable acceptance/contract IDs and risk tier when supplied by `@patch-plan`, `@dev-loop`, or `@branch-review`;
+- stable acceptance/contract IDs and risk tier when supplied by `@patch-plan`, `@dev-loop`, or `@change-review`;
 - unresolved human decisions with options, authority, blocker, and safe fallback;
 - the exact next action, its authorization requirement, prerequisite, and revalidation check;
 - evidence URLs, commit/PR/Task identifiers, and an observation timestamp.
@@ -78,9 +91,9 @@ Use `none` or `unknown` instead of omitting a field that controls a gate. Treat 
 ## Record workflow
 
 1. Read the current carrier and live repository metadata. Pin the branch, base/head SHAs, PR state, checks, review decision, linked Issue, and relevant task state.
-2. Compare the proposed state with the previous valid marker. If the carrier, workflow, or SHAs changed unexpectedly, stop and record a conflict rather than overwriting history.
+2. Compare with the previous marker. Expected SHA evolution is a new observation that invalidates affected old reviews/gates, not a conflict to erase. Unexpected carrier/workflow identity or divergent predecessor chains require conflict reconciliation; preserve both records rather than overwriting.
 3. Serialize only durable facts and decisions. Exclude transient thoughts, secrets, speculative plans, and anything not needed to resume.
-4. Show the exact target carrier, marker block, and write method before writing. Automatic recording may use the available GitHub connector; command-only workflows may emit the exact user-run `gh` update as `pending-write`. Never claim a record was saved when only a block was generated.
+4. Announce the carrier and concise update before writing; show the full marker only for explicit repair, a user request, or `pending-write`. Automatic recording may use the connector; command-only workflows may emit an exact user-run update as `pending-write`. Never claim a record was saved when only a block was generated.
 5. After a successful write, read the carrier back and verify the marker, sequence, timestamp, and referenced SHAs. Report the canonical URL and the resulting state.
 
 When a workflow is read-only, it may still perform the automatic state-marker write described above; it must not modify product-facing Issue/PR content or review state. A failed write leaves the previous valid state untouched and returns a retry or manual-application path. Do not silently drop the checkpoint because the workflow's substantive result is read-only.
@@ -88,13 +101,17 @@ When a workflow is read-only, it may still perform the automatic state-marker wr
 ## Restore workflow
 
 1. Resolve the repository and requested branch/PR/Issue, then fetch live metadata at an immutable commit.
-2. Find the newest valid `codex-repo-state:v1` marker on the canonical carrier. If multiple carriers exist, prefer the carrier explicitly named by the workflow and report all conflicting markers.
+2. Find the newest valid non-conflicting `codex-repo-state:v1` predecessor chain on the canonical carrier. Respect writer ownership and carrier transfers; report competing chains rather than selecting by timestamp. Legacy markers without event IDs need live reconstruction before a transition.
 3. Revalidate every action-binding field against live state: repository, branch, Issue/PR number, PR state, base/head SHA, required checks, approvals, task lifecycle, and merge result.
 4. Mark the record `fresh`, `stale`, `conflicted`, `incomplete`, or `reconstructed`. Never treat a stale or conflicted record as permission to write, merge, or dispatch work.
 5. Fill missing live facts from the repository and Issues/PRs, clearly labeling reconstructed fields. Preserve the last durable decisions but do not resurrect a closed or superseded action.
 6. Return a self-contained recovery packet with the current stage, workstream table, human decisions, blockers, evidence, next action, and the exact revalidation required before it can proceed.
 
-If no marker exists, return `No durable repository handoff found` followed by a `bootstrap` packet. The packet may be used to start a new record only after explicit authorization.
+If no marker exists on an existing canonical carrier, label the reconstruction and automatically save/read back its first marker. If no carrier exists, return `No durable repository handoff found` and a `bootstrap` packet; only creating a new carrier requires separate approval.
+
+For delegated runs, restore run/revision/digest, exact session binding, operation grant and stop point. Verify the binding through a current read-only observation before sending. An unreachable session means `unknown`, not failed or safe to resend. Old v1 markers without these fields cannot prove authorization or absence of prior dispatch. Preserve executor-reported claims separately from Arca-verified evidence.
+
+Ask monitoring and notifications belong to SwitchBoard. Arca and OpenCode do not install watchers, poll indefinitely or promise surveillance after a turn. A notification may trigger an authorized status check but is never approval, an answer or completion proof. Record a safe correlation reference and known delivery status; do not imply SwitchBoard is configured without evidence.
 
 ## Output format
 
@@ -133,7 +150,7 @@ For `record`, return the intended marker and human summary before writing, then 
 
 - `@dev-loop` should restore before acting on `next` and automatically record every substantive checkpoint, including blocked and terminal states.
 - `@repo-status` should consume this record and flag missing, stale, or conflicting state.
-- `@branch-review`, `@repo-review`, `@patch-plan`, `@pr-merge`, `@repo-status`, and `@human-review` should automatically record their state fields on an existing carrier; their no-code/no-merge/command-only boundaries remain in force.
+- `@change-review`, `@repo-review`, `@patch-plan`, `@opencode-bridge`, `@repo-status`, and `@human-review` automatically record their owned fields or return deltas to the coordinator; no-code/no-merge/command-only boundaries remain in force.
 - `@human-review` should read the durable decisions and list only the still-open human gates.
 - `@handover` may link to the canonical carrier instead of duplicating GitHub-backed state.
 
