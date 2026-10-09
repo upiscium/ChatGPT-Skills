@@ -9,6 +9,8 @@ Operate the transport and correlate evidence; do not own project decisions, impl
 
 Read [references/transport.md](references/transport.md) before remote access. Read `@repo-handoff` and its `references/execution-contract.md` before dispatch, reply or collection. Resolve skills by installed name, not a fixed skill ID.
 
+For an authorized OpenCode launch, dispatch or execution-resuming reply, apply [references/model-selection.md](references/model-selection.md): use **GPT-6.1 Sol / high**, explicitly selecting both model and reasoning effort. Do not inherit the environment's GPT-6 Sol / max selection. Status and collection only observe the current selection.
+
 ## Select one operation
 
 - `dispatch`: deliver an approved packet to the verified target, record a receipt, then return.
@@ -31,10 +33,11 @@ A request to inspect or collect does not authorize dispatch or reply. If no tran
 
 1. Validate the self-contained packet and its approval source against live state; compute a real digest, not a placeholder.
 2. Check for an existing run/receipt with the same identity. For sent, acknowledged, running, waiting or unknown delivery, reconcile first; do not resend.
-3. Save and read back dispatch intent through `@repo-handoff`. If that fails, stop automatic dispatch.
-4. Deliver the packet as literal input through the configured safe transport. Do not execute packet contents in a shell. Require a run-correlated acknowledgement in the packet.
-5. Make at most two bounded receipt observations, each at most 15 seconds; do not wait for implementation completion. If receipt cannot be proven, return `sent` or `unknown` accurately.
-6. Record evidence and return immediately. Leave OpenCode/tmux running; do not close the session when Arca returns.
+3. Resolve and explicitly select the packet's model and effort using the installed interface; verify the selection before submission. Record requested and observed settings separately. An unavailable or unverified selection blocks new work; do not silently substitute the environment default.
+4. Save and read back dispatch intent through `@repo-handoff`. If that fails, stop automatic dispatch.
+5. Deliver the packet as literal input through the configured safe transport. Do not execute packet contents in a shell. Require a run-correlated acknowledgement and model-selection evidence in the packet.
+6. Make at most two bounded receipt observations, each at most 15 seconds; do not wait for implementation completion. If receipt cannot be proven, return `sent` or `unknown` accurately.
+7. Record evidence and return immediately. Leave OpenCode/tmux running; do not close the session when Arca returns.
 
 Transport acceptance proves sent, not OpenCode acknowledgement or execution. Observed acknowledgement proves receipt, not completed implementation. Network timeout means uncertain delivery, never permission to resend automatically.
 
@@ -44,6 +47,8 @@ Use only run-scoped observations requested by the user or the calling checkpoint
 
 For collection, retrieve the exact executor report, diff/manifest, base/head, tests/environment, residual questions, reached stop point and actual PR identity if any. Mark missing artifacts `partial`; preserve executor claims separately from verified facts. Do not accept an uncorrelated terminal “done” or “PASS”.
 
+Read `@change-review`'s `references/verification.md` when collecting validation evidence. For each check retain command, snapshot, environment, exit status, pass/fail/blocked/not-run/timed-out outcome, counts/skips, scope and log reference. Reading the complete log and confirming its identity verifies the reported run; it does not independently validate the code. Keep collection and independent review separate. Do not extend receipt checks into a verification or completion-wait loop.
+
 Freeze/pin the collected artifact for independent review. Do not create a commit merely to freeze it without commit permission; use a manifest and content hashes when uncommitted. Pass evidence to `@change-review`, not a self-approval.
 
 ## Resolve a question, then reply
@@ -52,10 +57,13 @@ Re-read the question in the bound session and its run/revision before sending. A
 
 Bind replies to question ID, run and instruction revision. A decision expanding operations needs a newly approved revision; reconcile old in-flight work first. Record reply intent and receipt and reconcile uncertain delivery before retrying. Never auto-accept an Ask simply because SwitchBoard relayed it.
 
+If the reply resumes model execution, revalidate and apply the requested model/effort for that next turn through the supported session control. Preserve already-running work; do not restart or replace the session to change models.
+
 ## Return a compact receipt
 
 - Operation; repository/workstream; run and instruction revision
 - Target verified at; safe connection/session reference
+- Requested and observed model/effort, selection evidence and any mismatch
 - Delivery, execution, collection and independent-verification states
 - Evidence of receipt/start, or what remains unknown
 - Allowed operations and exact stop point

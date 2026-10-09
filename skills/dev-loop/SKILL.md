@@ -13,7 +13,9 @@ Own orchestration and verification, not implementation or continuous monitoring.
 - `merge-command-only`: for “このPRのマージコマンドだけ出して” or the former `@pr-merge` intent, read [references/merge-command.md](references/merge-command.md) and handle only the named PR. Do not start a repository review, create Issues or initiate a whole loop.
 - Status/collection request: inspect the existing run; do not launch or resume work implicitly.
 
-Read `@repo-handoff` and its execution-contract reference before planning or dispatch. Use `@change-review` instead of the legacy `@branch-review` compatibility entrypoint.
+Read `@repo-handoff` and its execution-contract reference before planning or dispatch. Use `@change-review` directly; the legacy `@branch-review` is an explicit-only compatibility alias.
+
+Use **GPT-6.1 Sol / high** for authorized OpenCode launches and subsequent execution turns unless the user overrides it. Read `@opencode-bridge`'s `references/model-selection.md`, carry the requested/resolved selection in packets, and verify both settings before dispatch or execution-resuming reply. Do not inherit GPT-6 Sol / max, interrupt busy sessions, or alter model selection during status/collection.
 
 ## Separate authority
 
@@ -38,7 +40,7 @@ Restore canonical state at entry and record each substantive checkpoint automati
 
 ## Resolve context
 
-Pin repository, base/integration branch/SHA, selected Issues/Tasks, contracts/risk/non-goals, dependencies and waves, backend/version, unique branches/worktrees, run/revision/digest, connection/session references, grant/stop point, snapshot or PR/base/head, independent review, merge evidence, carrier/writer and next gate.
+Pin repository, base/integration branch/SHA, selected Issues/Tasks, contracts/risk/non-goals, dependencies and waves, backend/version, unique branches/worktrees, run/revision/digest, connection/session references, requested and observed model/effort, grant/stop point, snapshot or PR/base/head, independent review, merge evidence, carrier/writer and next gate.
 
 Choose `agent-core` when live repository instructions own Main/Task lifecycle; otherwise `generic-worktree`. Do not combine their mutation procedures or invent a new contract system. Retain unknown fields explicitly.
 
@@ -55,6 +57,8 @@ Use `@issue-filer` only for the explicitly selected findings or approved design 
 ### 3. Planning
 
 Use `@patch-plan` for selected filed Issues. Require a Workstream Contract: goal/source, stable ACs, invariants, non-goals, risk, human authority, design latitude and unresolved choices.
+
+For an unexplained failure, first use `@debug-investigate` to produce evidence or a bounded investigation packet. Do not dispatch a guessed repair. Keep investigation and eventual repair within their respective grants.
 
 Build the dependency/conflict graph (`parallel|ordered|combined|blocked`), isolate ownership and assign waves. A packet must state run/revision, allowed operations and exact stop point. Choose investigation-only, implementation/tests, or expressly authorized publication; never assume commit/push/Draft PR for every task.
 
@@ -76,9 +80,13 @@ On the next requested checkpoint use bridge status/collect. Preserve sent, ackno
 
 Collect run-correlated snapshot/manifest, validation evidence, actual operations and stop point. PR absence is expected for prepublication grants, not automatic failure. If publication was authorized/required, verify the actual PR number, URL, branch and SHA; never invent one. Match Issue/Task/backend lifecycle and approved scope.
 
+Apply `@change-review`'s `references/verification.md`: report exactly which behavior/check passed on which snapshot, and retain blocked, unrun or timed-out checks. Collection may finish while independent verification is still pending; do not turn an executor report into a verified completion claim.
+
 ### 6. Independent change review and correction
 
 Use `@change-review` in prepublication or PR mode. Require the order Intent → ACs → Failure Model → Test Evidence → Implementation → Scope. Executor PASS is not independent evidence.
+
+Read [references/review-feedback.md](references/review-feedback.md) when handling findings or reviewer suggestions. Verify each suggestion against the contract and current code before including it in a correction packet. Keep separate contract-compliance and code-quality conclusions without requiring a fresh agent for every small step. See [references/superpowers-notice.md](references/superpowers-notice.md) for the adapted source.
 
 Before concurrent review, create a Review Batch Manifest: batch/workstream IDs, exact snapshots or PR/head, common base, contracts, siblings, dependencies, overlap and isolation. Bound concurrency; give each reviewer one snapshot and no shared writable checkout. Reviewers return deltas; only the coordinator writes aggregate state.
 

@@ -9,6 +9,8 @@ Review independently from the implementation run. Treat intent as authority, tes
 
 Read [references/prepublication.md](references/prepublication.md) for a frozen, not-yet-published change. Read `@repo-handoff` and its execution contract for delegated run identities and evidence provenance.
 
+Read [references/verification.md](references/verification.md) to judge test quality and completion claims. It is the shared evidence policy for planning, collection and review; copy relevant requirements into executor packets. Adaptation provenance is in [references/superpowers-notice.md](references/superpowers-notice.md).
+
 ## Resolve the target and mode
 
 - `prepublication`: require the repository, approved Issue/Task contract, run/revision, exact base and frozen change manifest/digest. A PR is not required. Inspect tracked and untracked content included in scope, deletions, generated files, submodules and binary evidence. Stop when the snapshot cannot be reproduced or changes while being read.
@@ -58,6 +60,12 @@ Review in this order:
 7. Consider CI and prior review signals, but verify their claims against the contract and code.
 8. Attribute actionable findings only to the PR or to unmet acceptance criteria of its linked Issues.
 9. List unrelated pre-existing problems only as post-merge review leads; do not use them to block this PR unless the change makes them materially worse.
+
+Separate contract compliance from implementation quality in the report. A tidy implementation of the wrong behavior fails the first; compliance alone does not prove robustness. These are review dimensions, not a requirement for two agents or repeated review of every small task.
+
+Give an independent reviewer the approved intent, frozen artifacts, relevant raw evidence and scope. Keep implementer conclusions and the coordinator's preferred verdict out of the initial instructions. Distinguish author claims from observations; inspect the code and evidence independently. Prior findings may be supplied for a scoped re-review.
+
+For every proposed test, identify the realistic defect it would detect. Exact-value or source-text assertions are not substitutes for exercising behavior. After corrections, recheck changed behavior and its affected callers; preserve unaffected valid evidence and avoid restarting the entire review without a concrete risk or required gate.
 
 ## Classify findings
 

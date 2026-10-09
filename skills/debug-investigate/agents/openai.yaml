@@ -1,0 +1,14 @@
+interface:
+  display_name: Debug Investigation
+  short_description: Trace failures and prepare evidence for a bounded repair
+  default_prompt: Use $debug-investigate to trace this failure, compare hypotheses
+    and prepare the next bounded investigation or repair handoff.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

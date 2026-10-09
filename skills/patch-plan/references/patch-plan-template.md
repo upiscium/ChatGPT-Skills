@@ -26,6 +26,9 @@ Use this structure and omit sections that are genuinely irrelevant. Preserve sou
 - Approval source and prerequisites per operation:
 - Exact stop point:
 - Connection/session reference and Main/Task/generic role:
+- Requested OpenCode model / effort: GPT-6.1 Sol / high, unless explicitly overridden by the user
+- Resolved provider/model ID / variant: openai/gpt-6.1-sol / high, subject to verification on the selected target
+- Model-selection evidence / observed values / verified at: unknown until inspected; verify both before dispatch
 - Ask monitoring owner: SwitchBoard
 - State status at planning: fresh | stale | conflicted | incomplete | reconstructed | none-found
 
@@ -116,6 +119,7 @@ Run independent workstreams in this wave concurrently, bounded by available SubA
 - Run / approved instruction revision / packet digest:
 - Allowed operations and their authority:
 - Exact stop point and fallback:
+- Requested OpenCode model / effort, resolved ID / variant and pre-dispatch selection check:
 - Dedicated branch:
 - Isolated worktree: guarded Agent Core assignment | `<repository-root>/.worktrees/WS-001`
 - Expected files/modules:
@@ -152,6 +156,16 @@ Omit when unnecessary.
 - Validation:
 - Completion criteria:
 
+For each task, include only applicable details:
+- Interfaces consumed / produced and their authoritative constraints:
+- Named defect each new test detects; independently derived expected behavior:
+- Relevant baseline / intended pre-fix failure / post-fix evidence:
+- Verified command, expected outcome, result scope and retained log reference:
+- Safe execution surface and any environment or operation prerequisite:
+- Optional broader checks and the concrete risk that requires them:
+
+Use independently testable change units, not arbitrary time slices. Keep code bodies out of the plan unless an approved algorithm is otherwise ambiguous. No new automated test is required merely to pin prose, editable configuration values or implementation structure.
+
 Repeat phases and tasks in dependency order. Repeat the workstream section for every Issue or inseparable Issue group. Put dependent work in later waves and require a refreshed base SHA.
 
 ## Test strategy
@@ -162,6 +176,8 @@ Repeat phases and tasks in dependency order. Repeat the workstream section for e
 - Regression and failure paths:
 - Compatibility or migration:
 - Validation commands:
+
+For each claimed result record the exact snapshot, command, environment, exit status, outcome (`pass|fail|blocked|not-run|timed-out`), scope, counts/skips and a readable evidence reference. Keep executor claims separate from inspected evidence. A timeout, incomplete shard set or dependency failure never proves the full suite passed. Reuse evidence only after checking snapshot, environment and scope applicability; rerun affected checks when those change.
 
 Use only commands verified in the repository. Otherwise describe the check and mark command discovery as required.
 
@@ -198,6 +214,7 @@ Use only commands verified in the repository. Otherwise describe the check and m
   - Agent Core Task ID and lifecycle status when applicable
   - Actual PR number and URL if authorized/created; otherwise not-created and reason
   - Frozen manifest/digest and exact validation snapshot
+  - Requested and observed OpenCode model/effort, evidence reference and any mismatch
   - Head branch and resulting commit SHA
   - Executor report reference; coordinator carrier/read-back status or pending-write
 

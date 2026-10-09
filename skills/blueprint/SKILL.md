@@ -9,6 +9,18 @@ Guide the user from an incomplete signal to a decision-ready design. Own what an
 
 Read [references/design-brief-template.md](references/design-brief-template.md) before producing the final design brief.
 
+## Scale the design work
+
+Choose the smallest useful artifact from the actual uncertainty:
+
+- Feasibility investigation: state the question, bounded probe, evidence needed and stop point. A successful probe is evidence, not approval to turn it into a product.
+- Bounded existing behavior: use a short brief with outcome, scope, stable ACs and unresolved decisions. Do not expand it into a subsystem specification.
+- New subsystem or architectural change: compare two or three credible approaches, recommend one with tradeoffs, and document interfaces, failure behavior and dependencies. Split independent capabilities into coherent design units.
+
+Reuse approvals and constraints already established. Do not add another approval round merely because a design was reformatted or a skill was invoked. Ask only about unresolved material decisions; carry existing authority into the next handoff. Scale the artifact, not the strength of its acceptance criteria.
+
+Keep future extensions separate from the approved MVP. Do not invent alternatives when the authoritative contract already selects the approach. See [references/superpowers-notice.md](references/superpowers-notice.md) for the adapted source and license.
+
 ## Identify the starting signal
 
 Classify the input as one or more of:

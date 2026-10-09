@@ -42,6 +42,13 @@ Use this reference when serializing or validating a `codex-repo-state:v1` marker
       "connection_ref": "<safe opaque configured reference>",
       "session_ref": "<safe opaque exact session binding>",
       "binding_verified_at": "<UTC or unknown>",
+      "model_selection": {
+        "requested": {"name": "GPT-6.1 Sol", "provider_model": "openai/gpt-6.1-sol", "effort": "high", "variant": "high"},
+        "observed": {"provider_model": "unknown", "effort": "unknown", "variant": "unknown"},
+        "status": "unknown",
+        "evidence_ref": "unknown",
+        "verified_at": "unknown"
+      },
       "authority": {
         "source": "<approval reference>",
         "operations": {"investigate": "allowed", "edit": "allowed", "test": "allowed", "commit": "not-authorized", "push": "not-authorized", "draft_pr": "not-authorized", "executor_report": "not-authorized"},
@@ -96,4 +103,5 @@ Rules:
 - Use event/predecessor IDs and writer ownership to detect conflicting successors; never choose by timestamp alone. Preserve unrelated fields and the pending coordinator action when applying a delta.
 - Executor reports use a separate immutable `codex-executor-report:v1` marker with event ID, run/revision/digest, reported snapshot, validation and evidence. They do not set coordinator verification, gates or next actions.
 - Mark evidence provenance `observed`, `executor-reported`, or `independently-verified`. Store only safe opaque connection/session references, not private host coordinates, paths or logs.
+- Keep model-selection status `unknown|verified|mismatch|unavailable`, with requested values distinct from observed evidence. Legacy runs without these fields have unknown selection. Do not rewrite historical observed settings to match a new preference or infer verification from requested flags.
 - Save dispatch intent before sending; locate uncertain event/request IDs before retrying. Carrier moves preserve predecessor/successor links.

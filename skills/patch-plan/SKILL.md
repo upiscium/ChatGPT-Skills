@@ -9,6 +9,8 @@ Turn selected filed Issues into self-contained OpenCode execution packets. `@blu
 
 Read [references/patch-plan-template.md](references/patch-plan-template.md) and `@repo-handoff`'s `references/execution-contract.md` before writing the plan. Copy resolved contract fields into the packet; an executor must not need these installed skills.
 
+Read `@change-review`'s `references/verification.md` when specifying tests or completion evidence. Copy the applicable rules into the packet. See [references/superpowers-notice.md](references/superpowers-notice.md) for the adapted planning source.
+
 ## Select the execution backend
 
 Inspect repository instructions before prescribing branches, worktrees, agents, or publication commands.
@@ -36,6 +38,8 @@ If the inputs contain `SEC-*` findings, vulnerability details, containment, cred
 ## Define authority and stop point
 
 Every packet must include workflow/workstream/run ID, approved instruction revision, immutable packet reference/digest, exact target/session role, operation allowlist and approval source. Use OpenCode only; never instruct it to launch standalone Codex CLI.
+
+Include the OpenCode model requirement from `@opencode-bridge`'s `references/model-selection.md`: **GPT-6.1 Sol / high** unless the user overrides it. Carry the resolved provider/model ID and variant, or mark their target-specific resolution pending before dispatch. Require explicit selection of both settings and observed evidence; never let an omitted field inherit GPT-6 Sol / max. Copy this requirement into every independent and manual packet.
 
 Choose the requested delivery scope, never a blanket default:
 - Investigation only: bounded questions/evidence; no code or publication.
@@ -98,6 +102,19 @@ For each implementation unit:
 7. Record dependencies, blockers, risks, and explicit non-goals.
 
 When evidence is insufficient for exact instructions, add a bounded Phase 0 discovery task with a decision output. Do not invent paths, APIs, commands, or architecture.
+
+### Make each unit executable without overprescribing
+
+- Size tasks by independently verifiable outcomes and review boundaries, not a fixed number of minutes, lines or agent calls. Keep setup and documentation with the behavior they support.
+- Identify each changed component's responsibility and the interfaces it consumes and produces. Pin names, types and values only when the approved contract or inspected code pins them. Preserve ordinary implementation latitude.
+- Give each step an observable result. Verification steps name a verified command, expected result and evidence to retain. Avoid vague instructions such as “test thoroughly”; do not transcribe the complete implementation into the plan.
+- Inspect the relevant baseline before attributing failures to the change. Preserve existing failures and environment blockers separately. An unrelated baseline failure need not block independent authorized work; a failure that prevents validating the changed behavior leaves that criterion unverified.
+- For an unexplained bug, use `@debug-investigate` or include its bounded method in Phase 0: reproduce, trace the first incorrect boundary, compare a working case, test one discriminating hypothesis, and record the result before selecting a repair. Investigation does not grant host changes or instrumentation edits.
+- Prefer a failing behavioral regression before a bug fix when practical. Record why it fails; a broken fixture or missing dependency is not the intended regression. Preserve existing work when adding tests later; never delete code to satisfy test-first ceremony.
+- Require tests to detect named behavioral defects using independently derived expectations. Avoid assertions that merely pin editable budgets, warning margins, prose or implementation text. Test the behavior across the chosen boundary instead. Low-impact prose or value changes may need no new automated test.
+- Choose focused checks plus required repository gates. Add broader integration checks for a concrete interaction risk; do not multiply full-suite runs or reviewers per small task without a reason.
+
+Before handing off, check AC coverage, consistent interfaces across tasks, unresolved assumptions, failure cases and proportionality. Copy the necessary design constraints into every independent packet without turning each packet into a second design authority.
 
 ## Order the plan
 

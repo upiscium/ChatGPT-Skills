@@ -6,6 +6,7 @@ Use across patch-plan, dev-loop, opencode-bridge and change-review. Copy the res
 
 - Identity: workflow/workstream IDs, globally unique run ID, instruction revision, exact packet digest and immutable packet reference.
 - Target: repository and Issue, Task if applicable, backend/version, expected base SHA, branch/worktree, execution role (Main or Task), safe connection reference.
+- Model selection: requested OpenCode display name, resolved provider/model ID and effort/variant, plus the requirement to select and verify both before work. Resolve the user preference through `@opencode-bridge`'s model-selection reference and copy it into the packet; keep target-specific resolution `unknown` until inspected. Record observed selection and evidence separately.
 - Authority: human-approved goal/source/revision, stable AC IDs, invariants, non-goals, design latitude, unresolved decisions.
 - Operation allowlist: investigate, edit, test, commit, push, Draft PR, executor-report writes. Mark each `allowed|not-authorized|conditional`, with exact approval source and prerequisites. Approval to plan or dispatch alone is not permission to edit or publish.
 - Stop point: exact artifact/action after which execution stops. Ready, Merge, release and cleanup are excluded from the standard grant. These skills never delegate Ready/Merge.
@@ -21,7 +22,11 @@ Compute the digest over exact canonical packet bytes excluding its own digest fi
 
 ## Receipt and result
 
-Report run/revision/digest, verified target binding, sent time and message/request ID when available. Keep separate axes:
+Report run/revision/digest, verified target binding, sent time and message/request ID when available.
+
+Also report requested and observed model/effort, evidence and verification time. An unresolved selection is not verified by copying the requested values. Preserve historical settings and mismatches on resume; the current preference applies at the next authorized execution boundary without relaunching or duplicating existing work.
+
+Keep separate axes:
 
 | Axis | Values |
 |---|---|
@@ -33,6 +38,8 @@ Report run/revision/digest, verified target binding, sent time and message/reque
 Transport success proves only sent. Acknowledged requires run-correlated receipt evidence; started requires separate execution evidence. Completion text is an executor claim until reviewed. Preserve timestamps and last-known facts when disconnected.
 
 Executor results include actual scope, changed paths, base/head or frozen manifest hashes, validation commands/results/environment, unrun checks, residual risks, questions, stop point reached, artifact locations and record-write status. Only the coordinator records independent verification; reviewers return pinned evidence deltas.
+
+Apply `@change-review`'s `references/verification.md` to result claims. Record each check's exact snapshot, command, environment, exit status, outcome, scope, counts/skips and readable evidence reference. Preserve original evidence provenance and applicability; copying a claim into a new checkpoint does not make it fresh or independently verified. Retain compact failed-hypothesis records and finding dispositions when they prevent repeated investigation, along with the next discriminating check. Keep raw/private logs out of public carriers.
 
 ## Question and reply
 
