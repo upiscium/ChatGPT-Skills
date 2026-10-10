@@ -43,7 +43,8 @@ Use this reference when serializing or validating a `codex-repo-state:v1` marker
       "session_ref": "<safe opaque exact session binding>",
       "binding_verified_at": "<UTC or unknown>",
       "model_selection": {
-        "requested": {"name": "GPT-6.1 Sol", "provider_model": "openai/gpt-6.1-sol", "effort": "high", "variant": "high"},
+        "policy": "opencode-config",
+        "requested": null,
         "observed": {"provider_model": "unknown", "effort": "unknown", "variant": "unknown"},
         "status": "unknown",
         "evidence_ref": "unknown",
@@ -103,5 +104,5 @@ Rules:
 - Use event/predecessor IDs and writer ownership to detect conflicting successors; never choose by timestamp alone. Preserve unrelated fields and the pending coordinator action when applying a delta.
 - Executor reports use a separate immutable `codex-executor-report:v1` marker with event ID, run/revision/digest, reported snapshot, validation and evidence. They do not set coordinator verification, gates or next actions.
 - Mark evidence provenance `observed`, `executor-reported`, or `independently-verified`. Store only safe opaque connection/session references, not private host coordinates, paths or logs.
-- Keep model-selection status `unknown|verified|mismatch|unavailable`, with requested values distinct from observed evidence. Legacy runs without these fields have unknown selection. Do not rewrite historical observed settings to match a new preference or infer verification from requested flags.
+- Keep model-selection status `unknown|verified|mismatch|unavailable`. For new runs use `policy: opencode-config` and `requested: null` to record that Arca supplies no override; this is state metadata, not an API model argument. Keep configured values separate from observed evidence, and leave unavailable metadata `unknown` without blocking dispatch solely for that absence. Preserve legacy requested/observed values and mismatches as history; never replay them as new model-selection instructions or rewrite them to match current configuration.
 - Save dispatch intent before sending; locate uncertain event/request IDs before retrying. Carrier moves preserve predecessor/successor links.

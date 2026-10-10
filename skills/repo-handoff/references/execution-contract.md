@@ -6,8 +6,8 @@ Use across patch-plan, dev-loop, opencode-bridge and change-review. Copy the res
 
 - Identity: workflow/workstream IDs, globally unique run ID, instruction revision, exact packet digest and immutable packet reference.
 - Target: repository and Issue, Task if applicable, backend/version, expected base SHA, branch/worktree, execution role (Main or Task), safe connection reference.
-- Model selection: requested OpenCode display name, resolved provider/model ID and effort/variant, plus the requirement to select and verify both before work. Resolve the user preference through `@opencode-bridge`'s model-selection reference and copy it into the packet; keep target-specific resolution `unknown` until inspected. Record observed selection and evidence separately.
-- Reviewer binding, when applicable: review kind, immutable review target, listed exact agent name/mode, configuration fingerprint or observation time, invocation route, fresh reviewer session and parent if any, requested versus observed agent/model/variant, and independence from the implementation run. Keep safe runtime references resolvable without publishing private host coordinates or security findings. A requested role or process name is not observed reviewer execution.
+- Model policy: `model_policy: opencode-config`; use OpenCode's configured model, effort and variant without CLI/API/prompt overrides. Copy `@opencode-bridge`'s model-selection policy into the packet. Record configured values separately from observed execution metadata and evidence; missing observations stay `unknown` and are not by themselves a dispatch blocker. Never convert observations into a pinned-model instruction.
+- Reviewer binding, when applicable: review kind, immutable review target, listed exact agent name/mode, configuration fingerprint or observation time, invocation route, fresh reviewer session and parent if any, requested versus observed agent, native model policy and observed model/variant, and independence from the implementation run. Keep safe runtime references resolvable without publishing private host coordinates or security findings. A requested role or process name is not observed reviewer execution.
 - Authority: human-approved goal/source/revision, stable AC IDs, invariants, non-goals, design latitude, unresolved decisions.
 - Operation allowlist: investigate, edit, test, commit, push, Draft PR, executor-report writes. Mark each `allowed|not-authorized|conditional`, with exact approval source and prerequisites. Approval to plan or dispatch alone is not permission to edit or publish.
 - Stop point: exact artifact/action after which execution stops. Ready, Merge, release and cleanup are excluded from the standard grant. These skills never delegate Ready/Merge.
@@ -25,7 +25,7 @@ Compute the digest over exact canonical packet bytes excluding its own digest fi
 
 Report run/revision/digest, verified target binding, sent time and message/request ID when available.
 
-Also report requested and observed model/effort, evidence and verification time. An unresolved selection is not verified by copying the requested values. Preserve historical settings and mismatches on resume; the current preference applies at the next authorized execution boundary without relaunching or duplicating existing work.
+Also report `opencode-config` policy, observed model/effort/variant, evidence and observation time. A configured value is not observed execution evidence. Preserve historical settings and mismatches, but do not replay an older pinned model into a new authorized turn. Leave running sessions and their current selection intact; do not relaunch or duplicate work to change models.
 
 Keep separate axes:
 

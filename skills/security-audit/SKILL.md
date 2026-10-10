@@ -9,7 +9,7 @@ Audit the requested repository state defensively. Produce a private-ready remedi
 
 Read [references/security-review-guide.md](references/security-review-guide.md) before beginning the audit.
 
-For an independent security review through OpenCode, use `@opencode-reviewer` to list and inspect the target runtime's security-focused Reviewer roles, then launch the exact role in a fresh context with the requested model/effort. Do not guess an agent name, use a subagent-incompatible CLI path, or treat a fallback to the default agent as a successful security-reviewer launch. Copy this skill's scoped audit requirements into the packet and verify the actual role/session before collecting its report. Keep security details in the authorized private review channel; public continuation records remain sanitized.
+For an independent security review through OpenCode, use `@opencode-reviewer` to list and inspect the target runtime's security-focused Reviewer roles, then launch the exact role in a fresh context using OpenCode's configured model/effort without overrides. Do not guess an agent name, use a subagent-incompatible CLI path, or treat a fallback to the default agent as a successful security-reviewer launch. Copy this skill's scoped audit requirements into the packet and verify the actual role/session before collecting its report. Keep security details in the authorized private review channel; public continuation records remain sanitized.
 
 ## Establish scope
 

@@ -15,7 +15,7 @@ Own orchestration and verification, not implementation or continuous monitoring.
 
 Read `@repo-handoff` and its execution-contract reference before planning or dispatch. Use `@change-review` directly; the legacy `@branch-review` is an explicit-only compatibility alias.
 
-Use **GPT-6.1 Sol / high** for authorized OpenCode launches and subsequent execution turns unless the user overrides it. Read `@opencode-bridge`'s `references/model-selection.md`, carry the requested/resolved selection in packets, and verify both settings before dispatch or execution-resuming reply. Do not inherit GPT-6 Sol / max, interrupt busy sessions, or alter model selection during status/collection.
+Use the model, reasoning effort and variant configured by OpenCode for authorized launches and subsequent execution turns. Read `@opencode-bridge`'s `references/model-selection.md`, carry `model_policy: opencode-config`, omit explicit model/effort overrides and record runtime metadata when exposed. Do not replay older pinned-model requirements, interrupt busy sessions or alter selection during status/collection.
 
 ## Separate authority
 
@@ -40,7 +40,7 @@ Restore canonical state at entry and record each substantive checkpoint automati
 
 ## Resolve context
 
-Pin repository, base/integration branch/SHA, selected Issues/Tasks, contracts/risk/non-goals, dependencies and waves, backend/version, unique branches/worktrees, run/revision/digest, connection/session references, requested and observed model/effort, grant/stop point, snapshot or PR/base/head, independent review, merge evidence, carrier/writer and next gate.
+Pin repository, base/integration branch/SHA, selected Issues/Tasks, contracts/risk/non-goals, dependencies and waves, backend/version, unique branches/worktrees, run/revision/digest, connection/session references, `opencode-config` model policy and observed model/effort, grant/stop point, snapshot or PR/base/head, independent review, merge evidence, carrier/writer and next gate.
 
 Choose `agent-core` when live repository instructions own Main/Task lifecycle; otherwise `generic-worktree`. Do not combine their mutation procedures or invent a new contract system. Retain unknown fields explicitly.
 

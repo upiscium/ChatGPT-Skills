@@ -39,7 +39,7 @@ If the inputs contain `SEC-*` findings, vulnerability details, containment, cred
 
 Every packet must include workflow/workstream/run ID, approved instruction revision, immutable packet reference/digest, exact target/session role, operation allowlist and approval source. Use OpenCode only; never instruct it to launch standalone Codex CLI.
 
-Include the OpenCode model requirement from `@opencode-bridge`'s `references/model-selection.md`: **GPT-6.1 Sol / high** unless the user overrides it. Carry the resolved provider/model ID and variant, or mark their target-specific resolution pending before dispatch. Require explicit selection of both settings and observed evidence; never let an omitted field inherit GPT-6 Sol / max. Copy this requirement into every independent and manual packet.
+Include the OpenCode model policy from `@opencode-bridge`'s `references/model-selection.md`: `model_policy: opencode-config`. Use the model, reasoning effort and variant already configured by OpenCode; omit model/effort overrides from CLI arguments, API fields and instructions. Record actual metadata when exposed, otherwise `unknown`. Copy this policy into every independent and manual packet; do not propagate an older pinned-model requirement.
 
 Choose the requested delivery scope, never a blanket default:
 - Investigation only: bounded questions/evidence; no code or publication.

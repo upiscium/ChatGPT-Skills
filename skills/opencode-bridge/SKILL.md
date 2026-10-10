@@ -11,7 +11,7 @@ For listing reviewer roles or starting an authorized independent review, route s
 
 Read [references/transport.md](references/transport.md) before remote access. Read `@repo-handoff` and its `references/execution-contract.md` before dispatch, reply or collection. Resolve skills by installed name, not a fixed skill ID.
 
-For an authorized OpenCode launch, dispatch or execution-resuming reply, apply [references/model-selection.md](references/model-selection.md): use **GPT-6.1 Sol / high**, explicitly selecting both model and reasoning effort. Do not inherit the environment's GPT-6 Sol / max selection. Status and collection only observe the current selection.
+For an authorized OpenCode launch, dispatch or execution-resuming reply, apply [references/model-selection.md](references/model-selection.md): use the model, reasoning effort and variant already configured by OpenCode. Omit model/effort overrides from CLI arguments, API fields and packets. Observe the actual selection without changing it.
 
 ## Select one operation
 
@@ -35,9 +35,9 @@ A request to inspect or collect does not authorize dispatch or reply. If no tran
 
 1. Validate the self-contained packet and its approval source against live state; compute a real digest, not a placeholder.
 2. Check for an existing run/receipt with the same identity. For sent, acknowledged, running, waiting or unknown delivery, reconcile first; do not resend.
-3. Resolve and explicitly select the packet's model and effort using the installed interface; verify the selection before submission. Record requested and observed settings separately. An unavailable or unverified selection blocks new work; do not silently substitute the environment default.
+3. Carry `model_policy: opencode-config`; omit model/effort overrides and let OpenCode resolve the selection. Record exposed configuration and observed execution separately. Missing metadata remains `unknown`; an actual unavailable-model error is a blocker, never permission to substitute another model.
 4. Save and read back dispatch intent through `@repo-handoff`. If that fails, stop automatic dispatch.
-5. Deliver the packet as literal input through the configured safe transport. Do not execute packet contents in a shell. Require a run-correlated acknowledgement and model-selection evidence in the packet.
+5. Deliver the packet as literal input through the configured safe transport. Do not execute packet contents in a shell. Require a run-correlated acknowledgement and observed model metadata when available; do not ask the executor to select a model.
 6. Make at most two bounded receipt observations, each at most 15 seconds; do not wait for implementation completion. If receipt cannot be proven, return `sent` or `unknown` accurately.
 7. Record evidence and return immediately. Leave OpenCode/tmux running; do not close the session when Arca returns.
 
@@ -59,13 +59,13 @@ Re-read the question in the bound session and its run/revision before sending. A
 
 Bind replies to question ID, run and instruction revision. A decision expanding operations needs a newly approved revision; reconcile old in-flight work first. Record reply intent and receipt and reconcile uncertain delivery before retrying. Never auto-accept an Ask simply because SwitchBoard relayed it.
 
-If the reply resumes model execution, revalidate and apply the requested model/effort for that next turn through the supported session control. Preserve already-running work; do not restart or replace the session to change models.
+If the reply resumes model execution, preserve OpenCode's native selection and omit model/effort overrides for that turn. Do not replay an older packet's pinned model. Preserve already-running work; do not restart or replace the session to change models.
 
 ## Return a compact receipt
 
 - Operation; repository/workstream; run and instruction revision
 - Target verified at; safe connection/session reference
-- Requested and observed model/effort, selection evidence and any mismatch
+- Model policy `opencode-config`; observed model/effort, evidence or `unknown`
 - Delivery, execution, collection and independent-verification states
 - Evidence of receipt/start, or what remains unknown
 - Allowed operations and exact stop point

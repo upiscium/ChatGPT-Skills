@@ -26,9 +26,9 @@ Use this structure and omit sections that are genuinely irrelevant. Preserve sou
 - Approval source and prerequisites per operation:
 - Exact stop point:
 - Connection/session reference and Main/Task/generic role:
-- Requested OpenCode model / effort: GPT-6.1 Sol / high, unless explicitly overridden by the user
-- Resolved provider/model ID / variant: openai/gpt-6.1-sol / high, subject to verification on the selected target
-- Model-selection evidence / observed values / verified at: unknown until inspected; verify both before dispatch
+- OpenCode model policy: opencode-config; use native role/session/default selection
+- Model / effort / variant overrides: omitted from launch, API calls and instructions
+- Observed provider/model / effort / variant / evidence / observed at: unknown until exposed by runtime metadata; observe without changing
 - Ask monitoring owner: SwitchBoard
 - State status at planning: fresh | stale | conflicted | incomplete | reconstructed | none-found
 
@@ -119,7 +119,7 @@ Run independent workstreams in this wave concurrently, bounded by available SubA
 - Run / approved instruction revision / packet digest:
 - Allowed operations and their authority:
 - Exact stop point and fallback:
-- Requested OpenCode model / effort, resolved ID / variant and pre-dispatch selection check:
+- OpenCode model policy: opencode-config; overrides omitted; observed metadata or unknown:
 - Dedicated branch:
 - Isolated worktree: guarded Agent Core assignment | `<repository-root>/.worktrees/WS-001`
 - Expected files/modules:
@@ -214,7 +214,7 @@ Use only commands verified in the repository. Otherwise describe the check and m
   - Agent Core Task ID and lifecycle status when applicable
   - Actual PR number and URL if authorized/created; otherwise not-created and reason
   - Frozen manifest/digest and exact validation snapshot
-  - Requested and observed OpenCode model/effort, evidence reference and any mismatch
+  - OpenCode model policy, observed model/effort/variant and evidence reference or unknown
   - Head branch and resulting commit SHA
   - Executor report reference; coordinator carrier/read-back status or pending-write
 

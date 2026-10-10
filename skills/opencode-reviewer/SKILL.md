@@ -1,6 +1,6 @@
 ---
 name: opencode-reviewer
-description: List and inspect installed OpenCode reviewer roles, select an appropriate exact role, and launch or collect an isolated code or security review with verified agent and model binding. Use for independent reviews through OpenCode, reviewer startup failures, or explicit Reviewer-role requests. Provides interim routing until the repository's KUMIKI/KAGARI lifecycle owns it.
+description: List and inspect installed OpenCode reviewer roles, select an appropriate exact role, and launch or collect an isolated code or security review with verified agent binding and OpenCode-configured model selection. Use for independent reviews through OpenCode, reviewer startup failures, or explicit Reviewer-role requests. Provides interim routing until the repository's KUMIKI/KAGARI lifecycle owns it.
 ---
 
 # Launch an Independent OpenCode Reviewer
@@ -22,25 +22,25 @@ Use this as the preferred OpenCode reviewer route for this user's independent co
 1. Resolve the selected connection, repository, exact review directory, immutable base/head or frozen manifest, and review kind. Preserve active implementation sessions and dirty work. Use repository-approved snapshot/worktree handling; this skill creates no replacement Task or lifecycle.
 2. Read applicable repository instructions first. A live KUMIKI/KAGARI or Agent Core reviewer API/call graph takes precedence over generic startup; use its supported role discovery and launch binding without bypassing its gates.
 3. Inspect `opencode --version`, installed help, and `opencode agent list` in the **same directory and environment** that will run the review. With an attached server, list its effective agents too. Do not assume RDC's initial directory, another worktree, or a config file on disk represents the target runtime.
-4. Inspect each candidate with the installed `opencode debug agent <exact-name>` or supported server agent endpoint. Record exact name/case, description, mode, model/effort overrides and effective permission rules. Do not dump full provider configuration, credentials or unrelated session transcripts.
+4. Inspect each candidate with the installed `opencode debug agent <exact-name>` or supported server agent endpoint. Record exact name/case, description, mode, configured model/effort and effective permission rules. Do not dump full provider configuration, credentials or unrelated session transcripts.
 5. Use the read-only helper `scripts/list_reviewers.mjs` when Node or Bun is already available: `bun <skill-root>/scripts/list_reviewers.mjs <absolute-review-directory> [exact-role ...]`. It lists names/modes and inspects reviewer candidates. Run it through the same already-approved environment wrapper as OpenCode. If it cannot parse the installed output, inspect native output or the supported structured API; do not install a runtime or conclude that no role exists from a failed filter.
 
 Prefer a listed security-focused reviewer for security scope, and a listed correctness/contract reviewer for ordinary changes. `reviewer` and `security-reviewer` are observed names, not universal constants. Inspect descriptions before deciding; `verifier` or `build` is not an automatic replacement. Select the clear best match without asking the user to make a routine choice. Report a missing/unsuitable role precisely instead of inventing one.
 
 ## Select a supported invocation
 
-- Prefer the supported session/message API when available: use a fresh reviewer session and explicit `agent`, model and variant fields, checked against the installed schema. OpenCode 1.18.30 was verified to execute registered subagent reviewer roles this way without changing their mode or permissions.
-- For `primary` / `all` roles, a supported CLI launch may use `--agent <exact-role>` together with the model and variant options documented for that command.
+- Prefer the supported session/message API when available: use a fresh reviewer session and an explicit `agent`, checked against the installed schema; omit `model`, `variant` and reasoning-effort overrides. OpenCode 1.18.30 supports registered subagent reviewer roles through this API without changing their mode or permissions.
+- For `primary` / `all` roles, a supported CLI launch may use `--agent <exact-role>`; omit model and variant options.
 - For `subagent` roles, **do not use `opencode run --agent <role>` on 1.18.30**: it falls back to the default agent. Use the verified API route, or a repository-approved fresh parent invoking the exact reviewer through the supported Task/@ mechanism. Verify the actual child role and model; the parent is only a dispatcher.
 - Do not change a role's mode, prompt or permissions to force startup. Do not retry through a more privileged agent after denial. Preserve native role restrictions and any stricter session restriction.
 
-Apply the user's current OpenCode preference: **GPT-6.1 Sol / high**, resolving the installed provider/model ID and checking variant semantics. Explicitly bind both settings to the reviewer execution, not just its parent or server. Agent-specific defaults may differ or refer to unavailable models; a prompt asking for another model does not override them. Use supported per-session/per-message selection; leave global configuration unchanged.
+Use the model, reasoning effort and variant configured by OpenCode for the reviewer. Preserve role-specific settings and native fallback/default behavior; do not copy inspected model values into an explicit override. Record exposed configured and actual values separately. If the runtime reports an unavailable configured model, report that blocker without substituting one or changing configuration.
 
-A full TUI's `--agent` or `--model` arguments are not proof of the active reviewer. Its variant selection differs from `run`; follow the model-selection reference and verify UI/runtime metadata before treating startup as successful.
+A full TUI's `--agent` argument is not proof of the active reviewer. Verify the actual role from UI/runtime metadata, and observe model/effort without changing the TUI selection. Missing model metadata remains `unknown`; do not confuse it with a failed role binding.
 
 ## Prepare an independent packet
 
-Include run/revision/digest, immutable review target, approved intent and ACs, non-goals, relevant raw evidence, review kind, chosen role, model/effort, operation grant, report format and exact stop point. Copy the applicable review instructions into the packet; OpenCode must not need Arca's installed skills.
+Include run/revision/digest, immutable review target, approved intent and ACs, non-goals, relevant raw evidence, review kind, chosen role, `model_policy: opencode-config`, operation grant, report format and exact stop point. State that model/effort overrides are omitted. Copy the applicable review instructions into the packet; OpenCode must not need Arca's installed skills.
 
 - Create a fresh context separate from the implementer. Do not resume or fork the implementation conversation into a reviewer. Resume only a verified reviewer session for the same authorized review/re-review.
 - Supply facts and artifacts rather than the implementer's preferred verdict or Arca's diagnosis. Prior findings are appropriate for an explicitly scoped re-review.
@@ -49,10 +49,10 @@ Include run/revision/digest, immutable review target, approved intent and ACs, n
 
 ## Launch once and return
 
-1. Reconcile existing reviewer bindings and uncertain sends for this run before creating a new session. Verify the chosen target, role, model and actual permissions; do not duplicate a running review.
+1. Reconcile existing reviewer bindings and uncertain sends for this run before creating a new session. Verify the chosen target, role and actual permissions; inspect native model settings when exposed without overriding them. Do not duplicate a running review.
 2. Reuse a verified configured server when suitable. If the authorized review needs its own runtime, start a dedicated OpenCode process in the approved review directory. A loopback-only `serve` process is a normal reviewer runtime, not a global service installation; record its actual returned address/process handle. Keep credentials with the configured transport and do not weaken authentication, expose a network listener, or alter host configuration.
-3. Create the isolated reviewer session through the supported interface; record its real ID, role/model read-back, source snapshot and a safe runtime reference. A terminal/tmux name or RDC PID is not an OpenCode session ID. Save and read back dispatch intent through `@repo-handoff` on the existing carrier. Without a carrier, keep a self-contained `bootstrap` receipt and make the durability limitation visible; do not invent a tracking Issue.
-4. Submit literal packet data once with the explicit role/model/variant. Use asynchronous submission when supported. Preserve the request/session identifiers even on timeout.
+3. Create the isolated reviewer session through the supported interface; record its real ID, role read-back, exposed model metadata, source snapshot and a safe runtime reference. A terminal/tmux name or RDC PID is not an OpenCode session ID. Save and read back dispatch intent through `@repo-handoff` on the existing carrier. Without a carrier, keep a self-contained `bootstrap` receipt and make the durability limitation visible; do not invent a tracking Issue.
+4. Submit literal packet data once with the explicit role and no model/variant/effort override. Use asynchronous submission when supported. Preserve the request/session identifiers even on timeout.
 5. Make at most two receipt observations, each at most 15 seconds. Check session/request and assistant metadata for the actual agent, provider/model and variant. HTTP acceptance proves `sent`; it does not prove the reviewer started or completed. Mark missing observations `unknown`. Never ask the model to self-identify as proof.
 6. Return promptly with the session alive. Do not wait for full review completion or take over ongoing Ask monitoring. SwitchBoard/MUSUBI owns notifications. A receipt timeout never permits automatic resend or session termination.
 
@@ -67,7 +67,7 @@ Return a compact receipt:
 - Review kind and immutable target; run/revision/digest
 - Listed role, description/mode and configuration fingerprint or evidence time
 - Invocation route; safe runtime and actual reviewer session references
-- Requested versus observed agent/model/variant and evidence
+- Requested versus observed agent; `opencode-config` policy and observed model/variant/effort with evidence or `unknown`
 - Delivery, execution, collection and review-result states separately
 - Findings/report reference or exact startup blocker; next action
 - Carrier/save status, or `bootstrap`/`pending-write`
