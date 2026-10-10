@@ -7,6 +7,8 @@ description: Send a bounded authorized packet to an existing OpenCode session, i
 
 Operate the transport and correlate evidence; do not own project decisions, implement inside Arca, or run a separate Codex CLI. Use OpenCode as the execution surface even when its model is Codex.
 
+For listing reviewer roles or starting an authorized independent review, route startup to `@opencode-reviewer`. It owns fresh reviewer-session creation and mode-compatible invocation; this bridge remains responsible for bounded transport/status/collection conventions. Do not guess Reviewer names, send a subagent through an incompatible `run --agent` path, or replace the implementer's active session.
+
 Read [references/transport.md](references/transport.md) before remote access. Read `@repo-handoff` and its `references/execution-contract.md` before dispatch, reply or collection. Resolve skills by installed name, not a fixed skill ID.
 
 For an authorized OpenCode launch, dispatch or execution-resuming reply, apply [references/model-selection.md](references/model-selection.md): use **GPT-6.1 Sol / high**, explicitly selecting both model and reasoning effort. Do not inherit the environment's GPT-6 Sol / max selection. Status and collection only observe the current selection.

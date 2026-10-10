@@ -86,6 +86,8 @@ Apply `@change-review`'s `references/verification.md`: report exactly which beha
 
 Use `@change-review` in prepublication or PR mode. Require the order Intent → ACs → Failure Model → Test Evidence → Implementation → Scope. Executor PASS is not independent evidence.
 
+Use `@opencode-reviewer` for configured OpenCode independent-review execution, including security-focused roles with `@security-audit`. List effective roles in the target context, inspect their modes, and verify a fresh review session's actual role/model. A review-stage request authorizes its normal isolated startup; do not add a confirmation solely for starting the reviewer. Preserve repository-owned KUMIKI/KAGARI or Agent Core review gates. A failed default-agent fallback or an implementer's self-review does not satisfy this stage; record the precise startup blocker and compatible next action.
+
 Read [references/review-feedback.md](references/review-feedback.md) when handling findings or reviewer suggestions. Verify each suggestion against the contract and current code before including it in a correction packet. Keep separate contract-compliance and code-quality conclusions without requiring a fresh agent for every small step. See [references/superpowers-notice.md](references/superpowers-notice.md) for the adapted source.
 
 Before concurrent review, create a Review Batch Manifest: batch/workstream IDs, exact snapshots or PR/head, common base, contracts, siblings, dependencies, overlap and isolation. Bound concurrency; give each reviewer one snapshot and no shared writable checkout. Reviewers return deltas; only the coordinator writes aggregate state.

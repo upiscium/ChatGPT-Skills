@@ -7,6 +7,8 @@ description: Independently review one frozen prepublication change or GitHub pul
 
 Review independently from the implementation run. Treat intent as authority, tests as evidence and code as the mechanism under review. Keep correction work separate from post-merge product review and future Issue generation. Never treat an executor's PASS as independent approval.
 
+For an independent review through OpenCode, use `@opencode-reviewer` to list the target runtime's roles, inspect their modes and launch the exact reviewer in a fresh context. This is the preferred configured route; a startup failure is not a reason to silently reuse the implementer or claim no independent reviewer is available. This skill still owns the review contract and verdict. Verify actual reviewer/session/model binding before accepting its report.
+
 Read [references/prepublication.md](references/prepublication.md) for a frozen, not-yet-published change. Read `@repo-handoff` and its execution contract for delegated run identities and evidence provenance.
 
 Read [references/verification.md](references/verification.md) to judge test quality and completion claims. It is the shared evidence policy for planning, collection and review; copy relevant requirements into executor packets. Adaptation provenance is in [references/superpowers-notice.md](references/superpowers-notice.md).
