@@ -60,6 +60,24 @@ Use this reference when serializing or validating a `codex-repo-state:v1` marker
       "collection": "not-collected",
       "verification": "not-reviewed",
       "receipt_ref": "<evidence reference>",
+      "resources": [
+        {
+          "resource_id": "R-001",
+          "kind": "opencode-runtime",
+          "ownership": "owned",
+          "locator_ref": "<resolvable private locator>",
+          "creation_evidence_ref": "<creation receipt>",
+          "identity_evidence_ref": "<verified process/session identity>",
+          "cleanup_owner": "<coordinator>",
+          "consumers": ["<owning run>"],
+          "release_trigger": "terminal report durably collected; no active consumers",
+          "recovery_ref": "unknown",
+          "state": "active",
+          "retention_reason": "run in progress",
+          "revisit_trigger": "result collection"
+        }
+      ],
+      "cleanup": {"policy": "owned-after-use", "authority_ref": "<workflow housekeeping grant>", "owner": "<coordinator>", "status": "pending", "intent_ref": "none", "receipt_ref": "none"},
       "question": {"id": "none", "revision": 1, "status": "none"},
       "executor_report_ref": "none",
       "verified_result_ref": "none",
@@ -106,3 +124,4 @@ Rules:
 - Mark evidence provenance `observed`, `executor-reported`, or `independently-verified`. Store only safe opaque connection/session references, not private host coordinates, paths or logs.
 - Keep model-selection status `unknown|verified|mismatch|unavailable`. For new runs use `policy: opencode-config` and `requested: null` to record that Arca supplies no override; this is state metadata, not an API model argument. Keep configured values separate from observed evidence, and leave unavailable metadata `unknown` without blocking dispatch solely for that absence. Preserve legacy requested/observed values and mismatches as history; never replay them as new model-selection instructions or rewrite them to match current configuration.
 - Save dispatch intent before sending; locate uncertain event/request IDs before retrying. Carrier moves preserve predecessor/successor links.
+- Add resource/cleanup fields without rewriting legacy history. Use `@workspace-cleanup`'s full record when needed; absent provenance is unknown, never disposable. Keep real locators privately resolvable, and retain cleaned/already-absent tombstones. Cleanup status is independent of implementation or review completion; each retained resource needs an owner, reason and revisit trigger. An uncertain cleanup action must be reconciled before retrying.

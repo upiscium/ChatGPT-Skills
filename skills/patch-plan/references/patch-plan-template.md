@@ -30,6 +30,10 @@ Use this structure and omit sections that are genuinely irrelevant. Preserve sou
 - Model / effort / variant overrides: omitted from launch, API calls and instructions
 - Observed provider/model / effort / variant / evidence / observed at: unknown until exposed by runtime metadata; observe without changing
 - Ask monitoring owner: SwitchBoard
+- Resource lifecycle: register persistent OpenCode/RDC/tmux/worktree resources; distinguish newly owned from borrowed/shared
+- Cleanup owner / routine cleanup grant / repository cleanup route:
+- Release triggers: durable result collection for disposable runtimes; verified integration/retirement for implementation worktrees
+- Evidence recovery destination / retained-resource reason and revisit trigger:
 - State status at planning: fresh | stale | conflicted | incomplete | reconstructed | none-found
 
 ## Source map
@@ -121,6 +125,7 @@ Run independent workstreams in this wave concurrently, bounded by available SubA
 - Exact stop point and fallback:
 - OpenCode model policy: opencode-config; overrides omitted; observed metadata or unknown:
 - Dedicated branch:
+- Resource IDs / creation and current identity evidence / consumers / cleanup owner and trigger:
 - Isolated worktree: guarded Agent Core assignment | `<repository-root>/.worktrees/WS-001`
 - Expected files/modules:
 - Must not touch:
@@ -215,6 +220,7 @@ Use only commands verified in the repository. Otherwise describe the check and m
   - Actual PR number and URL if authorized/created; otherwise not-created and reason
   - Frozen manifest/digest and exact validation snapshot
   - OpenCode model policy, observed model/effort/variant and evidence reference or unknown
+  - Owned/borrowed resource references, evidence-preservation location and cleanup handoff or retained reason/owner/revisit trigger
   - Head branch and resulting commit SHA
   - Executor report reference; coordinator carrier/read-back status or pending-write
 

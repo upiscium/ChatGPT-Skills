@@ -19,6 +19,12 @@ Record opaque references in public GitHub state; keep host/IP/path/session mappi
 - Do not kill a remote operation because the receipt budget expired. Report uncertainty and preserve its identifier.
 - Bounded receipt checks are dispatch acknowledgement checks, not Ask monitoring. SwitchBoard alone owns ongoing Ask detection/notifications.
 
+## Resource lifecycle
+
+Register persistent RDC-launched processes, OpenCode runtimes and tmux resources with `@workspace-cleanup` before/after creation. Capture the actual process identity, not just RDC's asynchronous handle; record server/pane/session IDs and whether the target is newly owned or reused. Preserve the RDC connector and shared transport itself.
+
+Keep executing resources alive at dispatch return. After completed output is collected and saved, let the coordinator use `@workspace-cleanup` to release eligible owned resources through the same configured connection. Report partial cleanup or loss of connectivity with retained IDs; never reinterpret an unreachable host as permission to kill or relaunch.
+
 ## Manual fallback
 
 Return the same approved packet with run/revision/digest, target, grant and stop point. State `not-sent`, who will submit it, what acknowledgement/result to return, and how the canonical record will be reconciled. Never hand the user a replacement job when the original may already have been delivered; first reconcile uncertain delivery.

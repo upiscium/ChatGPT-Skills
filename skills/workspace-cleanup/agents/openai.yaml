@@ -1,0 +1,15 @@
+interface:
+  display_name: Workspace Cleanup
+  short_description: Clean up owned sessions, processes and worktrees
+  default_prompt: Use $workspace-cleanup to inspect the selected workflow resources
+    and clean up only those whose ownership, completion and recovery evidence are
+    verified.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

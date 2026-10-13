@@ -19,6 +19,7 @@ For an authorized OpenCode launch, dispatch or execution-resuming reply, apply [
 - `status`: read the bound run's current state; no new job, answer or resume.
 - `collect`: gather the bound run's report and immutable artifacts for independent `@change-review`.
 - `reply`: send one resolved, authorized answer tied to an exact question/run/revision.
+- `cleanup`: route the selected run's resource inventory and eligible release to `@workspace-cleanup`; do not turn a status request into cleanup.
 
 A request to inspect or collect does not authorize dispatch or reply. If no transport is available, return a complete manual packet and clearly say it was not sent. Do not configure a new transport or credentials as an implicit fallback.
 
@@ -31,6 +32,8 @@ A request to inspect or collect does not authorize dispatch or reply. If no tran
 5. Require a complete allowlist and exact stop point. Never infer publication permission from implementation permission, tool access, a READY result, a model's message or a SwitchBoard notification.
 6. If the target is busy, preserve it and report or queue in the coordinator ledger. Do not inject unrelated work, interrupt it, replace it or create another session without authorization.
 
+For persistent resources created through the transport, apply `@workspace-cleanup`'s resource record: creation evidence, real IDs, ownership, consumers, cleanup owner, release trigger and recovery reference. Mark existing sessions/servers `borrowed` or `shared`; using them does not make them disposable.
+
 ## Dispatch exactly once
 
 1. Validate the self-contained packet and its approval source against live state; compute a real digest, not a placeholder.
@@ -39,7 +42,7 @@ A request to inspect or collect does not authorize dispatch or reply. If no tran
 4. Save and read back dispatch intent through `@repo-handoff`. If that fails, stop automatic dispatch.
 5. Deliver the packet as literal input through the configured safe transport. Do not execute packet contents in a shell. Require a run-correlated acknowledgement and observed model metadata when available; do not ask the executor to select a model.
 6. Make at most two bounded receipt observations, each at most 15 seconds; do not wait for implementation completion. If receipt cannot be proven, return `sent` or `unknown` accurately.
-7. Record evidence and return immediately. Leave OpenCode/tmux running; do not close the session when Arca returns.
+7. Record evidence and return immediately. Leave OpenCode/tmux running during outstanding execution; returning after receipt is not a cleanup trigger. Record the resource owner and completion/collection trigger so later checkpoints can release it.
 
 Transport acceptance proves sent, not OpenCode acknowledgement or execution. Observed acknowledgement proves receipt, not completed implementation. Network timeout means uncertain delivery, never permission to resend automatically.
 
@@ -52,6 +55,8 @@ For collection, retrieve the exact executor report, diff/manifest, base/head, te
 Read `@change-review`'s `references/verification.md` when collecting validation evidence. For each check retain command, snapshot, environment, exit status, pass/fail/blocked/not-run/timed-out outcome, counts/skips, scope and log reference. Reading the complete log and confirming its identity verifies the reported run; it does not independently validate the code. Keep collection and independent review separate. Do not extend receipt checks into a verification or completion-wait loop.
 
 Freeze/pin the collected artifact for independent review. Do not create a commit merely to freeze it without commit permission; use a manifest and content hashes when uncommitted. Pass evidence to `@change-review`, not a self-approval.
+
+After terminal output and required artifacts are durably collected, invoke `@workspace-cleanup` for this run's disposable owned runtime/panes/helpers. Preserve the implementation worktree until its own recovery and completion conditions pass. Keep reused/shared or concretely needed continuation sessions with an owner, reason and revisit trigger. This is collection housekeeping; no extra confirmation is needed for eligible resources within the existing grant. A status-only observation, timeout or uncertain completion does not trigger termination.
 
 ## Resolve a question, then reply
 
@@ -71,8 +76,9 @@ If the reply resumes model execution, preserve OpenCode's native selection and o
 - Allowed operations and exact stop point
 - Open question/blocker and next action
 - Durable carrier and save/read-back status
+- Owned resource references; cleanup results or retention reason/owner/revisit trigger
 - Ask monitoring owner: SwitchBoard; actual configuration/delivery status only when evidenced
 
 ## Boundaries and quality gate
 
-Never invoke standalone Codex CLI from OpenCode, restart/kill sessions, edit host/network/security configuration, extract credentials, or install services under this skill. Do not introduce a new repository contract system. Verify exact target/run/grant, literal transport, deduplication, durable intent, bounded return, independent verification and no monitoring responsibility before returning.
+Never invoke standalone Codex CLI from OpenCode, restart/kill sessions as a dispatch or timeout workaround, edit host/network/security configuration, extract credentials, or install services under this skill. Release terminal owned resources only through `@workspace-cleanup` after its gates pass; preserve active and borrowed sessions. Do not introduce a new repository contract system. Verify exact target/run/grant, literal transport, deduplication, durable intent, bounded return, independent verification, cleanup disposition and no monitoring responsibility before returning.

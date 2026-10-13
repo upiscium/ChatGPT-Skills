@@ -14,6 +14,7 @@ Read [references/launch.md](references/launch.md) before starting a process or s
 - `list`: inspect available roles and recommend the matching role; do not launch, send or change configuration.
 - `start`: start the requested independent review on the verified target, confirm bounded receipt and return. An explicit independent-review request includes this normal reviewer startup; do not ask again merely because a fresh reviewer session is needed.
 - `status` / `collect`: inspect the recorded reviewer session and its pinned artifacts; do not start another reviewer implicitly.
+- `cleanup`: use `@workspace-cleanup` on this review's recorded resources; preserve output and verify eligibility before release.
 
 Use this as the preferred OpenCode reviewer route for this user's independent code and security reviews when the configured connection is available. Scope or authority uncertainty still matters; routine role selection and startup do not require new approval. Never treat a listing/status request as launch permission.
 
@@ -50,17 +51,21 @@ Include run/revision/digest, immutable review target, approved intent and ACs, n
 ## Launch once and return
 
 1. Reconcile existing reviewer bindings and uncertain sends for this run before creating a new session. Verify the chosen target, role and actual permissions; inspect native model settings when exposed without overriding them. Do not duplicate a running review.
-2. Reuse a verified configured server when suitable. If the authorized review needs its own runtime, start a dedicated OpenCode process in the approved review directory. A loopback-only `serve` process is a normal reviewer runtime, not a global service installation; record its actual returned address/process handle. Keep credentials with the configured transport and do not weaken authentication, expose a network listener, or alter host configuration.
+2. Reuse a verified configured server when suitable and record it as borrowed/shared. If the authorized review needs its own runtime, register the planned resource with `@workspace-cleanup`, then start a dedicated OpenCode process in the approved review directory. A loopback-only `serve` process is a normal reviewer runtime, not a global service installation; bind its actual returned address/process identity, cleanup owner, consumers and release trigger. Register any new tmux pane or review worktree too. Keep credentials with the configured transport and do not weaken authentication, expose a network listener, or alter host configuration.
 3. Create the isolated reviewer session through the supported interface; record its real ID, role read-back, exposed model metadata, source snapshot and a safe runtime reference. A terminal/tmux name or RDC PID is not an OpenCode session ID. Save and read back dispatch intent through `@repo-handoff` on the existing carrier. Without a carrier, keep a self-contained `bootstrap` receipt and make the durability limitation visible; do not invent a tracking Issue.
 4. Submit literal packet data once with the explicit role and no model/variant/effort override. Use asynchronous submission when supported. Preserve the request/session identifiers even on timeout.
 5. Make at most two receipt observations, each at most 15 seconds. Check session/request and assistant metadata for the actual agent, provider/model and variant. HTTP acceptance proves `sent`; it does not prove the reviewer started or completed. Mark missing observations `unknown`. Never ask the model to self-identify as proof.
-6. Return promptly with the session alive. Do not wait for full review completion or take over ongoing Ask monitoring. SwitchBoard/MUSUBI owns notifications. A receipt timeout never permits automatic resend or session termination.
+6. Return promptly with the session alive while review work is outstanding. Record cleanup after durable report collection; do not retain the runtime indefinitely just because receipt checks ended. Do not wait for full review completion or take over ongoing Ask monitoring. SwitchBoard/MUSUBI owns notifications. A receipt timeout never permits automatic resend or session termination.
 
 A verified role mismatch, default-agent fallback, unavailable model or permission error is a failed reviewer start, even when the process exists or exits zero. Retain any submitted run and report its state. Correct only evidenced invocation mistakes; reconcile delivery before a bounded retry. Never reinterpret a failed reviewer launch as a positive independent verdict.
+
+After preserving startup-error evidence, use `@workspace-cleanup` for newly owned leftovers only when no request, child or uncertain submission remains. Failure is not a reason to leave a proved-unused dedicated server running forever.
 
 ## Collect and report
 
 Collect the exact bound review report and raw evidence, confirm target freshness and actual role/model, and apply the originating review skill's quality gate. A reviewer `COMPLETED` status alone is not a valid security or publication verdict. Missing coverage stays explicit. If new code changes the target, invalidate affected conclusions and prepare only the required re-review.
+
+Save and read back the full required report/evidence outside the cleanup set, then invoke `@workspace-cleanup` for the owned reviewer runtime, pane and disposable review worktree. A `changes-required` verdict does not require keeping a completed reviewer process alive. Preserve session history, active children, shared servers and any sole uncommitted snapshot; record a concrete retention reason/owner/trigger for exceptions. A pending publication or merge gate does not by itself block release of disposable review resources.
 
 Return a compact receipt:
 
@@ -71,5 +76,6 @@ Return a compact receipt:
 - Delivery, execution, collection and review-result states separately
 - Findings/report reference or exact startup blocker; next action
 - Carrier/save status, or `bootstrap`/`pending-write`
+- Resource references and cleanup outcome; retained resources with owner/reason/revisit trigger
 
 KUMIKI/KAGARI can later replace this startup layer. Preserve the reviewer binding and report contract, adopt its live APIs when available, and do not use this interim skill to weaken repository-owned isolation or publication gates.

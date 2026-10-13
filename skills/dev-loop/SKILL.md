@@ -12,6 +12,7 @@ Own orchestration and verification, not implementation or continuous monitoring.
 - Normal loop: restore the current workstream and perform only the requested or previously announced stage.
 - `merge-command-only`: for “このPRのマージコマンドだけ出して” or the former `@pr-merge` intent, read [references/merge-command.md](references/merge-command.md) and handle only the named PR. Do not start a repository review, create Issues or initiate a whole loop.
 - Status/collection request: inspect the existing run; do not launch or resume work implicitly.
+- Cleanup request: use `@workspace-cleanup` for the selected run/repository/host scope; inventory first, apply only eligible actions, and preserve unrelated work.
 
 Read `@repo-handoff` and its execution-contract reference before planning or dispatch. Use `@change-review` directly; the legacy `@branch-review` is an explicit-only compatibility alias.
 
@@ -38,6 +39,8 @@ Complete at most one substantive stage per response, record it and stop. A stage
 
 Restore canonical state at entry and record each substantive checkpoint automatically through `@repo-handoff`. Existing carriers bootstrap automatically. No carrier means `bootstrap`, no hidden tracking Issue. Save/read back dispatch intent before sending. Recording failures are visible, never implied saved.
 
+Own routine resource cleanup as the tail of the current checkpoint through `@workspace-cleanup`. Register newly created persistent resources with real identities, cleanup owner and trigger; mark reused resources borrowed/shared. After result collection, verified merge/retirement or a proved-unused failed start, release eligible owned resources without another confirmation. Keep execution completion and cleanup completion separate. Status-only and merge-command-only modes report cleanup candidates without performing cleanup.
+
 ## Resolve context
 
 Pin repository, base/integration branch/SHA, selected Issues/Tasks, contracts/risk/non-goals, dependencies and waves, backend/version, unique branches/worktrees, run/revision/digest, connection/session references, `opencode-config` model policy and observed model/effort, grant/stop point, snapshot or PR/base/head, independent review, merge evidence, carrier/writer and next gate.
@@ -60,7 +63,7 @@ Use `@patch-plan` for selected filed Issues. Require a Workstream Contract: goal
 
 For an unexplained failure, first use `@debug-investigate` to produce evidence or a bounded investigation packet. Do not dispatch a guessed repair. Keep investigation and eventual repair within their respective grants.
 
-Build the dependency/conflict graph (`parallel|ordered|combined|blocked`), isolate ownership and assign waves. A packet must state run/revision, allowed operations and exact stop point. Choose investigation-only, implementation/tests, or expressly authorized publication; never assume commit/push/Draft PR for every task.
+Build the dependency/conflict graph (`parallel|ordered|combined|blocked`), isolate ownership and assign waves. A packet must state run/revision, allowed operations and exact stop point, plus resource ownership, coordinator cleanup grant/triggers and evidence-retention destination. Choose investigation-only, implementation/tests, or expressly authorized publication; never assume commit/push/Draft PR for every task.
 
 In Agent Core, map each stream to one canonical numeric Issue-backed Task whose Issue carries the full contract. Main owns init, guarded Issue-start/resume, readiness evidence and multi-Task batch safety checks; launch exactly one Task Orchestrator per ready parallel-safe Task. Do not use raw Git mutations or generic SubAgents as substitutes.
 
@@ -70,7 +73,7 @@ Present a complete OpenCode packet. Stop before dispatch unless dispatch itself 
 
 ### 4. Dispatch
 
-Use `@opencode-bridge dispatch` with the exact authorized packet and verified Main/Task/generic session. It saves dispatch intent, sends once, performs bounded receipt checks and returns without waiting for implementation completion. Leave OpenCode/tmux alive.
+Use `@opencode-bridge dispatch` with the exact authorized packet and verified Main/Task/generic session. It saves dispatch intent, sends once, performs bounded receipt checks and returns without waiting for implementation completion. Leave OpenCode/tmux alive while work is outstanding; carry their cleanup owner and release trigger to collection.
 
 Keep dispatch and execution distinct. If connection unavailable before any send, return a manual handoff. If delivery uncertain, do not offer a replacement send/manual submission until reconciled.
 
@@ -79,6 +82,8 @@ Keep dispatch and execution distinct. If connection unavailable before any send,
 On the next requested checkpoint use bridge status/collect. Preserve sent, acknowledged, running, waiting-question, reported-complete and unknown separately. Routine contract-resolvable questions may be answered within the grant through a separately authorized reply; human-owned choices go to `@human-review`.
 
 Collect run-correlated snapshot/manifest, validation evidence, actual operations and stop point. PR absence is expected for prepublication grants, not automatic failure. If publication was authorized/required, verify the actual PR number, URL, branch and SHA; never invent one. Match Issue/Task/backend lifecycle and approved scope.
+
+After durable collection, release eligible completed runtimes/helpers and report retained continuation sessions/worktrees with owner and next use. Do not delete the sole frozen prepublication artifact or a worktree still needed by a sibling/reviewer. Apply `@workspace-cleanup` rather than leaving every completed process alive by default.
 
 Apply `@change-review`'s `references/verification.md`: report exactly which behavior/check passed on which snapshot, and retain blocked, unrun or timed-out checks. Collection may finish while independent verification is still pending; do not turn an executor report into a verified completion claim.
 
@@ -117,6 +122,8 @@ Present dependency-safe commands; defer later dependent blocks until earlier mer
 
 Use `@repo-review` on the verified merged commit, checking product intent and cross-PR behavior. A new review does not authorize new Issues. Later waves need refreshed bases and dependency/batch revalidation.
 
+After merge verification or explicit workstream retirement, run `@workspace-cleanup` through the live repository's designated finalization/cleanup owner. Remove eligible linked worktrees and owned runtime leftovers; retain branches/history by default. A missing or blocked repository cleanup API is a concrete retained item, not permission for a raw lifecycle bypass. Revisit previously retained resources at their next recorded trigger.
+
 ## Ledger
 
 Report concise common fields and one row per stream:
@@ -126,10 +133,12 @@ Report concise common fields and one row per stream:
 
 Also include stage/backend/base, active wave, carrier/save status, focused human decisions and the exact next action with target, `stop|conditional|allowed`, prerequisite, clearing authority, fallback, evidence and revalidation. Preserve these fields even if summarizing.
 
+Include cleanup owner/status, resources actually released, and each retained/blocked/unknown resource's reason and revisit trigger. A completed implementation is not proof that cleanup completed.
+
 ## Boundaries and quality gate
 
 - No implementation inside Arca; no unbounded loop or Ask monitoring. No separate Codex CLI.
-- No raw lifecycle bypass, shared writable checkout, undisclosed task, unauthorized publication, Ready/Merge, cleanup or security disclosure.
+- No raw lifecycle bypass, shared writable checkout, undisclosed task, unauthorized publication, Ready/Merge or security disclosure. Routine owned-resource cleanup is allowed only through `@workspace-cleanup` and the live repository gates; no force deletion or disposal of unique work.
 - Source-only inspection, status and notifications never imply a new business write. Neutral marker updates are the narrow recording exception.
 - Keep correction findings in the same change; broader leads go to post-merge repo-review. Route restricted SEC work through security skills.
 - Every transition must be run/snapshot-bound, evidence-backed, within authority and durable or explicitly incomplete. A new chat must recover routing without recovering permissions from prose.

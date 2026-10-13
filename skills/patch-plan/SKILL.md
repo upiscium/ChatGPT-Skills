@@ -50,6 +50,8 @@ Planning approval is not dispatch authority. Goal approval is not architecture/r
 
 Require run-correlated receipt and result formats. Arca coordinates and independently verifies; OpenCode implements; SwitchBoard owns Ask monitoring/notifications. Do not add monitoring loops to Arca or OpenCode or require a new monitoring service before otherwise authorized work. Connection configuration is separate from this generic skill.
 
+Copy `@workspace-cleanup`'s resource lifecycle into every packet: register newly created persistent processes/tmux resources/worktrees with real IDs, ownership, consumers, cleanup owner, recovery destination and release trigger. Grant the coordinator routine cleanup of eligible owned resources after collection/completion; preserve explicit keep instructions and repository-owned finalization gates. Reused/shared resources are not disposable. Require cleanup receipts or a retained reason/owner/revisit trigger; do not turn an execution stop point into indefinite resource retention.
+
 ## Form implementation units
 
 Group active work by root cause, change boundary, and dependency rather than making one task per issue.
@@ -143,7 +145,7 @@ In `agent-core` mode, produce one self-contained Main Orchestrator batch packet 
 5. Launch exactly one Task Orchestrator per parallel-safe Task, up to available concurrency, with that Task's complete readiness handoff. Do not launch generic implementation SubAgents in place of Task Orchestrators.
 6. Keep each Task Orchestrator inside its assigned Task worktree. It may delegate its own bounded Work Units only according to the repository call graph, then stop at the packet's authorized boundary. Draft PR preparation/publication is not automatic.
 7. Preserve partial progress: one blocked, failed, or decision-waiting Task does not cancel or rewrite independent Tasks. Continue only work that the batch plan still marks parallel-safe.
-8. Leave merge, post-merge finalization, and cleanup with the Main/human authorities defined by the repository.
+8. Leave merge, post-merge finalization, and cleanup with the Main/human authorities defined by the repository. Identify the current supported cleanup route and owner in the handoff so `@workspace-cleanup` can invoke it after its gates pass; do not silently omit finalization or replace it with generic Git commands.
 
 Do not also apply the generic worktree setup below in `agent-core` mode.
 
@@ -189,7 +191,7 @@ Instruct the executor to:
 6. If a PR is authorized and created, report real number, canonical URL, branch and head SHA, Issue/Task mapping, goal/AC coverage, non-goals, risk, validation and limitations. Never invent an identity.
 7. If no publication was authorized, report `not-created; outside grant` and the reached prepublication stop. This is successful scoped delivery, not a missing-PR failure.
 8. Return a run/revision/digest-bound executor report. The coordinator automatically records verified state through `@repo-handoff`; an executor may append only its own immutable report when authorized, never overwrite coordinator state. Preserve claims versus verified facts.
-9. Stop at the exact granted boundary. Do not run Ready/Merge, release, cleanup, host reconfiguration or Ask monitoring.
+9. Stop at the exact granted boundary and hand resource identities/results to the cleanup owner. Do not run Ready/Merge, release, unassigned cleanup, host reconfiguration or Ask monitoring. The coordinator performs granted routine cleanup after evidence collection; the executor must not destroy its own evidence/transport before handoff.
 
 For blocked publication, preserve permitted work and report exact blocker, branch/snapshot and next gate. A marker write failure is `pending-write`, not permission to change the carrier or claim durable recovery.
 

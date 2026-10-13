@@ -36,6 +36,7 @@ Review exactly one PR or frozen change per invocation. In prepublication mode, a
 - Record the review batch ID and workstream ID when supplied, the shared base SHA, and every sibling PR head SHA known at dispatch time.
 - Pin all findings and the recommendation to this PR's exact head. Never let another PR's implementation or tests satisfy this PR's acceptance criteria.
 - Use read-only source access or a dedicated isolated checkout. Concurrent reviewers must not share a writable checkout, branch, generated outputs, or test state.
+- Register any newly created review checkout/runtime with `@workspace-cleanup`, including its owner, real identity, source/evidence recovery pointer and report-collection release trigger. Borrowed implementation resources stay outside the cleanup set.
 - Inspect declared dependencies and likely overlap with sibling PRs. Classify the recommendation as `base-stable` when it remains valid after independent sibling merges, or `base-sensitive` when merge order, shared contracts, or overlap can invalidate it.
 - Report cross-PR concerns to the batch coordinator for integration analysis. Do not expand this review into a combined multi-PR verdict.
 
@@ -159,6 +160,8 @@ Keep existing `PR-*` finding IDs when reviewing a PR. Use stable `CHG-*` IDs for
 ## Emit a durable checkpoint
 
 Return a pinned state delta with mode, run/revision, manifest/digest or PR/base/head, criterion evidence, verdict, base sensitivity, human decisions and next gate. A batch reviewer returns it to the sole coordinator writer; standalone reviews use `@repo-handoff` to record on the existing canonical carrier without changing its unrelated runs or pending coordinator action. Read back any marker written, or expose `bootstrap|pending-write`. No review submission, approval or protected publication checkpoint is implied.
+
+After the full required report/evidence is saved outside the cleanup set, let the coordinator invoke `@workspace-cleanup` for eligible review-only runtimes, panes and worktrees. This housekeeping does not require a passing review verdict or merge. Preserve the sole uncommitted source snapshot and shared/active consumers; include cleanup results or retained owner/reason/revisit trigger in the delta. Do not end a reviewer before its result handoff is durable.
 
 For low-risk PRs with no unresolved authority question, `summary-only` may be recommended. Use `focused-review` for medium or high risk and name the exact contract, file, or trade-off the human should inspect. Use `decision-required` whenever project direction, architecture, public API, migration, security boundary, compatibility policy, material scope, or risk acceptance is unresolved.
 

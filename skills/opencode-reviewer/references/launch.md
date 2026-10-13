@@ -28,7 +28,7 @@ OpenCode **1.18.30**, checked 2026-10-10: `run.ts` rejects both unknown agents a
 
 ## Verified session API example
 
-Inspect the selected server's `/doc` first; schemas differ between versions. Use the configured authenticated transport. If an authorized dedicated process is necessary, `opencode serve --hostname 127.0.0.1 --port 0` is supported by 1.18.30. Discover the actual returned port; do not assume 4096, reuse another task's port, install a daemon or disable authentication. Record who owns the process and preserve it after the receipt budget.
+Inspect the selected server's `/doc` first; schemas differ between versions. Use the configured authenticated transport. If an authorized dedicated process is necessary, `opencode serve --hostname 127.0.0.1 --port 0` is supported by 1.18.30. Discover the actual returned port; do not assume 4096, reuse another task's port, install a daemon or disable authentication. Register actual process identity, owner, consumers and report-collection cleanup trigger with `@workspace-cleanup`. Preserve it after the receipt budget while work remains outstanding, then release the owned runtime after evidence collection and eligibility checks.
 
 On 1.18.30, use `GET /path` to verify the effective directory and `GET /agent` for roles and exposed model settings. Filter sensitive configuration before presenting any output. Create one fresh session with the exact role and no model override:
 
