@@ -11,6 +11,10 @@ Read [references/patch-plan-template.md](references/patch-plan-template.md) and 
 
 Read `@change-review`'s `references/verification.md` when specifying tests or completion evidence. Copy the applicable rules into the packet. See [references/superpowers-notice.md](references/superpowers-notice.md) for the adapted planning source.
 
+## Explain any human approval request
+
+When actually requesting a human decision or handing off a user-run action, use `@human-review approval-brief`. Include **今回やった内容**, **今回承認してほしい内容**, **承認によって影響がある範囲**, and **否認した場合の対応** in the same message. Name the action/actor, target/revision and reason for the gate; distinguish completed work from proposals. Use the brief only to explain a needed decision, without an additional queue scan/write or confirmation for already authorized work. Preserve the stated denial response at continuation.
+
 ## Select the execution backend
 
 Inspect repository instructions before prescribing branches, worktrees, agents, or publication commands.
@@ -46,7 +50,7 @@ Choose the requested delivery scope, never a blanket default:
 - Implementation and tests: deliver a frozen manifest/diff and evidence, stop before unapproved commit/push/Draft PR.
 - Publication: only specifically authorized operations and reviewed snapshot, through repository guards; stop at the named Draft PR or earlier artifact.
 
-Planning approval is not dispatch authority. Goal approval is not architecture/risk or publication permission. Unknown operations remain not-authorized. Ready/Merge stays user-executed outside the packet. Include the seven-field execution gate even for an allowed stream, and retain the exact unresolved human decisions.
+Planning approval is not dispatch authority. Goal approval is not architecture/risk or publication permission. Unknown operations remain not-authorized. Ready/Merge stays user-executed outside the packet. Include the seven-field execution gate even for an allowed stream, and retain the exact unresolved human decisions. Copy the human-question contract into every packet: report work completed, exact requested action/actor and target/revision, affected scope, denial handling and why human authority is needed. Do not send a bare approval prompt or assume OpenCode can load Arca's skills.
 
 Require run-correlated receipt and result formats. Arca coordinates and independently verifies; OpenCode implements; SwitchBoard owns Ask monitoring/notifications. Do not add monitoring loops to Arca or OpenCode or require a new monitoring service before otherwise authorized work. Connection configuration is separate from this generic skill.
 

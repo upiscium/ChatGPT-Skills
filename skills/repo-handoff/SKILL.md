@@ -84,7 +84,7 @@ Required semantic fields:
 - stage and per-workstream status (`planned`, `running`, `pr-open`, `review-pending`, `changes-required`, `merge-ready`, `merged`, `blocked`, or `completed`);
 - Issue, Task, branch, PR, and head SHA mappings for every workstream;
 - stable acceptance/contract IDs and risk tier when supplied by `@patch-plan`, `@dev-loop`, or `@change-review`;
-- unresolved human decisions with options, authority, blocker, and safe fallback;
+- human decisions with options, authority, blocker, safe fallback and exact status/source; pending approval briefs retain work completed, requested action/actor and target/revision, affected scope and denial handling;
 - the exact next action, its authorization requirement, prerequisite, and revalidation check;
 - evidence URLs, commit/PR/Task identifiers, and an observation timestamp.
 - resource ownership/bindings and cleanup owner, grant, trigger, outcome, evidence preservation, and retention reasons/revisit events when resources exist.
@@ -114,6 +114,8 @@ If no marker exists on an existing canonical carrier, label the reconstruction a
 
 For delegated runs, restore run/revision/digest, exact session binding, operation grant and stop point. Verify the binding through a current read-only observation before sending. An unreachable session means `unknown`, not failed or safe to resend. Old v1 markers without these fields cannot prove authorization or absence of prior dispatch. Preserve executor-reported claims separately from Arca-verified evidence.
 
+Restore the four-field approval explanation and exact decision source/scope too. Use `@human-review approval-brief` only when actually asking for an unresolved decision, including a proposed new carrier. Do not invoke its queue scan or writes just for formatting. Preserve denied/deferred/approved outcomes; `next` cannot reopen a denied action or supply missing scope. Reconstruct missing legacy explanation from evidence and ask only for a still-unresolved material decision, never blanket reapproval of a concrete prior grant.
+
 Restore resource and cleanup records too. Reconcile pending/unknown cleanup actions against live identity before retrying; never recreate a cleaned runtime from an old session reference. Legacy resources without ownership evidence remain unknown until reconstructed. Report resources whose revisit trigger is now reached to the calling workflow; restore/audit/status alone do not terminate or delete them.
 
 Ask monitoring and notifications belong to SwitchBoard. Arca and OpenCode do not install watchers, poll indefinitely or promise surveillance after a turn. A notification may trigger an authorized status check but is never approval, an answer or completion proof. Record a safe correlation reference and known delivery status; do not imply SwitchBoard is configured without evidence.
@@ -138,7 +140,7 @@ For `restore`, `bootstrap`, or `audit`, return:
 |---|---|---|---|---|---|---|
 
 ## Human decisions and gates
-<!-- preserve target action, status, prerequisite, authority, fallback, evidence, and revalidation -->
+<!-- preserve target action, status, prerequisite, authority, fallback, evidence and revalidation; actual approval requests include completed work, requested action, affected scope and denial handling -->
 
 ## Next action
 - Action:
@@ -156,7 +158,7 @@ For `record`, return the intended marker and human summary before writing, then 
 - `@dev-loop` should restore before acting on `next` and automatically record every substantive checkpoint, including blocked and terminal states.
 - `@repo-status` should consume this record and flag missing, stale, or conflicting state.
 - `@change-review`, `@repo-review`, `@patch-plan`, `@opencode-bridge`, `@repo-status`, and `@human-review` automatically record their owned fields or return deltas to the coordinator; no-code/no-merge/command-only boundaries remain in force.
-- `@human-review` should read the durable decisions and list only the still-open human gates.
+- `@human-review review-queue` should read the durable decisions and list only the still-open human gates. Its `approval-brief` formatter alone does not scan or write state; the calling workflow owns any authorized recording.
 - `@workspace-cleanup` records exact resource intent/results or returns a delta to the designated coordinator; its live ownership, recovery and repository gates remain separate from recording.
 - `@handover` may link to the canonical carrier instead of duplicating GitHub-backed state.
 

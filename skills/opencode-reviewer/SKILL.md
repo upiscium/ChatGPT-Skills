@@ -9,6 +9,10 @@ Own role discovery, isolated reviewer startup and receipt evidence. Let `@change
 
 Read [references/launch.md](references/launch.md) before starting a process or sending a review. Read `@opencode-bridge`'s transport and model-selection references, and `@repo-handoff`'s execution contract. Resolve installed skills by name, never fixed IDs.
 
+## Explain any human approval request
+
+When actually requesting a human decision or handing off a user-run action, use `@human-review approval-brief`. Include **今回やった内容**, **今回承認してほしい内容**, **承認によって影響がある範囲**, and **否認した場合の対応** in the same message. Name the action/actor, target/revision and reason for the gate; distinguish completed work from proposals. Use the brief only to explain a needed decision, without an additional queue scan/write or confirmation for already authorized work. Preserve the stated denial response at continuation.
+
 ## Select one operation
 
 - `list`: inspect available roles and recommend the matching role; do not launch, send or change configuration.
@@ -41,7 +45,7 @@ A full TUI's `--agent` argument is not proof of the active reviewer. Verify the 
 
 ## Prepare an independent packet
 
-Include run/revision/digest, immutable review target, approved intent and ACs, non-goals, relevant raw evidence, review kind, chosen role, `model_policy: opencode-config`, operation grant, report format and exact stop point. State that model/effort overrides are omitted. Copy the applicable review instructions into the packet; OpenCode must not need Arca's installed skills.
+Include run/revision/digest, immutable review target, approved intent and ACs, non-goals, relevant raw evidence, review kind, chosen role, `model_policy: opencode-config`, operation grant, report format and exact stop point. State that model/effort overrides are omitted. Copy the applicable review instructions into the packet; OpenCode must not need Arca's installed skills. Require any human-owned question to return work completed, exact requested action/actor, affected scope and denial handling, bound to its question/run/revision, so the coordinator can explain it before seeking approval.
 
 - Create a fresh context separate from the implementer. Do not resume or fork the implementation conversation into a reviewer. Resume only a verified reviewer session for the same authorized review/re-review.
 - Supply facts and artifacts rather than the implementer's preferred verdict or Arca's diagnosis. Prior findings are appropriate for an explicitly scoped re-review.

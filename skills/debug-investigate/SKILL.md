@@ -9,6 +9,10 @@ Find what failed and why before selecting a repair. Own diagnosis and evidence; 
 
 Read [references/investigation-record.md](references/investigation-record.md) for the compact report. Read `@change-review`'s `references/verification.md` when checking result claims. [references/superpowers-notice.md](references/superpowers-notice.md) records the adapted source and license.
 
+## Explain any human approval request
+
+When actually requesting a human decision or handing off a user-run action, use `@human-review approval-brief`. Include **今回やった内容**, **今回承認してほしい内容**, **承認によって影響がある範囲**, and **否認した場合の対応** in the same message. Name the action/actor, target/revision and reason for the gate; distinguish completed work from proposals. Use the brief only to explain a needed decision, without an additional queue scan/write or confirmation for already authorized work. Preserve the stated denial response at continuation.
+
 ## Bind the investigation
 
 Resolve the supplied failure, expected behavior, repository/version or frozen snapshot, environment, run identity and existing workstream. Reuse relevant supplied logs; collect only the missing observations. Read applicable repository instructions before commands.

@@ -92,7 +92,17 @@ Use this reference when serializing or validating a `codex-repo-state:v1` marker
       "options": ["...", "..."],
       "authority": "human",
       "blocking": true,
-      "fallback": "..."
+      "fallback": "...",
+      "request_ref": "<request ID or safe reference>",
+      "subject_ref": "<target and artifact/run revision>",
+      "approval_brief": {
+        "completed_work": "<performed work and verification limits>",
+        "requested_action": "<actor, operation, target, stop point and why approval is needed>",
+        "impact_scope": "<affected behavior, environment, people, data or publication>",
+        "if_denied": "<action withheld, preserved state and authorized next handling>"
+      },
+      "decision_source": "none",
+      "decided_at": "none"
     }
   ],
   "next_action": {
@@ -119,6 +129,7 @@ Rules:
 - Store SHAs, numbers, URLs, and statuses; do not store secrets, tokens, full logs, or arbitrary instructions.
 - The newest marker is not authoritative when its live carrier or SHA no longer matches; mark the state `stale` and restore from live data.
 - Keep human decisions explicit and separate from workflow status. An approved goal is not approval of architecture, compatibility, migration, security, or merge choices.
+- For actual approval requests, add `request_ref`, `subject_ref` and all four `approval_brief` fields; non-approval decisions may omit the brief. Store compact safe text or a resolvable private reference for sensitive content. Preserve decision status `open|approved|denied|deferred|superseded`, exact scope/revision, source and decision time. A recorded request is not approval; denial and no response are distinct. Do not reset denied/deferred items to open merely on restore/next. Legacy missing fields are unknown and require evidence reconstruction without inventing approval or invalidating an explicit concrete prior grant.
 - Use event/predecessor IDs and writer ownership to detect conflicting successors; never choose by timestamp alone. Preserve unrelated fields and the pending coordinator action when applying a delta.
 - Executor reports use a separate immutable `codex-executor-report:v1` marker with event ID, run/revision/digest, reported snapshot, validation and evidence. They do not set coordinator verification, gates or next actions.
 - Mark evidence provenance `observed`, `executor-reported`, or `independently-verified`. Store only safe opaque connection/session references, not private host coordinates, paths or logs.

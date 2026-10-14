@@ -7,6 +7,10 @@ description: Produce an evidence-backed snapshot of a software repository's curr
 
 Build a current, read-only map of the repository. Explain what the product can do now, what work is active, and how that work fits the intended system.
 
+## Explain any human approval request
+
+When actually requesting a human decision or handing off a user-run action, use `@human-review approval-brief`. Include **今回やった内容**, **今回承認してほしい内容**, **承認によって影響がある範囲**, and **否認した場合の対応** in the same message. Name the action/actor, target/revision and reason for the gate; distinguish completed work from proposals. Use the brief only to explain a needed decision, without an additional queue scan/write or confirmation for already authorized work. Preserve the stated denial response at continuation.
+
 ## Pin the snapshot
 
 1. Identify the repository, default or requested branch, and review scope.

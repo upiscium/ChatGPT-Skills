@@ -101,10 +101,18 @@ Replace `--MERGE_METHOD` with a literal supported flag; do not leave it as a var
 
 ## Return the handoff
 
+Before the command, include `@human-review approval-brief` in the same message: what was reviewed/verified; the exact Ready/Merge action the user would execute and its reviewed target; the affected base branch and evidenced CI/queue/deployment effects; and what happens if the user declines (no command execution, retain the PR/work and identify the next bounded handling). Describe known merge/recovery constraints without claiming reversibility or deployment behavior that was not verified. This explains the user-run handoff and adds no approval round.
+
 Return:
 
 ````markdown
 # PR Merge Command
+
+- 今回やった内容:
+- 今回承認してほしい内容（ユーザーが実行する操作）:
+- 承認によって影響がある範囲:
+- 否認した場合の対応:
+
 - Repository:
 - Pull request:
 - Pull request URL:

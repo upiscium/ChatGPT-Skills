@@ -42,6 +42,10 @@ Use this structure and omit sections that are genuinely irrelevant. Preserve sou
 |---|---:|---|---|---|---|---|---|
 | WS-001 | 1 | IMP-001 | F-001 | #123 | #123 or not-applicable | bug | active |
 
+## Human approval requests
+
+Include only when a decision is still required; do not ask again for an existing grant. For each request, state work actually completed, the exact proposed action/actor and target/revision, affected scope, and handling on denial. Include the reason/source for requiring authority. Copy this four-field human-question contract into each executable packet so the executor can return an explainable question without Arca's installed skills.
+
 ## Workstream execution contracts
 
 Repeat for every workstream, including allowed ones. Unknown authority never means permission.

@@ -1,8 +1,8 @@
 interface:
   display_name: Human Review
-  short_description: List and checkpoint decisions needing human review
-  default_prompt: Use $human-review to list and checkpoint everything that currently
-    requires my review.
+  short_description: Explain approvals and list unresolved human decisions
+  default_prompt: Use $human-review to explain what I need to approve, what was done,
+    the affected scope, and what happens if I decline.
   icon_small: assets/icon.svg
   icon_large: assets/icon.svg
 policy:

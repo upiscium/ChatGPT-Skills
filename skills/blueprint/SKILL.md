@@ -9,6 +9,10 @@ Guide the user from an incomplete signal to a decision-ready design. Own what an
 
 Read [references/design-brief-template.md](references/design-brief-template.md) before producing the final design brief.
 
+## Explain any human approval request
+
+When actually requesting a human decision or handing off a user-run action, use `@human-review approval-brief`. Include **今回やった内容**, **今回承認してほしい内容**, **承認によって影響がある範囲**, and **否認した場合の対応** in the same message. Name the action/actor, target/revision and reason for the gate; distinguish completed work from proposals. Use the brief only to explain a needed decision, without an additional queue scan/write or confirmation for already authorized work. Preserve the stated denial response at continuation.
+
 ## Scale the design work
 
 Choose the smallest useful artifact from the actual uncertainty:

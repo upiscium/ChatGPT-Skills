@@ -60,6 +60,7 @@ Adapt this template to the task. Omit sections that do not apply.
 ### Confirmed
 ### Assumed
 ### Open
+For each requested human decision, include work completed, exact requested approval and scope, affected behavior/users, and handling if denied. Use the four-field approval brief; design acceptance grants only the stated scope.
 ### Rejected
 
 ## 10. Execution contracts

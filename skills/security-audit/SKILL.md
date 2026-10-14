@@ -11,6 +11,10 @@ Read [references/security-review-guide.md](references/security-review-guide.md) 
 
 For an independent security review through OpenCode, use `@opencode-reviewer` to list and inspect the target runtime's security-focused Reviewer roles, then launch the exact role in a fresh context using OpenCode's configured model/effort without overrides. Do not guess an agent name, use a subagent-incompatible CLI path, or treat a fallback to the default agent as a successful security-reviewer launch. Copy this skill's scoped audit requirements into the packet and verify the actual role/session before collecting its report. Keep security details in the authorized private review channel; public continuation records remain sanitized.
 
+## Explain any human approval request
+
+When actually requesting a human decision or handing off a user-run action, use `@human-review approval-brief`. Include **今回やった内容**, **今回承認してほしい内容**, **承認によって影響がある範囲**, and **否認した場合の対応** in the same message. Name the action/actor, target/revision and reason for the gate; distinguish completed work from proposals. Use the brief only to explain a needed decision, without an additional queue scan/write or confirmation for already authorized work. Preserve the stated denial response at continuation.
+
 ## Establish scope
 
 1. Identify the repository, target branch or commit, and optional base branch.

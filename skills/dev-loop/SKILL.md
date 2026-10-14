@@ -7,6 +7,10 @@ description: Coordinate Arca planning, authorized OpenCode delegation, independe
 
 Own orchestration and verification, not implementation or continuous monitoring. Use `@opencode-bridge` for authorized OpenCode transport. Keep a complete manual packet fallback when the selected connection is unavailable and no send is uncertain.
 
+## Explain any human approval request
+
+When actually requesting a human decision or handing off a user-run action, use `@human-review approval-brief`. Include **今回やった内容**, **今回承認してほしい内容**, **承認によって影響がある範囲**, and **否認した場合の対応** in the same message. Name the action/actor, target/revision and reason for the gate; distinguish completed work from proposals. Use the brief only to explain a needed decision, without an additional queue scan/write or confirmation for already authorized work. Preserve the stated denial response at continuation.
+
 ## Select the entrypoint
 
 - Normal loop: restore the current workstream and perform only the requested or previously announced stage.
@@ -31,7 +35,7 @@ An implementation and its tests cannot jointly redefine ambiguous intent. Requir
 
 Complete at most one substantive stage per response, record it and stop. A stage may contain the explicitly selected independent batch, never undisclosed later waves.
 
-- `next`, `continue` or `Accept` applies only to the exact previously announced action, target, revision and grant. Re-read live evidence and repository gates immediately before acting.
+- `next`, `continue` or `Accept` applies only to the exact previously explained action, target, revision and grant. Present the four-field approval brief when this is a request for authority; a bare next/approve prompt has no implicit scope. Preserve concrete prior authorization and scoped denials. Re-read live evidence and repository gates immediately before acting.
 - A prior plan/ledger, readiness result or notification is not executable authority. If identity/scope changes, show the new state and request the necessary decision.
 - While a run is sent, running, waiting or delivery-unknown, inspect/reconcile it; never launch a duplicate.
 - Next after a command handoff verifies user execution; it never performs Ready/Merge.

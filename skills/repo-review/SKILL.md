@@ -7,6 +7,10 @@ description: Review the merged state of a GitHub repository against documented p
 
 Assess the integrated product against authoritative intent after merge and produce structured candidates that `@issue-filer` can safely turn into the next Issues. Treat tests as evidence of behavior, never as the source of product requirements.
 
+## Explain any human approval request
+
+When actually requesting a human decision or handing off a user-run action, use `@human-review approval-brief`. Include **今回やった内容**, **今回承認してほしい内容**, **承認によって影響がある範囲**, and **否認した場合の対応** in the same message. Name the action/actor, target/revision and reason for the gate; distinguish completed work from proposals. Use the brief only to explain a needed decision, without an additional queue scan/write or confirmation for already authorized work. Preserve the stated denial response at continuation.
+
 ## Resolve the snapshot
 
 1. Identify the repository and review branch or commit. Default to the repository's default branch only when unspecified.
@@ -96,8 +100,10 @@ Keep `D-*` decision requests outside `F-*` findings. They identify authority tha
 ## Human decisions required
 
 ### D-001: <decision>
-- Why human authority is required:
-- Affected objectives or scope:
+- 今回やった内容:
+- 今回承認してほしい内容（判断対象・権限が必要な理由）:
+- 承認によって影響がある範囲:
+- 否認した場合の対応:
 - Options and trade-offs:
 - Safe fallback while unresolved:
 

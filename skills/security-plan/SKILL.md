@@ -9,6 +9,10 @@ Turn verified security findings into a safe, testable patch plan. Preserve confi
 
 Read [references/security-remediation-plan-template.md](references/security-remediation-plan-template.md) before producing the final plan.
 
+## Explain any human approval request
+
+When actually requesting a human decision or handing off a user-run action, use `@human-review approval-brief`. Include **今回やった内容**, **今回承認してほしい内容**, **承認によって影響がある範囲**, and **否認した場合の対応** in the same message. Name the action/actor, target/revision and reason for the gate; distinguish completed work from proposals. Use the brief only to explain a needed decision, without an additional queue scan/write or confirmation for already authorized work. Preserve the stated denial response at continuation.
+
 ## Resolve inputs
 
 1. Require the repository, patch base branch or commit, and the selected security findings.

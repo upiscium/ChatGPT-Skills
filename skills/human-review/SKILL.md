@@ -1,11 +1,18 @@
 ---
 name: human-review
-description: Inspect the current state of a software repository or development workflow and list only unresolved decisions, approvals, risk acceptances, or focused inspections that require human authority, while automatically checkpointing the review queue. Use when the user asks what they need to review, whether any human review remains, what is waiting for their judgment, or wants a Japanese human-review queue across Issues, Tasks, pull requests, plans, and blockers. Return an explicit no-review result when nothing qualifies. Do not perform a general code review or invent human gates for routine engineering work.
+description: Explain concrete human approval requests or list unresolved decisions, risk acceptances and focused inspections in a software workflow. Use approval-brief whenever a workflow needs a self-contained approval request or user-run action handoff; explain completed work, the requested action, affected scope and what happens on denial. Use review-queue when the user asks what needs their judgment across Issues, Tasks, pull requests, plans and blockers, and checkpoint that queue. Do not invent gates for routine or already authorized work.
 ---
 
 # Identify Human Review
 
-Produce a concise, evidence-backed decision queue in Japanese. Surface only work that an agent cannot legitimately settle from authoritative repository contracts and current evidence.
+Produce a concise, evidence-backed approval brief or decision queue in the user's language. Surface only work that an agent cannot legitimately settle from authoritative contracts and current evidence.
+
+## Select the operation
+
+- `approval-brief`: explain a concrete decision or action already identified by the calling workflow. Read [references/approval-request.md](references/approval-request.md) and return its four-field brief in the user's language. Use the supplied current evidence and resolve only material gaps. Do not start a repository-wide review, create a queue, write a checkpoint or perform the proposed action merely to format the request; the caller keeps its existing authority and recording rules.
+- `review-queue`: inspect the selected repository/workflow using the steps below. For every qualifying item, read the same reference and include all four fields before asking for judgment. Automatically checkpoint only under the existing queue workflow's recording policy.
+
+This format explains a necessary decision; it never creates an additional approval requirement. Reuse applicable prior authorization. Finish already authorized preparation and verification before asking so the user decides on a concrete result.
 
 ## Establish the current snapshot
 
@@ -55,6 +62,7 @@ For every qualifying item, determine:
 - Available options and their material trade-offs
 - A recommended decision, rationale, and confidence
 - A safe default or fallback if the review is deferred
+- Work actually completed, the exact approval and actor, affected scope, and the response to denial, following the shared approval brief
 - Evidence pinned to current Issues, PR heads, commits, files, checks, or review findings
 
 Phrase the review target as an answerable question. Avoid vague requests such as “please review the architecture” or “check whether this looks good.” Name the smallest contract, behavior, diff location, or trade-off that enables a decision.
@@ -75,7 +83,7 @@ Do not weaken a gate because of a deadline, existing plan, apparent consensus, d
 
 ## Output no-review state
 
-When no qualifying item exists, return exactly:
+In `review-queue` mode, when no qualifying item exists, return exactly:
 
 ```markdown
 # Human Review
@@ -87,23 +95,14 @@ Do not add optional suggestions, completed reviews, low-risk summaries, or an em
 
 ## Output the review queue
 
-When at least one item exists, use:
+In `review-queue` mode, when at least one item exists, use:
 
 ```markdown
 # Human Review
 
 ## HR-001: <レビュー対象の題名>
 
-### 要約
-
-- 人間の判断が必要な理由:
-- Blockしているもの:
-- 現行実装・判断の問題:
-- 判断期限・発火条件: なし | 不明 | <具体的条件>
-
-### レビュー対象
-
-<人間が答えられる一つの具体的な質問。必要なら確認すべきファイル、PR箇所、契約を併記する。>
+<references/approval-request.md の4項目を、この判断対象について具体的に記載する。>
 
 ### 選択肢
 
@@ -122,6 +121,7 @@ When at least one item exists, use:
 
 - 安全な既定動作:
 - 再開条件:
+- 判断期限・発火条件: なし | 不明 | <根拠のある具体的条件>
 
 ### 根拠
 
@@ -129,7 +129,7 @@ When at least one item exists, use:
 - Evidence:
 ```
 
-Omit the options table only when the task is a focused inspection with a binary pass/fail contract rather than a design choice. Keep each item compact enough that the user can decide without reading the entire repository history.
+Omit the options table for a simple approval or focused binary inspection. Keep recommendations advisory and each item compact enough to decide without the repository history. Never replace the four-field brief with a link, gate ID, command, prior commentary or a bare request to approve.
 
 Order items by blocking dependency, then risk and leverage. Do not use urgency alone to inflate importance.
 
@@ -140,6 +140,7 @@ Order items by blocking dependency, then risk and leverage. Do not use urgency a
 - Use `@repo-status` evidence to locate active work, but re-evaluate whether each blocker truly requires human authority.
 - Direct code-quality investigation to `@change-review` or `@repo-review`; include only unresolved human-owned decisions here. Include observed OpenCode questions only when authoritative contracts cannot resolve them; SwitchBoard owns monitoring, and a notice alone is not a new human gate or approval.
 - After the user decides, report the decision and its exact scope. Do not modify code, Issue/PR content, or gates unless the user separately asks for that action. The automatic `codex-repo-state:v1` marker update on an existing carrier is the sole recording exception; if unavailable, mark it `pending-write`.
+- Preserve `denied` and `deferred` separately from `open` and `approved`, with the request/snapshot and decision source. Follow the stated denial response within existing authority; do not silently substitute another action or reopen the same denied request on `next`. A changed proposal needs a new scope/revision and explanation of the change.
 - Preserve an exact no-review final response. If recording is unavailable, disclose `bootstrap`/`pending-write` and its consequence in commentary before that final response; do not invent a review item to carry the storage failure.
 
 ## Quality gate
@@ -149,9 +150,11 @@ Verify that:
 - Every listed item requires human authority rather than more agent work.
 - Every item is current for the recorded commit or PR head.
 - The question is concrete and answerable.
+- Every actual approval request includes completed work, requested action, affected scope and denial response in the same user-facing message; proposed work and verification limits are explicit.
 - The blocked action and consequence of delay are explicit without invented urgency.
 - Options are materially distinct and recommendations are clearly advisory.
 - The safe fallback does not bypass the unresolved decision.
 - Duplicate manifestations of one decision are consolidated.
-- If no item qualifies, the response contains only the required no-review result.
-- The latest human-review snapshot is automatically saved and read back, or is explicitly marked `bootstrap`/`pending-write` with the recovery consequence.
+- In `review-queue` mode, if no item qualifies, the response contains only the required no-review result.
+- The latest review-queue snapshot is automatically saved and read back, or is explicitly marked `bootstrap`/`pending-write` with the recovery consequence.
+- `approval-brief` alone performed no queue scan, checkpoint write or proposed action, and added no redundant confirmation.

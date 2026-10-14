@@ -9,6 +9,10 @@ Extract durable, reusable workflows from conversation evidence and turn only the
 
 Read [references/candidate-rubric.md](references/candidate-rubric.md) before ranking candidates.
 
+## Explain any human approval request
+
+When actually requesting a human decision or handing off a user-run action, use `@human-review approval-brief`. Include **今回やった内容**, **今回承認してほしい内容**, **承認によって影響がある範囲**, and **否認した場合の対応** in the same message. Name the action/actor, target/revision and reason for the gate; distinguish completed work from proposals. Use the brief only to explain a needed decision, without an additional queue scan/write or confirmation for already authorized work. Preserve the stated denial response at continuation.
+
 ## Establish the source
 
 1. Use the current visible conversation by default.

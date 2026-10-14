@@ -13,6 +13,10 @@ Read [references/prepublication.md](references/prepublication.md) for a frozen, 
 
 Read [references/verification.md](references/verification.md) to judge test quality and completion claims. It is the shared evidence policy for planning, collection and review; copy relevant requirements into executor packets. Adaptation provenance is in [references/superpowers-notice.md](references/superpowers-notice.md).
 
+## Explain any human approval request
+
+When actually requesting a human decision or handing off a user-run action, use `@human-review approval-brief`. Include **今回やった内容**, **今回承認してほしい内容**, **承認によって影響がある範囲**, and **否認した場合の対応** in the same message. Name the action/actor, target/revision and reason for the gate; distinguish completed work from proposals. Use the brief only to explain a needed decision, without an additional queue scan/write or confirmation for already authorized work. Preserve the stated denial response at continuation.
+
 ## Resolve the target and mode
 
 - `prepublication`: require the repository, approved Issue/Task contract, run/revision, exact base and frozen change manifest/digest. A PR is not required. Inspect tracked and untracked content included in scope, deletions, generated files, submodules and binary evidence. Stop when the snapshot cannot be reproduced or changes while being read.

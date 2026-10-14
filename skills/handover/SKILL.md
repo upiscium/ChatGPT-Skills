@@ -39,6 +39,8 @@ When any decision, blocker, approval, safety condition, dependency, or user inst
 
 Use explicit `none` or `unknown` when a required field cannot be recovered; do not silently omit it. Distinguish a user requirement or verified gate from an assistant recommendation. A deadline, existing plan, apparent consensus, delegated ownership, or prior exception never weakens an active constraint unless the named authority explicitly changed it.
 
+For pending human approvals, preserve the four-field `@human-review approval-brief`: **今回やった内容**, **今回承認してほしい内容**, **承認によって影響がある範囲**, and **否認した場合の対応**, plus request ID, target/revision, decision status and source. Keep approved, denied, deferred and unresolved decisions distinct; a new chat must neither infer scope from a bare approval prompt nor reopen a denied action on `next`. A handover preserves the request; it does not ask the user to approve it again.
+
 If no action-binding state exists, omit this section. Do not invent a blocker merely to fill the schema.
 
 ## Output requirements

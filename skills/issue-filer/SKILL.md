@@ -7,6 +7,10 @@ description: Create deduplicated Bug or Feature Request Issues from explicitly s
 
 Create high-quality GitHub Issues from selected review findings or approved design units while preventing duplicates and unsupported claims. Do not turn PR/prepublication correction findings into new Issues; keep them with the active change.
 
+## Explain any human approval request
+
+When actually requesting a human decision or handing off a user-run action, use `@human-review approval-brief`. Include **今回やった内容**, **今回承認してほしい内容**, **承認によって影響がある範囲**, and **否認した場合の対応** in the same message. Name the action/actor, target/revision and reason for the gate; distinguish completed work from proposals. Use the brief only to explain a needed decision, without an additional queue scan/write or confirmation for already authorized work. Preserve the stated denial response at continuation.
+
 ## Require explicit write intent
 
 Treat a request such as “create issues for all actionable findings” as authorization for those findings. Otherwise require the user to identify finding IDs or approve the proposed set before creating anything.

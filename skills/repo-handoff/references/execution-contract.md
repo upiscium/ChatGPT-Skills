@@ -16,6 +16,7 @@ Use across patch-plan, dev-loop, opencode-bridge and change-review. Copy the res
 - Work: bounded steps, expected/must-not-touch paths, dependencies, tests and acceptance criteria.
 - Delivery: frozen diff/manifest, validation and environment evidence; branch/head if present; PR number/URL only when actually authorized and created.
 - Recovery: canonical carrier, coordinator writer, run-scoped executor-report destination if authorized; question ID/revision and safe fallback on interruption.
+- Human-question contract: before asking for authority, return completed work and verification limits, exact requested action/actor and target/revision, affected scope, denial handling and the reason/source for the human gate. Copy these requirements into the executor packet; it must not depend on Arca's installed `@human-review` skill. Existing grants remain valid and routine questions resolved by the contract need no new approval.
 - Monitoring: Ask monitor/notification owner `SwitchBoard`; safe correlation reference or `unknown`. No watcher or polling duty for Arca or OpenCode.
 
 Unknown operation authority means do not perform it. Even investigation-only work needs authority for expensive or side-effectful checks. Do not force a PR for an implementation-only stop.
@@ -47,4 +48,4 @@ Apply `@change-review`'s `references/verification.md` to result claims. Record e
 
 ## Question and reply
 
-Bind a question to run/revision, question ID and current target snapshot. Answer contract-resolvable questions only from a cited, still-applicable contract inside the grant. Escalate human-owned decisions with options, recommendation, blocked action and safe fallback. A SwitchBoard notice does not answer a question. Send only a resolved authorized answer; scope/authority changes need a revised packet. Reconcile uncertain reply delivery instead of blindly retrying.
+Bind a question to run/revision, question ID and current target snapshot. Answer contract-resolvable questions only from a cited, still-applicable contract inside the grant. Escalate human-owned decisions with the four-field approval brief, options when needed, recommendation, blocked action and safe fallback. Preserve the explained request and `approved|denied|deferred|open` outcome separately; denial blocks that action and does not grant an alternate operation. The coordinator must expand a bare executor Ask into an evidence-backed brief before asking the user. A SwitchBoard notice does not answer a question. Send only a resolved authorized answer; scope/authority changes need a revised packet. Reconcile uncertain reply delivery instead of blindly retrying.

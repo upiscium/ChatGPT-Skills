@@ -9,6 +9,10 @@ Close the resource lifecycle as part of finishing work. A completed answer, idle
 
 Read [references/resources.md](references/resources.md) for resource records and eligibility, and [references/operations.md](references/operations.md) before executing cleanup. Use `@repo-handoff` for the existing repository carrier and `@opencode-bridge`'s transport rules for remote access. Resolve installed skills by name.
 
+## Explain any human approval request
+
+When actually requesting a human decision or handing off a user-run action, use `@human-review approval-brief`. Include **今回やった内容**, **今回承認してほしい内容**, **承認によって影響がある範囲**, and **否認した場合の対応** in the same message. Name the action/actor, target/revision and reason for the gate; distinguish completed work from proposals. Use the brief only to explain a needed decision, without an additional queue scan/write or confirmation for already authorized work. Preserve the stated denial response at continuation.
+
 ## Choose one operation
 
 - `inventory`: inspect the selected host/repository/run and report resources, ownership and unknowns; no termination or deletion.
@@ -17,7 +21,7 @@ Read [references/resources.md](references/resources.md) for resource records and
 
 At ordinary workflow completion/collection checkpoints, routine cleanup of that workflow's verified disposable resources is included in the authorized work. Carry this policy into the execution packet; the coordinator performs cleanup after collecting evidence, not a reviewer killing its own transport. An explicit preserve/no-cleanup instruction or repository lifecycle restriction takes precedence. Creating/editing this skill, a status-only request or an inventory request is not a request to clean a live host now.
 
-This policy permits releasing owned temporary resources. It does not authorize discarding unique work, terminating someone else's session, deleting OpenCode history, deleting remote branches, removing shared services, or weakening repository gates. Ask only for the specific additional decision actually needed; complete unrelated eligible cleanup first.
+This policy permits releasing owned temporary resources. It does not authorize discarding unique work, terminating someone else's session, deleting OpenCode history, deleting remote branches, removing shared services, or weakening repository gates. Ask only for the specific additional decision actually needed; complete unrelated eligible cleanup first. In its approval brief, report what inventory/preservation/cleanup already completed, the exact remaining resource/action, affected consumers/data and recovery limits, and the retained state/next handling on denial. Human consent does not replace ownership, quiescence, preservation or repository-gate evidence; unresolved evidence stays retained/unknown, not a force-cleanup option.
 
 ## Register resources when creating them
 

@@ -13,6 +13,10 @@ Read [references/transport.md](references/transport.md) before remote access. Re
 
 For an authorized OpenCode launch, dispatch or execution-resuming reply, apply [references/model-selection.md](references/model-selection.md): use the model, reasoning effort and variant already configured by OpenCode. Omit model/effort overrides from CLI arguments, API fields and packets. Observe the actual selection without changing it.
 
+## Explain any human approval request
+
+When actually requesting a human decision or handing off a user-run action, use `@human-review approval-brief`. Include **今回やった内容**, **今回承認してほしい内容**, **承認によって影響がある範囲**, and **否認した場合の対応** in the same message. Name the action/actor, target/revision and reason for the gate; distinguish completed work from proposals. Use the brief only to explain a needed decision, without an additional queue scan/write or confirmation for already authorized work. Preserve the stated denial response at continuation.
+
 ## Select one operation
 
 - `dispatch`: deliver an approved packet to the verified target, record a receipt, then return.
@@ -60,7 +64,7 @@ After terminal output and required artifacts are durably collected, invoke `@wor
 
 ## Resolve a question, then reply
 
-Re-read the question in the bound session and its run/revision before sending. Arca may answer a routine question from an authoritative current contract inside the grant. For human-owned design, scope, publication or risk choices, use `@human-review` and stop.
+Re-read the question in the bound session and its run/revision before sending. Arca may answer a routine question from an authoritative current contract inside the grant. For human-owned design, scope, publication or risk choices, prepare `@human-review approval-brief` from the exact question and verified run context, then stop that action. Do not forward a bare Ask/Accept prompt: explain completed work, requested permission, affected scope and denial handling before requesting a reply. Preserve any denial against that question/revision rather than auto-accepting or selecting a different option.
 
 Bind replies to question ID, run and instruction revision. A decision expanding operations needs a newly approved revision; reconcile old in-flight work first. Record reply intent and receipt and reconcile uncertain delivery before retrying. Never auto-accept an Ask simply because SwitchBoard relayed it.
 
