@@ -1,0 +1,232 @@
+{
+  "source_commit": "bee79678b9d2add5c1cb1e97a493787d880d71e6",
+  "source_tree": "5fda54461829efbe4df13ba7f2a9024090ae3ce3",
+  "installed_commit": "d4d4fb191bbe24d15f0347b10f6d714a70416b08",
+  "installed_files": 85,
+  "matching_files": 68,
+  "preexisting_differences": [
+    {
+      "path": "skills/security-audit/agents/openai.yaml",
+      "kind": "ui-metadata-drift",
+      "installed_git_blob": "8b3e4e993f595d833db71ec1e368ccb7e4f8dd87",
+      "source_git_blob": "cdeac5cc40e163bc8791d35d3bf56649242772f1"
+    },
+    {
+      "path": "skills/security-audit/assets/icon.svg",
+      "kind": "installed-only",
+      "installed_git_blob": "2468028d1ed0fc8009b1fc45e7bb027adaf0d079",
+      "source_git_blob": null
+    },
+    {
+      "path": "skills/btw/agents/openai.yaml",
+      "kind": "installed-only",
+      "installed_git_blob": "1c2553696664249f6d96d55fc3e68b260ba2922d",
+      "source_git_blob": null
+    },
+    {
+      "path": "skills/btw/assets/icon.svg",
+      "kind": "installed-only",
+      "installed_git_blob": "f0ec0fb4fb305880342dc69ee33cec099fb4dd24",
+      "source_git_blob": null
+    },
+    {
+      "path": "skills/opencode-bridge/assets/icon.svg",
+      "kind": "icon-drift",
+      "installed_git_blob": "f387e96b74b4a2a407760075db8859a99fdf91f1",
+      "source_git_blob": "c782ded19ff8d6a930f75d1c6433f509da0df66a"
+    },
+    {
+      "path": "skills/patch-plan/assets/icon.svg",
+      "kind": "icon-drift",
+      "installed_git_blob": "f19f1b68e96ba7df24829e7aec93ebd17396a341",
+      "source_git_blob": "c782ded19ff8d6a930f75d1c6433f509da0df66a"
+    },
+    {
+      "path": "skills/change-review/assets/icon.svg",
+      "kind": "icon-drift",
+      "installed_git_blob": "2468028d1ed0fc8009b1fc45e7bb027adaf0d079",
+      "source_git_blob": "f0ec0fb4fb305880342dc69ee33cec099fb4dd24"
+    },
+    {
+      "path": "skills/repo-review/agents/openai.yaml",
+      "kind": "serialization-only",
+      "installed_git_blob": "8897ce1caae9893a6ce45322d5b897ec349db404",
+      "source_git_blob": "1589338ba378b54406f2baec97b4b02199816495"
+    },
+    {
+      "path": "skills/repo-review/assets/icon.svg",
+      "kind": "installed-only",
+      "installed_git_blob": "2468028d1ed0fc8009b1fc45e7bb027adaf0d079",
+      "source_git_blob": null
+    },
+    {
+      "path": "skills/dev-loop/assets/icon.svg",
+      "kind": "icon-drift",
+      "installed_git_blob": "f19f1b68e96ba7df24829e7aec93ebd17396a341",
+      "source_git_blob": "c782ded19ff8d6a930f75d1c6433f509da0df66a"
+    },
+    {
+      "path": "skills/handover/agents/openai.yaml",
+      "kind": "serialization-only",
+      "installed_git_blob": "6ef6479b693953433f750781c88fe08f7380f284",
+      "source_git_blob": "7e690b27be582cf08261fac3fdfa9893c08a744a"
+    },
+    {
+      "path": "skills/issue-filer/assets/icon.svg",
+      "kind": "icon-drift",
+      "installed_git_blob": "f0ec0fb4fb305880342dc69ee33cec099fb4dd24",
+      "source_git_blob": "c782ded19ff8d6a930f75d1c6433f509da0df66a"
+    },
+    {
+      "path": "skills/security-plan/agents/openai.yaml",
+      "kind": "ui-metadata-drift",
+      "installed_git_blob": "664e994427c74efb4c3af894abadf923478b43d4",
+      "source_git_blob": "818dab36b8f7714b72bdfe50e21ebc16a13a2a7d"
+    },
+    {
+      "path": "skills/security-plan/assets/icon.svg",
+      "kind": "installed-only",
+      "installed_git_blob": "c782ded19ff8d6a930f75d1c6433f509da0df66a",
+      "source_git_blob": null
+    },
+    {
+      "path": "skills/security-plan/references/security-remediation-plan-template.md",
+      "kind": "instruction-drift",
+      "installed_git_blob": "024606761050c866631851f2cf6e755183765d97",
+      "source_git_blob": "09a161264469c1cf81d76124fc555594014c894b"
+    },
+    {
+      "path": "skills/blueprint/assets/icon.svg",
+      "kind": "icon-drift",
+      "installed_git_blob": "b989e1ec3cbca170d1d9aac663b864902e188a09",
+      "source_git_blob": "4c3163aa85e15ed80114f93a9a2b140a53012c44"
+    },
+    {
+      "path": "skills/debug-investigate/assets/icon.svg",
+      "kind": "icon-drift",
+      "installed_git_blob": "2468028d1ed0fc8009b1fc45e7bb027adaf0d079",
+      "source_git_blob": "3aa5522d9c0f47cbeaabca31dcbcb2111d99531b"
+    }
+  ],
+  "source_only_archive": "uninstalled/ contains two historical skill implementations and is not an installed target",
+  "activation_performed": false,
+  "candidate_changes": [
+    {
+      "path": "skills/blueprint/SKILL.md",
+      "installed_before_blob": "b5635fc198a308088e195ac396b910a6cf970031",
+      "candidate_blob": "e6e54628f688f68f47a8a39e1ac907671fe53171",
+      "candidate_sha256": "305a7d1bb8d3fd366185067f4f9ac547d51d7dcee6e589d1d6c52ef38b97d4a3"
+    },
+    {
+      "path": "skills/blueprint/references/design-brief-template.md",
+      "installed_before_blob": "34381b0a76b1b3f0c619ad5461411bd54a726ab9",
+      "candidate_blob": "9703db6be8f07fff69cc30c78253f24b1d2c72be",
+      "candidate_sha256": "a9a5df6fbd144756175b29570a69b41fffafa1e33531b89c06124c0a4e5cb1cd"
+    },
+    {
+      "path": "skills/change-review/SKILL.md",
+      "installed_before_blob": "4d971494b4b0cf0edc87b57d3eeb419e83c4dcc9",
+      "candidate_blob": "5a3970bacb4600ba9c0227b7d383d65e043764be",
+      "candidate_sha256": "51ee423ef8cf510b8f3932bd5f1ee41504c7bf9c8e7b114c342f967b2e28c1a9"
+    },
+    {
+      "path": "skills/dev-loop/SKILL.md",
+      "installed_before_blob": "7d1c58169d4f57e65f22d5b05343bcb8c1e848c3",
+      "candidate_blob": "c1eb482ad7847be828c3f08245e6f49a865676ef",
+      "candidate_sha256": "cc92d9665819ca4e8351ea956f61f996ed2af0edc84cf20b8a1d7d52ce5fa571"
+    },
+    {
+      "path": "skills/human-review/SKILL.md",
+      "installed_before_blob": "612663de5b42a44505a2db1aafe56d4d97a7b132",
+      "candidate_blob": "6c83571eb991e8771255d8898dde161ae6f907c6",
+      "candidate_sha256": "3a03b5b84cb73b356f8963cf97dd9760e808a07aec1d9f930c845ae36cbca136"
+    },
+    {
+      "path": "skills/human-review/agents/openai.yaml",
+      "installed_before_blob": "bf62c200306c64f836e6bc3eb43abd26764048ce",
+      "candidate_blob": "0a6443a1955746d04b12ac27c96157184217c090",
+      "candidate_sha256": "3be7626cae53199fdedd5fc652253e037b75124d7c5bdf3430abd7e2680e6617"
+    },
+    {
+      "path": "skills/human-review/references/approval-request.md",
+      "installed_before_blob": "240f3b72fae6b741a3f8283b024a0874638ab1ee",
+      "candidate_blob": "9dd4de7f770e8b68530b7dfffdea2998d5cab19e",
+      "candidate_sha256": "c6f033876102b2dafaa080f6b07ec342f285567ee6622c5e3b15cdf93c10b8fe"
+    },
+    {
+      "path": "skills/human-review/references/decision-sweep.md",
+      "installed_before_blob": null,
+      "candidate_blob": "f168c81d8065511e6bc481cab24c82caea96e276",
+      "candidate_sha256": "243eaec01006a8fa275e8c9c3c9d90c7d658889ec6dff31eece13c2f8aa1e43c"
+    },
+    {
+      "path": "skills/human-review/references/goal-alignment.md",
+      "installed_before_blob": null,
+      "candidate_blob": "0218b5f283af7c3fb046ab418241ce42a574496e",
+      "candidate_sha256": "55220a36bd57c443dd2d8e3b96840a938f5bd747a79e5593c7a86252f40c8462"
+    },
+    {
+      "path": "skills/human-review/references/missed-decision-audit.md",
+      "installed_before_blob": null,
+      "candidate_blob": "05a85f4a9e767ac5cb84d1fba3d3236464871d57",
+      "candidate_sha256": "79168aa2e954a6e57f6ae0dbd40c80dabc3e5a91e6d22820849c780dc96ef213"
+    },
+    {
+      "path": "skills/opencode-bridge/SKILL.md",
+      "installed_before_blob": "aa2e0d361b5b63ab577f9330320381d8d550f41f",
+      "candidate_blob": "6be51c34fe47e4c192ec5f3f7ba42d0120ac3edf",
+      "candidate_sha256": "79b40fc2f3bfb4e9a03cdcee9f385a9ce6246566c1156f7098ec9d1c931baf75"
+    },
+    {
+      "path": "skills/patch-plan/SKILL.md",
+      "installed_before_blob": "e04aec253911f26a143eeb8f010b5e02e3e78538",
+      "candidate_blob": "62fbeea08ef5b47b7ee0630cfdade934289237ce",
+      "candidate_sha256": "992881f4812df7371feceac98929dcbc145417636155464deae0105fb4602d7c"
+    },
+    {
+      "path": "skills/patch-plan/references/patch-plan-template.md",
+      "installed_before_blob": "b26702da0583c787652fd7f4cd442859626bf1fa",
+      "candidate_blob": "48ac506abc0c816b7dc1b65bb1b5c62fbaff4a6a",
+      "candidate_sha256": "d3256803b5e3b42d0c7f3c326e20f9b15536934196ac9cce3937e4e91651ce8c"
+    },
+    {
+      "path": "skills/repo-handoff/SKILL.md",
+      "installed_before_blob": "5063d23e42a009cfe3ac1f6b31eb50723d490577",
+      "candidate_blob": "ed19d3e926f505b66aee5e38fab1bf11eb55847a",
+      "candidate_sha256": "404cc8f8538109a818944ae46c045569aa8a6b012074768433d9af5fad18f13a"
+    },
+    {
+      "path": "skills/repo-handoff/references/execution-contract.md",
+      "installed_before_blob": "94f52f5ad5d47faeaa799ddcd3783d13cb5c28ac",
+      "candidate_blob": "1fb08fa42315bb7bd5a1e58c28c052120db47c98",
+      "candidate_sha256": "de6972ad09c50b843fac50674f5f4bf438402388a1375ceaf5b97ee19b3fda6c"
+    },
+    {
+      "path": "skills/repo-handoff/references/state-schema.md",
+      "installed_before_blob": "e00410303f069d488582525fd0d24ca671d80f35",
+      "candidate_blob": "ebcca8220663a23b58c6a3803b295e7f16475190",
+      "candidate_sha256": "a48912773f646593b426072316b17fc0a02be2db676a5f231d917039b1cab5cf"
+    },
+    {
+      "path": "skills/repo-review/SKILL.md",
+      "installed_before_blob": "b35330976e76cc5ec63c2bf85730acd5511d9837",
+      "candidate_blob": "415493f6f3bf21df521b9b73df1ed4a953ae7c6b",
+      "candidate_sha256": "9e5f06ac17cd338831e5e8643ab97e6adf45cf1df9e5910162ce64ded1f6ba79"
+    },
+    {
+      "path": "skills/repo-status/SKILL.md",
+      "installed_before_blob": "1bd3d4312a5e34d7be6f3ebdbcf73b5a75e30b5b",
+      "candidate_blob": "3589639f95e2085ddcc48278f5f1af3ae82eee1d",
+      "candidate_sha256": "b2febfb2c5112c7e5e0032032deeb5f3c2f37511e29ef997be33e760d0117aa8"
+    }
+  ],
+  "verification": {
+    "installed_files_unchanged": 85,
+    "candidate_files_equal_in_isolated_overlay": 18,
+    "untouched_installed_files_preserved": 70,
+    "mode": "scratch overlay only; no installed repository mutation",
+    "activation": "pending separate approval",
+    "source_repository_main": "unchanged baseline until separately approved Merge"
+  },
+  "deployment_rule": "Apply only these reviewed file deltas after verifying each installed preimage. Preserve installed-only and unrelated drift. Do not replace whole skill folders from the source mirror."
+}

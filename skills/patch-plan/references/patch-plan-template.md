@@ -22,6 +22,9 @@ Use this structure and omit sections that are genuinely irrelevant. Preserve sou
 - Run ID / instruction revision:
 - Immutable packet reference / actual digest:
 - Design source / approved revision / approval scope:
+- Measurable product/user/research outcome (separate from technical ACs):
+- Known resource envelope and allocation authority; unknown limits:
+- Goal-alignment snapshot / material scope-responsibility delta / unresolved human choices:
 - Operation allowlist: investigate / edit / test / commit / push / Draft PR / executor report
 - Approval source and prerequisites per operation:
 - Exact stop point:
@@ -92,7 +95,7 @@ At every substantive checkpoint, the coordinator updates the existing carrier th
 
 ## Design decisions
 
-Record each decision, its rationale, alternatives rejected, and compatibility consequences. If a decision cannot yet be made, convert it into a Phase 0 task with a concrete output.
+Record each decision, its rationale, alternatives rejected, and compatibility consequences. If a fact cannot yet be established, use a bounded Phase 0 investigation with a concrete output. Keep unresolved human-owned choices as gates; investigation cannot silently authorize them. Copy the decision-sweep rules into the packet: inspect actual material scope/resources/responsibilities even without Ask flags, resolve routine choices and exact prior grants without reapproval, mark missing provenance unknown, and report only unresolved human-owned effects with an explainable brief. The coordinator owns final detection and recording; this is no always-on monitor.
 
 ## Workstream execution
 

@@ -1,18 +1,25 @@
 ---
 name: human-review
-description: Explain concrete human approval requests or list unresolved decisions, risk acceptances and focused inspections in a software workflow. Use approval-brief whenever a workflow needs a self-contained approval request or user-run action handoff; explain completed work, the requested action, affected scope and what happens on denial. Use review-queue when the user asks what needs their judgment across Issues, Tasks, pull requests, plans and blockers, and checkpoint that queue. Do not invent gates for routine or already authorized work.
+description: Explain concrete approvals, identify unresolved human decisions, and independently audit missed decisions in bounded repository history. Use approval-brief for an approval or user-run action handoff, review-queue for current human judgment across Issues/PRs/plans, and missed-decision-audit for retrospective scope/architecture milestones or historical samples. Supply goal-alignment and per-turn decision-sweep guidance to repository workflows. Do not invent gates for routine or already authorized work.
 ---
 
 # Identify Human Review
 
-Produce a concise, evidence-backed approval brief or decision queue in the user's language. Surface only work that an agent cannot legitimately settle from authoritative contracts and current evidence.
+Produce a concise, evidence-backed approval brief, decision queue or independent retrospective audit in the user's language. Surface only work that an agent cannot legitimately settle from authoritative contracts and current evidence.
 
 ## Select the operation
 
 - `approval-brief`: explain a concrete decision or action already identified by the calling workflow. Read [references/approval-request.md](references/approval-request.md) and return its four-field brief in the user's language. Use the supplied current evidence and resolve only material gaps. Do not start a repository-wide review, create a queue, write a checkpoint or perform the proposed action merely to format the request; the caller keeps its existing authority and recording rules.
 - `review-queue`: inspect the selected repository/workflow using the steps below. For every qualifying item, read the same reference and include all four fields before asking for judgment. Automatically checkpoint only under the existing queue workflow's recording policy.
+- `missed-decision-audit`: read [references/missed-decision-audit.md](references/missed-decision-audit.md) and perform its bounded independent retrospective review. Do not substitute the current queue or rely only on executor flags. Return a pinned delta to the existing writer; keep substantive actions read-only.
 
 This format explains a necessary decision; it never creates an additional approval requirement. Reuse applicable prior authorization. Finish already authorized preparation and verification before asking so the user decides on a concrete result.
+
+## Shared checks for calling workflows
+
+Read [references/goal-alignment.md](references/goal-alignment.md) at new workstreams, material scope/design/resource changes, important PR/release milestones and repository status. Read [references/decision-sweep.md](references/decision-sweep.md) before final responses of substantive repository turns, including a review-queue result. These checks inspect actual deltas even without `NEEDS_DECISION`; exempt `@btw`, unrelated conversation and unchanged pure observations. They are declarative guidance, not a guaranteed runtime hook or background Ask monitor. Resolve references by installed skill name; opaque installation directory IDs and sibling paths are not portable.
+
+For `approval-brief`, use supplied evidence only and preserve formatter-only behavior; the calling workflow owns any sweep, gate and recording. For `missed-decision-audit`, follow the audit reference rather than the queue procedure below. The remaining snapshot/queue steps apply to `review-queue`.
 
 ## Establish the current snapshot
 

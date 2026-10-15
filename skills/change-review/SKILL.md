@@ -56,6 +56,8 @@ Before using the diff or tests to judge correctness:
 
 ## Review the implementation
 
+Use `@human-review`'s `references/goal-alignment.md` at material changes and important PR milestones, and its `references/decision-sweep.md` before the substantive review final. Check silent human-owned effects in the actual diff, not just flagged gates or passing tests. At a significant scope/architecture milestone, also apply its `missed-decision-audit` mode to a bounded historical decision window in this independent context (or a fresh reviewer if this reviewer made the original decision). Keep that retrospective classification separate from this change's correctness verdict; a missing approval log alone is not a verified violation.
+
 Review in this order:
 
 1. Confirm that the approved intent is still appropriate for the current project contract; escalate rather than revise it when human authority is required.

@@ -1,0 +1,176 @@
+{
+  "source_base": "bee79678b9d2add5c1cb1e97a493787d880d71e6",
+  "baseline_tree": "5fda54461829efbe4df13ba7f2a9024090ae3ce3",
+  "review_manifest_sha256": "4c0d526c47957076f657d016961ca18ac3e9b0bbbf64edfe89790d443850457c",
+  "scope": "Initial independent review covered complete frozen source tree; entries below list its 24 proposed changes. Subsequent evidence-only report additions are separately identified in the final review report.",
+  "files": [
+    {
+      "blob": "d57e5427e790614f9ce461dbab423e4dbd3cc7fa",
+      "disposition": "add",
+      "mode": "100644",
+      "path": "docs/validation/issue-1-pilot.md",
+      "sha256": "55200806592d93814a2d79e06e56f94894d8dc8db5b9afc1150f60a0481f8e68"
+    },
+    {
+      "blob": "41f3109374d476ecafad12420b6b34611835af2a",
+      "disposition": "add",
+      "mode": "100644",
+      "path": "docs/validation/issue-1-sync.json",
+      "sha256": "575c0d96e34e46c390272f0c4a18252bd2f50034c882b40b1d7ce8e50dc81e8b"
+    },
+    {
+      "blob": "e6e54628f688f68f47a8a39e1ac907671fe53171",
+      "disposition": "modify",
+      "mode": "100644",
+      "path": "skills/blueprint/SKILL.md",
+      "sha256": "305a7d1bb8d3fd366185067f4f9ac547d51d7dcee6e589d1d6c52ef38b97d4a3"
+    },
+    {
+      "blob": "9703db6be8f07fff69cc30c78253f24b1d2c72be",
+      "disposition": "modify",
+      "mode": "100644",
+      "path": "skills/blueprint/references/design-brief-template.md",
+      "sha256": "a9a5df6fbd144756175b29570a69b41fffafa1e33531b89c06124c0a4e5cb1cd"
+    },
+    {
+      "blob": "5a3970bacb4600ba9c0227b7d383d65e043764be",
+      "disposition": "modify",
+      "mode": "100644",
+      "path": "skills/change-review/SKILL.md",
+      "sha256": "51ee423ef8cf510b8f3932bd5f1ee41504c7bf9c8e7b114c342f967b2e28c1a9"
+    },
+    {
+      "blob": "c1eb482ad7847be828c3f08245e6f49a865676ef",
+      "disposition": "modify",
+      "mode": "100644",
+      "path": "skills/dev-loop/SKILL.md",
+      "sha256": "cc92d9665819ca4e8351ea956f61f996ed2af0edc84cf20b8a1d7d52ce5fa571"
+    },
+    {
+      "blob": "6c83571eb991e8771255d8898dde161ae6f907c6",
+      "disposition": "modify",
+      "mode": "100644",
+      "path": "skills/human-review/SKILL.md",
+      "sha256": "3a03b5b84cb73b356f8963cf97dd9760e808a07aec1d9f930c845ae36cbca136"
+    },
+    {
+      "blob": "0a6443a1955746d04b12ac27c96157184217c090",
+      "disposition": "modify",
+      "mode": "100644",
+      "path": "skills/human-review/agents/openai.yaml",
+      "sha256": "3be7626cae53199fdedd5fc652253e037b75124d7c5bdf3430abd7e2680e6617"
+    },
+    {
+      "blob": "9dd4de7f770e8b68530b7dfffdea2998d5cab19e",
+      "disposition": "modify",
+      "mode": "100644",
+      "path": "skills/human-review/references/approval-request.md",
+      "sha256": "c6f033876102b2dafaa080f6b07ec342f285567ee6622c5e3b15cdf93c10b8fe"
+    },
+    {
+      "blob": "f168c81d8065511e6bc481cab24c82caea96e276",
+      "disposition": "add",
+      "mode": "100644",
+      "path": "skills/human-review/references/decision-sweep.md",
+      "sha256": "243eaec01006a8fa275e8c9c3c9d90c7d658889ec6dff31eece13c2f8aa1e43c"
+    },
+    {
+      "blob": "0218b5f283af7c3fb046ab418241ce42a574496e",
+      "disposition": "add",
+      "mode": "100644",
+      "path": "skills/human-review/references/goal-alignment.md",
+      "sha256": "55220a36bd57c443dd2d8e3b96840a938f5bd747a79e5593c7a86252f40c8462"
+    },
+    {
+      "blob": "05a85f4a9e767ac5cb84d1fba3d3236464871d57",
+      "disposition": "add",
+      "mode": "100644",
+      "path": "skills/human-review/references/missed-decision-audit.md",
+      "sha256": "79168aa2e954a6e57f6ae0dbd40c80dabc3e5a91e6d22820849c780dc96ef213"
+    },
+    {
+      "blob": "6be51c34fe47e4c192ec5f3f7ba42d0120ac3edf",
+      "disposition": "modify",
+      "mode": "100644",
+      "path": "skills/opencode-bridge/SKILL.md",
+      "sha256": "79b40fc2f3bfb4e9a03cdcee9f385a9ce6246566c1156f7098ec9d1c931baf75"
+    },
+    {
+      "blob": "62fbeea08ef5b47b7ee0630cfdade934289237ce",
+      "disposition": "modify",
+      "mode": "100644",
+      "path": "skills/patch-plan/SKILL.md",
+      "sha256": "992881f4812df7371feceac98929dcbc145417636155464deae0105fb4602d7c"
+    },
+    {
+      "blob": "48ac506abc0c816b7dc1b65bb1b5c62fbaff4a6a",
+      "disposition": "modify",
+      "mode": "100644",
+      "path": "skills/patch-plan/references/patch-plan-template.md",
+      "sha256": "d3256803b5e3b42d0c7f3c326e20f9b15536934196ac9cce3937e4e91651ce8c"
+    },
+    {
+      "blob": "ed19d3e926f505b66aee5e38fab1bf11eb55847a",
+      "disposition": "modify",
+      "mode": "100644",
+      "path": "skills/repo-handoff/SKILL.md",
+      "sha256": "404cc8f8538109a818944ae46c045569aa8a6b012074768433d9af5fad18f13a"
+    },
+    {
+      "blob": "1fb08fa42315bb7bd5a1e58c28c052120db47c98",
+      "disposition": "modify",
+      "mode": "100644",
+      "path": "skills/repo-handoff/references/execution-contract.md",
+      "sha256": "de6972ad09c50b843fac50674f5f4bf438402388a1375ceaf5b97ee19b3fda6c"
+    },
+    {
+      "blob": "ebcca8220663a23b58c6a3803b295e7f16475190",
+      "disposition": "modify",
+      "mode": "100644",
+      "path": "skills/repo-handoff/references/state-schema.md",
+      "sha256": "a48912773f646593b426072316b17fc0a02be2db676a5f231d917039b1cab5cf"
+    },
+    {
+      "blob": "415493f6f3bf21df521b9b73df1ed4a953ae7c6b",
+      "disposition": "modify",
+      "mode": "100644",
+      "path": "skills/repo-review/SKILL.md",
+      "sha256": "9e5f06ac17cd338831e5e8643ab97e6adf45cf1df9e5910162ce64ded1f6ba79"
+    },
+    {
+      "blob": "3589639f95e2085ddcc48278f5f1af3ae82eee1d",
+      "disposition": "modify",
+      "mode": "100644",
+      "path": "skills/repo-status/SKILL.md",
+      "sha256": "b2febfb2c5112c7e5e0032032deeb5f3c2f37511e29ef997be33e760d0117aa8"
+    },
+    {
+      "blob": "69bec75890f37d33da1610c7d0ed980e621b3e83",
+      "disposition": "add",
+      "mode": "100644",
+      "path": "tests/issue1/audit-and-brief.json",
+      "sha256": "03cea6a0e6d685bb65a428553c33d9017dbd07bc6c78dc697099ceff6794f4e1"
+    },
+    {
+      "blob": "d1c214b903d65db3471ae15ae6a0dea0ba32f241",
+      "disposition": "add",
+      "mode": "100644",
+      "path": "tests/issue1/decision-turns.json",
+      "sha256": "1fad3efddeeed2ea9c8d6e4a2e71b2cc9f008ca669c71591eb816e76592c91fc"
+    },
+    {
+      "blob": "47d6e6a23d209200ac764d98df5281b501f0ce7a",
+      "disposition": "add",
+      "mode": "100644",
+      "path": "tests/issue1/status-turns.json",
+      "sha256": "639bb81dcd9cd64cf637c2ccd1742b5b53972048636ec3ebbf5f4203aedd0164"
+    },
+    {
+      "blob": "69d572b5589a4d60f23f453489faa39be188bcd2",
+      "disposition": "add",
+      "mode": "100644",
+      "path": "tests/issue1/validate_structure.py",
+      "sha256": "de7a8937503c471322e92d96b2b1ad3bcc12e565bf20d5b9c0b32125a97d7aac"
+    }
+  ]
+}

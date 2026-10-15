@@ -40,6 +40,8 @@ For persistent resources created through the transport, apply `@workspace-cleanu
 
 ## Dispatch exactly once
 
+Check the packet's goal/outcome/non-goal/resource record against the granted scope using `@human-review`'s `references/goal-alignment.md` when a preflight trigger applies. On collection or a substantive dispatch/reply checkpoint, apply its `references/decision-sweep.md` before returning: compare actual delivered contracts, scope, responsibility and resource changes with the packet even if the executor reported no Ask. Preserve status-only mode; unchanged observation needs no new sweep. Return a candidate delta to the coordinator without silently revising the packet or granting operations.
+
 1. Validate the self-contained packet and its approval source against live state; compute a real digest, not a placeholder.
 2. Check for an existing run/receipt with the same identity. For sent, acknowledged, running, waiting or unknown delivery, reconcile first; do not resend.
 3. Carry `model_policy: opencode-config`; omit model/effort overrides and let OpenCode resolve the selection. Record exposed configuration and observed execution separately. Missing metadata remains `unknown`; an actual unavailable-model error is a blocker, never permission to substitute another model.

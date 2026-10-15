@@ -29,7 +29,9 @@ Arca: recover contracts, prepare packets, coordinate authorized dispatch, collec
 OpenCode: implement and validate only inside the current run grant through repository-owned APIs. Never launch standalone Codex CLI inside OpenCode.
 SwitchBoard: ongoing Ask detection and notifications. Arca/OpenCode have no Ask watcher/polling responsibility; a notice is not approval or a resolved answer. Do not claim SwitchBoard setup or delivery without evidence.
 
-An implementation and its tests cannot jointly redefine ambiguous intent. Require human-authored/approved goals and stable AC IDs. Escalate material unknowns instead of selecting the easiest interpretation.
+An implementation and its tests cannot jointly redefine ambiguous intent. Require human-authored/approved goals and stable AC IDs. Escalate material unknowns instead of selecting the easiest interpretation. Human ownership also includes priority and resource allocation; Arca must proactively detect consequential choices, not merely relay executor questions.
+
+Apply `@human-review`'s `references/goal-alignment.md` at new workstreams, material changes and important PR/release milestones. Before each substantive turn's final, apply its `references/decision-sweep.md` to newly seen contracts, actual scope/resources, evidence and next action even without `NEEDS_DECISION`. Reuse a current nested sweep; unchanged pure observations are exempt. At significant scope/architecture milestones, route a bounded retrospective `missed-decision-audit` to a fresh reviewer context and collect its delta separately from implementation verification. Keep SwitchBoard/MUSUBI monitoring ownership and existing stage/operation grants.
 
 ## Checkpoint semantics
 
