@@ -28,6 +28,18 @@ Name only material impacts supported by evidence. State an unresolved impact as 
 
 Scope approval to the stated action and revision. Design acceptance, dispatch, implementation, publication, risk acceptance, merge and cleanup can authorize different effects; do not bundle them behind “approve” or “next”. An explicitly requested combined grant may cover multiple named actions when their effects and stop point are clear. Independently decidable requests need separate IDs and briefs; shared background may be stated once in the same message without losing each decision's four fields.
 
+## Critical substantive decisions
+
+For purpose, priority/resource allocation, material architecture/product design or critical policy/risk choices, make the four-field brief decision-ready. Add only information that can change the choice:
+
+- Why this choice is needed now and which actual next action depends on it; do not invent urgency.
+- Credible alternatives, including doing nothing/retaining the current state, with explicit gains, losses, cost and responsibility/operational tradeoffs. State when an option is infeasible and why.
+- Recommended option and rationale, separating verified facts from inference, with confidence and the evidence that could change the recommendation.
+- Unverified impact and its consequence; bounded inspection can resolve a factual gap before asking for authority.
+- Acceptance conditions, known rollback/recovery limits, and what must be revalidated before execution or after changed assumptions. Do not promise reversibility without evidence.
+
+Place these details under the relevant four fields or use a compact options table; do not duplicate a long template. A simple scope-specific tool or Merge approval stays concise when no substantive choice remains. Concrete prior authorization still applies; criticality alone is not a reason to ask again.
+
 ## Denial, deferral and later continuation
 
 - Treat denial as a valid scoped decision. Do not perform the denied action, route it through another tool, discard completed work or roll back unrelated work by implication. Continue only separable work that is still authorized.

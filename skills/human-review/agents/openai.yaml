@@ -1,14 +1,13 @@
 interface:
-  display_name: Human Review
-  short_description: Explain approvals and list unresolved human decisions
-  default_prompt: Use $human-review to explain what I need to approve, what was done,
-    the affected scope, and what happens if I decline.
-  icon_small: assets/icon.svg
-  icon_large: assets/icon.svg
+  display_name: "Human Review"
+  short_description: "Explain approvals and audit missed human decisions"
+  default_prompt: "Use $human-review to explain a concrete approval, list unresolved decisions, or independently audit missed decisions in a bounded repository history."
+  icon_small: "assets/icon.svg"
+  icon_large: "assets/icon.svg"
 policy:
   products:
-  - chatgpt
-  - codex
-  - api
-  - atlas
+    - "chatgpt"
+    - "codex"
+    - "api"
+    - "atlas"
   allow_implicit_invocation: true

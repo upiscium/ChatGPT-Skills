@@ -65,6 +65,10 @@ Keep a valid predecessor chain and a monotonically increasing sequence per carri
 
 ## State record contract
 
+For substantive repository turns, apply `@human-review`'s `references/decision-sweep.md` before finalizing the owned checkpoint, including when a caller has no dedicated integration. Reuse a same-snapshot caller sweep rather than repeating it; `@btw`, unrelated conversation and unchanged pure observation remain sweep-exempt. A sweep does not expand this skill's recording or action authority.
+
+Persist additive goal-alignment, decision-sweep and retrospective-audit deltas when produced. Read `@human-review`'s `references/goal-alignment.md` for triggered preflights and `references/missed-decision-audit.md` for bounded independent audits; do not start a historical audit merely to restore state. Preserve objective sources/revisions, explicit supersession scope, outcome versus technical evidence, provenance gaps and the coordinator's pending next action. Legacy missing fields stay unknown without invalidating concrete prior grants or implying a missed decision.
+
 The machine-readable part must be a small JSON object inside an HTML comment. Keep the human-readable summary immediately after it. Use the template in [references/state-schema.md](references/state-schema.md).
 
 ```markdown

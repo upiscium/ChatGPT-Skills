@@ -23,6 +23,8 @@ When actually requesting a human decision or handing off a user-run action, use 
 
 ## Reconstruct intended architecture
 
+Apply `@human-review`'s `references/goal-alignment.md` to the approved objective, measurable product/research outcome, non-goals, known resource envelope and current work. Show material alignment gaps within the five views without replacing the agreed next action. Technical success is not scientific acceptance or user availability. Before a substantive final, use its `references/decision-sweep.md` to detect newly seen choices even without a flag; unchanged pure observation is exempt. Report candidates and evidence needs within status scope, without launching work or turning the snapshot into an unsolicited approval request.
+
 Derive the system's documented goals, major components, responsibility boundaries, primary end-to-end flows, and milestones. Prefer accepted design records and current code over old plans. When sources disagree, report the conflict and identify which source appears authoritative; do not silently choose a convenient narrative.
 
 If no authoritative overall design exists, say so and provide only a code-derived component map labeled as an inference.

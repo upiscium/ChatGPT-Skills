@@ -29,6 +29,8 @@ When actually requesting a human decision or handing off a user-run action, use 
 
 ## Inspect the integrated product
 
+At material scope/architecture milestones, apply `@human-review`'s `references/goal-alignment.md` and bounded `missed-decision-audit` mode in an independent reviewer context. Compare significant historical decisions and later corrections with authority effective at the time; do not reclassify missing logs or a later priority change as proved unauthorized work. Before the substantive final, use its `references/decision-sweep.md` for newly observed choices and the next action. Keep historical audit results separate from `F-*` defects and current `D-*` choices; preserve existing writer ownership and read-only boundaries.
+
 1. Inventory major components, public interfaces, workflows, persistence boundaries, integrations, deployment configuration, tests, and documentation.
 2. Trace important end-to-end user and operator workflows across component boundaries.
 3. For each reviewed objective, define the observable acceptance contract before inspecting whether tests pass.

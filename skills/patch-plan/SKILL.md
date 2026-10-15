@@ -41,6 +41,8 @@ If the inputs contain `SEC-*` findings, vulnerability details, containment, cred
 
 ## Define authority and stop point
 
+Apply `@human-review`'s `references/goal-alignment.md` before planning a new workstream or materially revised scope. Copy the approved objective/revision, outcome criteria, non-goals, known resource envelope and unresolved material deltas into the packet. Before returning, apply its `references/decision-sweep.md` to the actual planned architecture/responsibilities, grants and next action; a complete task list or Green CI cannot settle an unapproved human-owned choice.
+
 Every packet must include workflow/workstream/run ID, approved instruction revision, immutable packet reference/digest, exact target/session role, operation allowlist and approval source. Use OpenCode only; never instruct it to launch standalone Codex CLI.
 
 Include the OpenCode model policy from `@opencode-bridge`'s `references/model-selection.md`: `model_policy: opencode-config`. Use the model, reasoning effort and variant already configured by OpenCode; omit model/effort overrides from CLI arguments, API fields and instructions. Record actual metadata when exposed, otherwise `unknown`. Copy this policy into every independent and manual packet; do not propagate an older pinned-model requirement.

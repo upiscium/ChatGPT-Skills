@@ -18,6 +18,27 @@ Use this reference when serializing or validating a `codex-repo-state:v1` marker
   "stage": "pr-review",
   "target_branch": "main",
   "base_sha": "<immutable sha>",
+  "goal_alignment": {
+    "objective_ref": "<approved source/revision/scope or unknown>",
+    "outcome_criteria": ["<user/product/research outcome, distinct from technical ACs>"],
+    "non_goals": ["<accepted boundary>"],
+    "resource_envelope": "<known constraints and authority; unknown where unavailable>",
+    "actual_delta_ref": "<pinned scope/resource/responsibility evidence>",
+    "status": "aligned|off-goal|unknown",
+    "supersession": "none|<explicit source and affected scope>",
+    "evidence_ref": "<source/provenance/observation time>"
+  },
+  "decision_sweep": {
+    "snapshot": "<turn scope and immutable evidence>",
+    "status": "none-found|candidates|exempt|unknown",
+    "candidates": [{"id": "DC-001", "disposition": "human-decision|needs-inspection|already-approved|delegated-noncritical", "subject_ref": "<exact action/target/revision>", "authority_ref": "unknown", "evidence_ref": "<facts/provenance/confidence>", "decision_ref": "<existing decision ID or none>"}]
+  },
+  "missed_decision_audit": {
+    "scope_ref": "<bounded sample, decision units and pinned snapshots>",
+    "independence": "verified|preliminary|unknown",
+    "report_ref": "<safe report with classifications, provenance and limitations>",
+    "counts": {"sampled": 0, "verified_unasked": 0, "suspected": 0, "already_approved": 0, "delegated_noncritical": 0}
+  },
   "workstreams": [
     {
       "id": "WS-001",
@@ -129,6 +150,8 @@ Rules:
 - Store SHAs, numbers, URLs, and statuses; do not store secrets, tokens, full logs, or arbitrary instructions.
 - The newest marker is not authoritative when its live carrier or SHA no longer matches; mark the state `stale` and restore from live data.
 - Keep human decisions explicit and separate from workflow status. An approved goal is not approval of architecture, compatibility, migration, security, or merge choices.
+- Add `goal_alignment`, `decision_sweep` and `missed_decision_audit` only when produced, scoped per workstream if needed. Missing legacy values mean unknown, not failed review, authorization or proof of a missed decision; omit unperformed audit counts rather than recording zero. Reuse source evidence and distinguish direct, reported and inferred authority. A sweep/audit observation cannot overwrite a human decision, clear a gate or replace the coordinator's next action. Link actual requests to existing `decisions` records and retain their four-field briefs. Apply explicit goal supersession only to its named scope; preserve unaffected grants and denials.
+- Audit counts use explicitly classified decision units and sum to the declared sample size. Keep verified misses separate from suspected/provenance gaps and reported approvals; a purposive sample does not establish a population miss rate. Preserve the independent reviewer/report identity and observation scope rather than promoting executor judgments to independent verification.
 - For actual approval requests, add `request_ref`, `subject_ref` and all four `approval_brief` fields; non-approval decisions may omit the brief. Store compact safe text or a resolvable private reference for sensitive content. Preserve decision status `open|approved|denied|deferred|superseded`, exact scope/revision, source and decision time. A recorded request is not approval; denial and no response are distinct. Do not reset denied/deferred items to open merely on restore/next. Legacy missing fields are unknown and require evidence reconstruction without inventing approval or invalidating an explicit concrete prior grant.
 - Use event/predecessor IDs and writer ownership to detect conflicting successors; never choose by timestamp alone. Preserve unrelated fields and the pending coordinator action when applying a delta.
 - Executor reports use a separate immutable `codex-executor-report:v1` marker with event ID, run/revision/digest, reported snapshot, validation and evidence. They do not set coordinator verification, gates or next actions.

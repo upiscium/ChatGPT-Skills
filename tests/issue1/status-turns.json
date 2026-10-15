@@ -1,0 +1,36 @@
+{
+  "artifact_context": "Use only the supplied repository snapshots. No live network or writes are available. Return the user-facing answer and a compact continuation delta per independent case.",
+  "cases": [
+    {
+      "id": "S1",
+      "skill": "repo-status",
+      "user": "現在地点と次にやろうとしていることを教えて。",
+      "snapshot": "sample-S1-v2",
+      "prior_plan": "Human previously accepted an experiment runner and a larger multi-agent dashboard later; coordinator recommended building the dashboard next. Existing experiment data export remains authorized.",
+      "latest_human_direction": "Collect K11 evidence for the paper now. Pause G2-G5 dashboard/runtime expansion. Keep the existing agreed data export cleanup.",
+      "state": "Experiment CLI runs locally with source tests and documented entrypoint. K11 dataset partly collected; interpretation outstanding. Dashboard stub exists but no integration; current branch explicitly paused. Accepted later appendix export has no source or active branch in the inspected set.",
+      "roadmap": "Accepted milestones: M1 runnable experiment; M2 K11 evidence + interpretation; M3 optional dashboard. Current coordinator next_action: bounded K11 collection within 2 GPU-hours then independent evidence review. No other allocation grant.",
+      "evidence": "Latest user direction applies to K11 and dashboard priority. No production deployment; all relevant branches/Issues and current source are supplied."
+    },
+    {
+      "id": "S2",
+      "skill": "repo-status",
+      "user": "研究パイプラインがPASSだったので仮説も検証できたと言える？現在の状況を教えて。",
+      "snapshot": "sample-S2-v1",
+      "contract": "Scientific success requires predefined outcome effect on an independent sample with uncertainty estimates and no stimulus injection. Technical AC requires pipeline ingestion, execution and artifact export.",
+      "state": "All 32 technical tests pass. Smoke run produced artifacts for 3 synthetic cases. Independent natural-prevalence dataset not collected. Effect size and uncertainty uncomputed.",
+      "roadmap": "R1 functioning pipeline; R2 natural sample + blinded analysis; R3 hypothesis decision. Next agreed action: bounded natural sample collection, no hypothesis conclusion yet.",
+      "evidence": "Current source and test logs confirm R1 only. No active R2 implementation or data collection run yet; R2 is accepted planned work."
+    },
+    {
+      "id": "S3",
+      "skill": "repo-status",
+      "user": "GitHub側と利用中Skillsはそろっている？そのまま使える？",
+      "snapshot": "sample-S3-v1",
+      "state": "Draft PR source h21 contains new human-review audit reference, tests pass and independent review accepted. GitHub main remains b20. Installed skill repo remains i20 with same behavior as b20. An unrelated installed icon differs from main. No synchronization service configured; activation uses separate installed repository commit/push.",
+      "authority": "User authorized source implementation, testing, independent review, Draft PR. Separate approval required for Merge and installed Skills deployment.",
+      "roadmap": "P1 source candidate; P2 review and Draft PR; P3 separately authorized merge; P4 separately authorized activation and readback. Current next_action: request the two concrete human gates after source validation.",
+      "evidence": "Hashes were read for all changed skill files and installed files; installed exact candidate differences listed. No mutation to main or installed Skills occurred."
+    }
+  ]
+}

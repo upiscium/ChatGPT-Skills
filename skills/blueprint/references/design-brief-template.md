@@ -32,8 +32,11 @@ Adapt this template to the task. Omit sections that do not apply.
 
 ## 5. Success criteria
 - User or product outcomes:
+- Research outcome/evidence standard, if applicable (technical execution is separate):
 - Technical acceptance criteria:
 - Operational signals:
+- Resource envelope and authority: time / cost / compute / maintenance / allocation; unknown limits remain unknown
+- Goal-alignment snapshot: approved objective/source/revision, actual scope delta, aligned | off-goal | unknown, next action
 
 ## 6. Existing-system assessment
 - Repository:
@@ -60,7 +63,7 @@ Adapt this template to the task. Omit sections that do not apply.
 ### Confirmed
 ### Assumed
 ### Open
-For each requested human decision, include work completed, exact requested approval and scope, affected behavior/users, and handling if denied. Use the four-field approval brief; design acceptance grants only the stated scope.
+For each requested human decision, include work completed, exact requested approval and scope, affected behavior/users, and handling if denied. Use the four-field approval brief; design acceptance grants only the stated scope. For critical choices add why-now, credible alternatives including retaining the current state, recommendation, losses/tradeoffs, facts versus inference/confidence, unverified impact, acceptance/recovery/revalidation. Do not reopen resolved choices.
 ### Rejected
 
 ## 10. Execution contracts
