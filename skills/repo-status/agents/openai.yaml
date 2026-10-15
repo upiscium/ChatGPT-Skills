@@ -1,8 +1,8 @@
 interface:
   display_name: Repository Status
-  short_description: Map and checkpoint implementation, work, and architecture
-  default_prompt: Use $repo-status to summarize and checkpoint where this repository
-    currently stands.
+  short_description: Map usable features, active work, roadmap, and next steps
+  default_prompt: Use $repo-status to show what is usable, what is in progress, what
+    has not started, where the overall roadmap stands, and what is planned next.
   icon_small: assets/icon.svg
   icon_large: assets/icon.svg
 policy:
