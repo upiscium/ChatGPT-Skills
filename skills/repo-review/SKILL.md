@@ -131,14 +131,14 @@ Use stable `F-*` IDs. Omit acceptance criteria only for non-issues. Include comm
 
 ## Emit a durable checkpoint
 
-Include a coordinator-ready `codex-repo-state:v1` payload (or all of its required fields) pinned to the reviewed commit, merge window, active `F-*` and `D-*` items, and the next action. Before returning, automatically persist this marker on the existing linked Issue, merged PR, or designated tracking carrier and read it back. This is a metadata-only checkpoint: the repository review must not create Issues, change Issue/PR content, or turn findings into work. If no canonical carrier exists, mark the state `bootstrap` and ask the coordinator to choose one rather than inventing a tracking Issue. If the marker write is unavailable, return the exact payload as `pending-write` and disclose that durable recovery is not yet verified.
+For a **new or materially changed** review outcome, include a coordinator-ready `codex-repo-state:v1` payload (or its required fields) pinned to the reviewed commit, merge window, active `F-*` and `D-*` items, and the next action; persist it on the existing carrier through `@repo-handoff` and read it back. An unchanged review reuses the prior marker without rebuilding or writing another full payload. This is a metadata-only checkpoint: the repository review must not create Issues, change Issue/PR content, or turn findings into work. If no canonical carrier exists, mark the state `bootstrap` and ask the coordinator to choose one rather than inventing a tracking Issue. If the marker write is unavailable, return the exact payload as `pending-write` and disclose that durable recovery is not yet verified.
 
 ## Preserve boundaries
 
 - Do not reclassify unresolved PR feedback as a repository finding until the relevant code is merged.
 - Do not create, edit, label, or add non-marker comments to Issues. The existing carrier's marked `codex-repo-state:v1` continuation update is the automatic-recording exception and must be read back.
 - Do not modify code, branches, commits, or PRs.
-- Do not treat a proposed payload as durable until `@repo-handoff` records and reads it back from a carrier. Automatic recording is expected whenever an existing carrier is available, but it is not approval to file Issues or execute implementation.
+- Do not treat a proposed payload as durable until `@repo-handoff` records and reads it back from a carrier. Automatic recording applies when material state changes and an existing carrier is available; unchanged rereads are no-write. A marker is not approval to file Issues or execute implementation.
 - Route selected actionable findings to `@issue-filer`.
 - Route security-sensitive findings to `@security-audit` rather than exposing vulnerability details in ordinary Issue candidates.
 
