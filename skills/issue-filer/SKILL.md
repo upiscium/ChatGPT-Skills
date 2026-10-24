@@ -26,6 +26,8 @@ Do not create issues when the user asked only for review, recommendations, draft
 5. Re-check material evidence when the report is stale, the reviewed branch moved, or the finding is low-confidence.
 6. Merge findings that share one root cause or represent one inseparable capability.
 
+For user-requirement features, keep one coherent function-level user outcome per Issue: original approved goal/revision, usage assumptions, specific user-visible behavior, explicit scope/non-goals, stable observable ACs, dependencies and evidence. Do not substitute OpenCode execution steps for user requirements.
+
 ## Check repository conventions
 
 1. Read contribution guidance, issue templates, and relevant project documentation.
@@ -78,6 +80,10 @@ When a caller supplies a `@repo-handoff` workflow ID or canonical carrier, prese
 If the source finding contains an action-binding constraint, preserve it as an explicit issue section with target action, status, unresolved prerequisite, clearing authority, admissible fallback, evidence snapshot, and required revalidation. Use `none` or `unknown` for missing fields. Do not weaken it into a note, suggestion, deferred owner task, or precedent-based exception.
 
 Create one issue at a time and capture its URL before continuing. If a write fails, stop creating dependent issues and report the failure.
+
+## Selected Issue implementation handoff
+
+Before KAGARI executes an Issue set, show the exact IDs, intended behavior and relevant changes/exclusions for a second focused human alignment check. Issue filing permission does not grant Task execution. Require explicit human authorization for the selected set and an actually verified KAGARI interface; otherwise return not-dispatched without launching an OpenCode Session. KAGARI owns technical reviews, corrective loops and native Task/Ask.
 
 ## Report results
 
