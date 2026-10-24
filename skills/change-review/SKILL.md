@@ -51,8 +51,8 @@ Before using the diff or tests to judge correctness:
 1. Resolve authority in descending order: explicit human-approved decisions, the linked Issue or Task contract, versioned product and architecture contracts, then the PR description for non-conflicting clarification.
 2. Reconstruct the PR goal, stable `AC-*` acceptance criteria, invariants, compatibility requirements, and out-of-scope behavior. Record provenance as `human-approved`, `source-confirmed`, or `derived-unconfirmed`.
 3. Treat implementation and tests as claims about the contract, never as sources that redefine it.
-4. Assign risk `low`, `medium`, or `high`. Public API or architecture changes, security boundaries, destructive behavior, data migrations, distributed consistency, and non-trivial compatibility decisions are normally high risk.
-5. Stop with `blocked` and an explicit human decision when intent is materially ambiguous or contradictory, the PR changes approved scope, or a design or risk trade-off belongs to project authority. Do not choose the most plausible interpretation merely because implementation and tests agree with it.
+4. Assign risk `low`, `medium`, or `high` relative to the approved stage and actually reachable effects. Material public API or architecture changes, in-scope security boundaries, destructive behavior, real data migrations, distributed consistency, and non-trivial compatibility decisions are normally high risk. A hypothetical out-of-scope production attack is not automatically high-risk for an isolated MOCK-only MVI.
+5. Stop with `blocked` and an explicit human decision when intent is materially ambiguous or contradictory, the PR changes approved scope, or an **in-scope** design or risk trade-off belongs to project authority. Record production-deferred hardening without blocking approved isolated MVI acceptance. Do not choose the most plausible interpretation merely because implementation and tests agree with it.
 
 ## Review the implementation
 
