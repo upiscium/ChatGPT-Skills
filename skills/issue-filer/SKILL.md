@@ -73,7 +73,7 @@ For a feature request, include:
 
 Under `Source review` or `Source design`, include the F/DES ID, source revision/approval scope, inspected branch/SHA, related artifacts and pinned evidence. Preserve stable AC IDs. Clearly label proposed designs and inferred reproduction; never present them as confirmed facts. Filing permission is not dispatch, implementation, commit, push or PR permission.
 
-When a caller supplies a `@repo-handoff` workflow ID or canonical carrier, preserve that durable reference in `Source review` and return the created Issue URL as the new workstream carrier. After each created or deduplicated Issue is identified, automatically persist the latest issue-filing state marker on the new or existing carrier and read it back. This marker records the result and next gate; it does not expand the user's authorization to create additional Issues or change their content.
+When a caller supplies a `@repo-handoff` workflow ID or canonical carrier, preserve that durable reference in `Source review` and return the created Issue URL as the new workstream carrier. After an Issue is created or a deduplicated result materially changes the carrier/next action, persist the new state marker via `@repo-handoff` and read it back. An unchanged duplicate lookup reuses the existing marker without writing. This marker records the result and next gate; it does not expand the user's authorization to create additional Issues or change their content.
 
 If the source finding contains an action-binding constraint, preserve it as an explicit issue section with target action, status, unresolved prerequisite, clearing authority, admissible fallback, evidence snapshot, and required revalidation. Use `none` or `unknown` for missing fields. Do not weaken it into a note, suggestion, deferred owner task, or precedent-based exception.
 
@@ -101,4 +101,4 @@ Before each creation, verify that:
 - Every source constraint either survives with its complete operational role or is explicitly marked incomplete and returned for clarification.
 - The body contains no credentials, private logs, or irrelevant review commentary.
 - Any supplied workflow/carrier reference is preserved so a later `@repo-handoff restore` can connect the Issue to its originating review and workstream.
-- The issue-filing result is automatically recorded and read back on an existing carrier; if no carrier or write path exists, return `bootstrap`/`pending-write` explicitly rather than claiming durable recovery.
+- New or materially changed issue-filing outcomes are recorded and read back on an existing carrier; identical dedup results are no-write. If a required new marker has no carrier or write path, return `bootstrap`/`pending-write` instead of claiming recovery.

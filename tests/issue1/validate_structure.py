@@ -35,7 +35,7 @@ def main():
         assert metadata["name"] == name and metadata["description"], name
         assert len(skill.splitlines()) < 500, name
         ui = yaml.safe_load((folder / "agents/openai.yaml").read_text())
-        assert "$" + name in ui["interface"]["default_prompt"], name
+        assert any(prefix + name in ui["interface"]["default_prompt"] for prefix in ("$", "@")), name
         for key in ("icon_small", "icon_large"):
             if key not in ui["interface"]:
                 continue
