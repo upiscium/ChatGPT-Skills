@@ -41,7 +41,7 @@ Inspect repository instructions before prescribing branches, worktrees, agents, 
 
 Require filed Issues for an execution-ready plan. If the user supplies findings without Issues, produce only a draft and mark Issue creation as a blocker.
 
-Before emitting workstreams, restore any `codex-repo-state:v1` record on the selected Issue/PR with `@repo-handoff` and revalidate its base SHA. Include the chosen carrier, workflow ID, current state status, and the state-record update points in the plan. Automatically persist the planning snapshot and read it back before returning. If no carrier exists, return `bootstrap`; never invent a hidden tracking Issue. A missing marker on an existing carrier is bootstrapped automatically.
+Before emitting workstreams, restore any `codex-repo-state:v1` record on the selected Issue/PR with `@repo-handoff` and revalidate its base SHA. Include the chosen carrier, workflow ID, current state status, and the state-record update points in the plan. Persist and read back a **new or materially changed** planning snapshot; if its contract, plan, authority and next action are unchanged, reuse the existing marker without writing. If no carrier exists, return `bootstrap`; never invent a hidden tracking Issue. A missing marker on an existing carrier is bootstrapped automatically.
 
 If the inputs contain `SEC-*` findings, vulnerability details, containment, credential rotation, or exploit-sensitive work, exclude those items and use `@security-plan`. Do not copy restricted security details into this plan.
 
