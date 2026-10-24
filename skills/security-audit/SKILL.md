@@ -22,7 +22,7 @@ When actually requesting a human decision or handing off a user-run action, use 
 3. Determine whether to review a diff, the full target snapshot, or both.
 4. Read repository instructions, architecture documentation, manifests, lockfiles, tests, CI/CD configuration, deployment files, and security policy.
 5. Record inaccessible components and external systems as coverage limitations.
-6. For GitHub-backed audits, automatically persist a sanitized continuation checkpoint through `@repo-handoff` on an existing carrier before returning. Include only repository/ref/commit, audit stage, finding IDs or counts, gates, and next action; never place vulnerability details, exploit paths, secrets, or private evidence in the public marker. If no carrier exists, return `bootstrap` rather than inventing a tracking Issue.
+6. For GitHub-backed audits, persist a sanitized continuation checkpoint through `@repo-handoff` on an existing carrier **only for new or materially changed findings, verdict, or next gate**. Unchanged read-only rechecks create no marker. Include only repository/ref/commit, audit stage, finding IDs or counts, gates, and next action; never place vulnerability details, exploit paths, secrets, or private evidence in the public marker. If no carrier exists, return `bootstrap` rather than inventing a tracking Issue.
 
 Do not claim a whole system is secure from a source-only or branch-limited review.
 
