@@ -39,6 +39,8 @@ Identify:
 
 Prioritize reachable attack paths over checklist completeness.
 
+For every finding, distinguish (a) exploitability under the **accepted stage-specific threat model**, (b) a future production-only exposure, and (c) an attack requiring explicitly excluded privileges or capabilities. Report relevant findings faithfully in a requested audit, but do not automatically convert (b) or (c) into an isolated MOCK-only MVI blocker. Reserve `changes-required` for violated in-scope acceptance, effect isolation, required trust boundaries or materially unaccepted risk. Keep future-hardening findings in a separate nonblocking section; revisit before real external effects. Missing threat-model evidence is `unknown`, not permission to dismiss an issue.
+
 ## Trace security-sensitive behavior
 
 1. Follow untrusted data from source to validation, authorization, storage, execution, and output.
