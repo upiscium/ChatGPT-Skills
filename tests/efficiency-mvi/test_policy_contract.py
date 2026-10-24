@@ -95,7 +95,7 @@ class ArcaPolicyContractTests(unittest.TestCase):
                     self.assertTrue((root / link).is_file(), (name, link))
 
     def test_relocated_stage_contracts_survive(self):
-        self.assertIn("Complete at most one substantive stage per response",
+        self.assertIn("For the default requirements/acceptance lane",
                       skill("dev-loop/references/governance.md"))
         self.assertIn("Before external dispatch, save and read back",
                       skill("repo-handoff/references/checkpoint-policy.md"))
