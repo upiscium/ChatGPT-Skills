@@ -5,7 +5,7 @@ description: Automatically persist and restore verified GitHub work state on exi
 
 # Persist or Restore Repository State
 
-Keep GitHub repository work resumable without making the chat transcript the source of truth. Use a compact, structured state record on an existing canonical Issue or pull request, then revalidate it against live repository state before proposing any action. GitHub-backed workflows use automatic checkpoint recording by default: after each meaningful observation or transition, persist the newest verified state without requiring a separate “record this” request.
+Keep GitHub repository work resumable without making the chat transcript the source of truth. Use a compact, structured state record on an existing canonical Issue or pull request, then revalidate it against live repository state before proposing any action. GitHub-backed workflows automatically checkpoint changed, actionable state at material transitions; repeated observation of an unchanged snapshot does not create another checkpoint.
 
 This skill is a repository-state handoff, not a replacement for `@handover`: use it for GitHub-backed work; use `@handover` for non-repository conversations or personal context that is not suitable for a public repository record.
 
@@ -16,20 +16,21 @@ Infer one operation from the request and state it explicitly:
 - `restore`: read the latest durable record and reconstruct the current stage, workstreams, gates, decisions, and next action.
 - `record`: explicitly repair, backfill, or inspect a checkpoint; routine workflow checkpoints use automatic recording instead.
 - `bootstrap`: reconstruct state when no durable record exists, without pretending it has been saved.
-- `audit`: compare recorded and live facts, reporting drift without substantive actions; automatically record only the observation under the metadata policy.
+- `audit`: compare recorded and live facts, reporting drift without substantive actions; record only actionable drift or a new material finding under the metadata policy.
 
-Restore, bootstrap, and audit do not change product, Issue, PR, branch, or task content. Automatic state recording is a narrowly-scoped metadata write to an already selected canonical carrier and is enabled for every GitHub-backed workflow by default. It does not require a separate user prompt, and `next` does not authorize any business or repository action beyond the one previously announced. Creating a new carrier or changing Issue/PR content, labels, status, reviewers, branches, code, or merge state still requires the responsible workflow's explicit authorization.
+Restore, bootstrap, and audit do not change product, Issue, PR, branch, or task content. Automatic state recording is a narrowly-scoped metadata write to an already selected canonical carrier and applies only when verified material state has changed. It does not require a separate user prompt, and `next` does not authorize any business or repository action beyond the one previously announced. Creating a new carrier or changing Issue/PR content, labels, status, reviewers, branches, code, or merge state still requires the responsible workflow's explicit authorization.
 
 ### Automatic checkpoint policy
 
-For every repository-workflow response that observes or changes state, record the latest verified snapshot before returning. This includes:
+Record the latest verified state only when a new fact changes what the next actor may or must do, or when a recoverability-critical boundary is reached. Examples:
 
-- start/restore, bootstrap, and carrier selection;
-- planning, dispatch, implementation delivery, PR discovery, review, correction, command handoff, and merge verification;
-- human decisions, newly discovered prerequisites, dependency or base changes, blocked/failed operations, and post-merge review;
-- the final state of a response even when no forward progress was possible.
+- first actionable carrier selection, a new or revised plan, authority decision, blocking prerequisite, or material dependency/base change;
+- dispatch-intent recording **before** send, acknowledged/uncertain delivery, run collection, changed review outcome, publication identity and merge verification;
+- a newly discovered failure, material scope change, cleanup result, or handoff that changes the next action.
 
-`@btw` side questions and non-repository conversations are exempt because they must not advance or mutate the main workflow. They may report the last visible stage, but they do not create or update a repository state marker.
+Do **not** write a fresh marker for unchanged reads, duplicate `next`/status responses, a re-opened but identical snapshot, or a failed read with no new actionable evidence. `bootstrap` without an existing carrier is an in-chat reconstruction, not a write. Reuse the valid prior event ID and explicitly say "unchanged" when relevant. If a new observation exposes meaningful drift, write its delta; do not suppress evidence to meet a token budget. Do not force a full repository rescan just to decide whether the marker changed.
+
+`@btw` side questions and non-repository conversations are exempt; neither changes the main workflow nor updates its marker.
 
 Use the existing canonical Issue or PR and update only neutral continuation metadata and its human summary. Prefer append-only successor records with event and predecessor IDs. Edit only an exclusively owned marker with a supported compare-and-swap guard; never use blind last-writer-wins. Read back the exact event and report its sequence, timestamp and URL. On an existing unambiguous carrier, the first marker is also automatic and needs no additional recording approval. Without a carrier, return `bootstrap`; never create a hidden tracking Issue. On write failure, return the exact sanitized marker as `pending-write` and do not claim durable recovery.
 
@@ -103,7 +104,7 @@ Use `none` or `unknown` instead of omitting a field that controls a gate. Treat 
 4. Announce the carrier and concise update before writing; show the full marker only for explicit repair, a user request, or `pending-write`. Automatic recording may use the connector; command-only workflows may emit an exact user-run update as `pending-write`. Never claim a record was saved when only a block was generated.
 5. After a successful write, read the carrier back and verify the marker, sequence, timestamp, and referenced SHAs. Report the canonical URL and the resulting state.
 
-When a workflow is read-only, it may still perform the automatic state-marker write described above; it must not modify product-facing Issue/PR content or review state. A failed write leaves the previous valid state untouched and returns a retry or manual-application path. Do not silently drop the checkpoint because the workflow's substantive result is read-only.
+When a workflow is read-only, it may write the narrow state marker only for newly verified material state or drift; unchanged observations are no-write. It must not modify product-facing Issue/PR content or review state. A failed write leaves the previous valid state untouched and returns a retry or manual-application path. Do not silently drop the checkpoint because the workflow's substantive result is read-only.
 
 ## Restore workflow
 
@@ -159,7 +160,7 @@ For `record`, return the intended marker and human summary before writing, then 
 
 ## Integrate with repository workflows
 
-- `@dev-loop` should restore before acting on `next` and automatically record every substantive checkpoint, including blocked and terminal states.
+- `@dev-loop` should restore before acting on `next` and automatically record each changed substantive checkpoint, including newly blocked and terminal states; unchanged status is read-only.
 - `@repo-status` should consume this record and flag missing, stale, or conflicting state.
 - `@change-review`, `@repo-review`, `@patch-plan`, `@opencode-bridge`, `@repo-status`, and `@human-review` automatically record their owned fields or return deltas to the coordinator; no-code/no-merge/command-only boundaries remain in force.
 - `@human-review review-queue` should read the durable decisions and list only the still-open human gates. Its `approval-brief` formatter alone does not scan or write state; the calling workflow owns any authorized recording.
