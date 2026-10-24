@@ -7,6 +7,8 @@ description: Explain concrete approvals, identify unresolved human decisions, an
 
 Produce a concise, evidence-backed approval brief, decision queue or independent retrospective audit in the user's language. Surface only work that an agent cannot legitimately settle from authoritative contracts and current evidence.
 
+For an accepted isolated MVI, judge security and assurance choices against its **documented threat model and actual effect scope**. Record production-only hardening as deferred rather than blocking the MVI, unless the user changes the agreed boundary. Do not treat a reviewer severity label as automatic permission to expand the MVI or demand new approval. Preserve explicit material risk, irreversible/external action and release gates.
+
 ## Select the operation
 
 - `approval-brief`: explain a concrete decision or action already identified by the calling workflow. Read [references/approval-request.md](references/approval-request.md) and return its four-field brief in the user's language. Use the supplied current evidence and resolve only material gaps. Do not start a repository-wide review, create a queue, write a checkpoint or perform the proposed action merely to format the request; the caller keeps its existing authority and recording rules.
@@ -29,7 +31,7 @@ For `approval-brief`, use supplied evidence only and preserve formatter-only beh
 4. Prefer live repository state over conversation summaries. Mark inaccessible or stale evidence.
 5. Restore and validate any `codex-repo-state:v1` marker on the relevant Issue/PR. Treat stale, conflicted, incomplete, and reconstructed records as evidence limitations, not as approvals.
 6. Preserve separate review items when they have different authorities or can be decided independently. Combine repeated symptoms that require one underlying decision.
-7. Before returning, automatically persist the owned human-gate fields through `@repo-handoff`, preserving unrelated runs and pending actions; batch workers return a delta to the coordinator. Read back any write. Recording the queue never approves or changes the underlying work.
+7. Persist changed human-gate fields through `@repo-handoff` when the queue introduces or resolves a material decision; unchanged queue observations reuse the previous marker. Preserve unrelated runs and pending actions; batch workers return deltas to the coordinator. Read back any performed write. Recording never approves or changes the underlying work.
 
 ## Decide what requires a human
 
@@ -37,7 +39,7 @@ Include an item only when at least one of these conditions is supported by evide
 
 - Product direction, priority, scope, non-goals, or user-facing behavior is materially ambiguous or conflicting.
 - Competing architecture, public API, data model, migration, compatibility, dependency, or integration choices have materially different consequences and no accepted contract resolves them.
-- Security posture, privacy, destructive action, irreversible migration, disclosure, licensing, cost, release, or operational risk requires explicit human acceptance.
+- A material change to the **accepted, in-scope** security/privacy posture; destructive action, irreversible migration, disclosure, licensing, cost, release, or a genuinely new critical operational risk requires explicit human acceptance.
 - A medium- or high-risk PR review identifies a specific contract, location, or trade-off that needs focused human confirmation.
 - An existing gate explicitly names the user or another human authority as the only entity that may clear it.
 - The user explicitly requested a human review of a named artifact or decision.
@@ -50,6 +52,7 @@ Do not include:
 - Questions that further repository inspection can answer mechanically.
 - Decisions already resolved by an authoritative source for the current artifact revision.
 - Speculative future choices that do not block or materially affect current work.
+- Production-only security hardening or out-of-threat-model findings for a MOCK-only MVI, unless they expose an in-scope effect, agreed invariant, or material change requiring user risk acceptance.
 - Low-risk `summary-only` review when there is no unresolved judgment; report it only if the user explicitly asks to inspect that PR.
 
 Durable-state drift alone is not a human decision. List it only when the user must choose a carrier, resolve conflicting records, accept a risk, or decide whether to proceed despite the drift.
