@@ -4,7 +4,7 @@ Before the final response of each substantive repository workflow turn, inspect 
 
 ## Bound the sweep
 
-Use the current turn's contracts, actual diff/scope and resource/responsibility deltas, observed results, review findings and next action. Reuse relevant current evidence; follow only concrete leads. Do not rescan the repository or run the retrospective audit every turn. Exempt `@btw`, unrelated conversation and unchanged pure observation. A newly observed material decision or drift makes an observation substantive.
+Use the current turn's contracts, actual diff/scope and resource/responsibility deltas, observed results, review findings and next action. Reuse relevant current evidence; follow only concrete leads. Do not fetch or re-read supporting Skills, Issues or full histories solely to satisfy this sweep when no new material candidate exists. Do not rescan the repository or run the retrospective audit every turn. Exempt `@btw`, unrelated conversation and unchanged pure observation. A newly observed material decision or drift makes an observation substantive.
 
 In read-only/status/command-only workflows, detect and report within that mode. A candidate does not authorize execution, an unsolicited approval request or an extra write. `approval-brief` alone remains formatting only. A nested skill/coordinator may reuse the same sweep at the same snapshot; do not duplicate it at every layer.
 
@@ -13,7 +13,7 @@ In read-only/status/command-only workflows, detect and report within that mode. 
 1. Compare accepted objective, success criteria, non-goals, scope and known resource envelope with what actually changed or is proposed. Use the goal-alignment preflight when its trigger applies.
 2. Look for new or changed architecture, public contract, responsibility/ownership, operational burden, compatibility, data/privacy/security policy, resource allocation or critical risk acceptance. Inspect important contracts/diffs as well as labels, tests and completion messages.
 3. Identify the smallest consequential choice, exact action/target/revision, human-owned effect, available authority source and whether it remains applicable. Distinguish an executor's claim of approval from the original decision when retrievable.
-4. Resolve routine technical choices from the accepted contract. Retain concrete existing approval, including an exact design or Merge grant, without demanding new formatting or ritual confirmation. A generic `Next`/`Accept` has only a recoverable previously explained scope; it cannot authorize an unidentified different target or risk.
+4. Resolve routine technical choices from the accepted contract. Evaluate a proposed security or assurance gate against the approved stage (isolated MVI vs real integration/production), actual reachable effects and documented threat model. Out-of-scope hardening is a nonblocking deferred candidate, not a new Ask; material changes to approved risk are human-owned. Retain concrete existing approval, including an exact design or Merge grant, without demanding new formatting or ritual confirmation. A generic `Next`/`Accept` has only a recoverable previously explained scope; it cannot authorize an unidentified different target or risk.
 5. Inspect recoverable provenance gaps before asking. Missing logs mean `unknown/needs-inspection`, not either permission or a verified violation. Do not manufacture speculative gates.
 
 ## Return a small delta
