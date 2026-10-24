@@ -20,7 +20,7 @@ When actually requesting a human decision or handing off a user-run action, use 
 3. Resolve the patch base to an immutable commit SHA.
 4. Re-read affected code, callers, tests, configuration, deployment files, and repository instructions.
 5. Confirm that each finding still applies to the patch base. Mark stale, fixed, or unverified findings instead of planning against outdated evidence.
-6. For GitHub-backed remediation planning, automatically persist a sanitized continuation checkpoint through `@repo-handoff` on an existing Issue/PR carrier before returning. Keep restricted vulnerability details out of the marker; record only remediation IDs or counts, stage, immutable base, gates, and next action. If no carrier exists, return `bootstrap` rather than creating one implicitly.
+6. For GitHub-backed remediation planning, persist a sanitized continuation checkpoint through `@repo-handoff` on an existing Issue/PR carrier **only for a new or materially changed plan, decision, or next gate**. An unchanged planning observation creates no marker. Keep restricted vulnerability details out of the marker; record only remediation IDs or counts, stage, immutable base, gates, and next action. If no carrier exists, return `bootstrap` rather than creating one implicitly.
 
 If a critical fact is missing, ask only the questions that can change the remediation architecture, compatibility, containment, or rollout.
 
