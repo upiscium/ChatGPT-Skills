@@ -15,11 +15,11 @@ When actually requesting a human decision or handing off a user-run action, use 
 
 1. Identify the repository, default or requested branch, and review scope from the request and verified context. Ask only if the target remains ambiguous. When a project spans repositories, state which components were inspected; do not extrapolate one repository's status to the whole project.
 2. Resolve the inspected state to an immutable commit SHA and record the observation time.
-3. Read repository instructions, architecture and design documents, roadmaps, manifests, entrypoints, public interfaces, tests, releases, and deployment configuration.
+3. Read only the repository instructions, architecture/roadmap sections, entrypoints, tests and release/deployment evidence necessary for the requested feature/area. Expand to other documents if a material gap remains; do not inventory every subsystem for a focused status question.
 4. Inspect relevant open and recently closed Issues, open and recently merged pull requests, implementation branches, and repository-native task state when available. Record which refs, releases, and environments each claim applies to; inspect active branch code when its state differs from the main snapshot.
 5. State inaccessible sources and freshness limitations. Do not fill gaps from memory or infer live status from stale conversation text.
 6. Search the canonical Issue/PR carriers for the latest `codex-repo-state:v1` record. Revalidate it against the inspected commit and mark it `fresh`, `stale`, `conflicted`, `incomplete`, or `reconstructed`; never treat the record alone as live authority.
-7. Before returning, automatically persist the observed repository-status snapshot through `@repo-handoff` on an existing canonical carrier. Preserve the verified coordinator next checkpoint; record recommendations separately without replacing it. This is a metadata-only state-marker update; if no carrier exists, return `bootstrap` instead of inventing a hidden Issue.
+7. Before returning, persist only a **changed, actionable** status snapshot through `@repo-handoff` on an existing canonical carrier. Repeated read-only status with no new state reuses the previous marker and makes no write. Preserve the coordinator's verified next checkpoint; record recommendations separately. If no carrier exists, return `bootstrap` rather than inventing a hidden Issue.
 
 ## Reconstruct intended architecture
 
