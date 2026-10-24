@@ -5,6 +5,8 @@ description: Convert selected filed GitHub Issues into dependency-aware OpenCode
 
 # Plan Review Patches
 
+**Legacy compatibility:** Arca Issue #4 now defaults to requirement alignment, function-level Issue specification and user-goal acceptance. KAGARI owns the new execution plan and technical review/correction. Use this OpenCode execution-packet planner only when an existing legacy operation has been explicitly selected; it is not the default next step after Issue filing.
+
 Convert only selected, filed Issues and approved Feature Contracts into bounded, self-contained OpenCode execution plans. `@blueprint` owns accepted feature design/ACs; Arca plans their execution, `@opencode-bridge` transports packets without granting authority, and OpenCode implements inside its grant. Publication, Merge, real external effects and material human-owned changes remain separate decisions.
 
 ## Fast path — load references on demand
