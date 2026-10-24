@@ -7,7 +7,13 @@ description: Convert selected filed GitHub Issues into dependency-aware OpenCode
 
 Turn selected filed Issues into self-contained OpenCode execution packets. `@blueprint` owns approved design and ACs; this skill owns how the selected Issue is executed. `@opencode-bridge` transports packets; it does not decide scope or grant operations.
 
-Read [references/patch-plan-template.md](references/patch-plan-template.md) and `@repo-handoff`'s `references/execution-contract.md` before writing the plan. Copy resolved contract fields into the packet; an executor must not need these installed skills.
+## Minimum viable implementation planning
+
+Size the packet to the approved target and current execution stage. For an isolated MOCK-only MVI, prioritize end-to-end minimum acceptance criteria, contained effects, deterministic regression checks and measured evidence. Do not add production identity, attack resistance against excluded privileged actors, extra encryption/signature layers, high availability or migration infrastructure unless the approved contract specifically requires them.
+
+Mark each proposed extra safeguard `in-scope-required`, `production-deferred`, or `out-of-scope` with its threat assumption and impact. Only in-scope failures block the MVI. A newly proposed real external effect, destructive operation, sensitive-data exposure or material change to the accepted threat model requires the applicable original human authority. Keep compact packets self-contained, including exact allowed operations, stop point, ACs, real resource identities if any, and evidence; omit inapplicable boilerplate rather than inventing fields.
+
+Use the relevant sections of [references/patch-plan-template.md](references/patch-plan-template.md) and `@repo-handoff`'s `references/execution-contract.md` only when producing an execution-ready plan. Reuse previously loaded text, and include only applicable resolved contract fields in the packet; an executor must not need these installed skills.
 
 Read `@change-review`'s `references/verification.md` when specifying tests or completion evidence. Copy the applicable rules into the packet. See [references/superpowers-notice.md](references/superpowers-notice.md) for the adapted planning source.
 
