@@ -119,7 +119,7 @@ Do not let an existing implementation plan, deadline, apparent agreement, delega
 
 Do not write implementation code or modify the repository unless the user separately asks.
 
-Offer `@issue-filer` for explicitly selected approved candidates, then `@patch-plan` for the resulting filed Issues. Do not create Issues or an OpenCode execution packet inside this skill. For an existing canonical carrier, automatically persist the brief revision, decision provenance and next gate through `@repo-handoff`; if no carrier exists, return a bootstrap reference without creating one.
+Offer `@issue-filer` for explicitly selected approved candidates, then `@patch-plan` for the resulting filed Issues. Do not create Issues or an OpenCode execution packet inside this skill. On an existing canonical carrier, persist a **new or materially revised** brief, decision provenance or next gate through `@repo-handoff`; an unchanged brief reuses the prior marker without writing. If no carrier exists, return a bootstrap reference without creating one.
 
 ## Quality gate
 
