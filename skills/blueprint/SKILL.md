@@ -5,7 +5,7 @@ description: Turn a vague idea, desired capability or workflow pain into a human
 
 # Build a Blueprint
 
-Guide the user from an incomplete signal to a decision-ready design. Own what and why; leave filed-Issue execution instructions to `@patch-plan`. Do not assume that the user's first proposed feature is the correct solution to the underlying problem.
+Guide the user from an incomplete signal to a decision-ready design. Own what and why; the new default execution owner is KAGARI/Task Orchestrator, while patch-plan is legacy compatibility. Do not assume that the user's first proposed feature is the correct solution to the underlying problem.
 
 Read [references/design-brief-template.md](references/design-brief-template.md) before producing the final design brief.
 
