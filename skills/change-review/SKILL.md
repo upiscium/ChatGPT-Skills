@@ -5,7 +5,7 @@ description: Independently review one frozen prepublication change or GitHub pul
 
 # Review a Frozen Change or Pull Request
 
-Review the exact change independently against the approved goal, ACs, non-goals and relevant evidence. Passing tests alone does not prove acceptance or authorize publication.
+Review the exact change independently against the approved goal, ACs, non-goals and relevant evidence. For OpenCode independent reviews, use `@opencode-reviewer` to verify the exact reviewer role/session/model in a fresh context. Read [verification policy](references/verification.md) to evaluate completion evidence; reuse relevant rules in executor packets. Passing tests alone does not prove acceptance or authorize publication.
 
 ## Select the applicable path
 

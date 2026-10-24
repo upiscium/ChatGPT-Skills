@@ -5,7 +5,7 @@ description: Convert selected filed GitHub Issues into dependency-aware OpenCode
 
 # Plan Review Patches
 
-Convert only selected, filed Issues and approved Feature Contracts into bounded, self-contained OpenCode execution plans. Arca plans; OpenCode implements inside its grant. Publication, Merge, real external effects and material human-owned changes remain separate decisions.
+Convert only selected, filed Issues and approved Feature Contracts into bounded, self-contained OpenCode execution plans. `@blueprint` owns accepted feature design/ACs; Arca plans their execution, `@opencode-bridge` transports packets without granting authority, and OpenCode implements inside its grant. Publication, Merge, real external effects and material human-owned changes remain separate decisions.
 
 ## Fast path — load references on demand
 

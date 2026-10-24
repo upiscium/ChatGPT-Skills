@@ -5,7 +5,7 @@ description: Automatically persist and restore verified GitHub work state on exi
 
 # Persist or Restore Repository State
 
-Use a single existing Issue/PR as the durable `codex-repo-state:v1` carrier. Restore live state before consequential action, preserve prior grants and competing writers, and never invent a tracking Issue or authority.
+Use a single existing Issue/PR as the durable `codex-repo-state:v1` carrier. Use `@handover` for non-repository context; link rather than duplicate canonical repository evidence. Restore live state before consequential action, preserve prior grants and competing writers, and never invent a tracking Issue or authority.
 
 ## Read only what the operation needs
 

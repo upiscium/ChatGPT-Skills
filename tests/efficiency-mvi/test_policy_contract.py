@@ -108,5 +108,13 @@ class ArcaPolicyContractTests(unittest.TestCase):
         self.assertIn("## Classify findings",
                       skill("change-review/references/review-method.md"))
 
+    def test_original_delegation_and_review_entrypoints_remain_reachable(self):
+        self.assertIn("@opencode-bridge", skill("dev-loop/SKILL.md"))
+        self.assertIn("complete manual packet", skill("dev-loop/SKILL.md"))
+        self.assertIn("@handover", skill("repo-handoff/SKILL.md"))
+        self.assertIn("@blueprint", skill("patch-plan/SKILL.md"))
+        self.assertIn("@opencode-reviewer", skill("change-review/SKILL.md"))
+        self.assertIn("references/verification.md", skill("change-review/SKILL.md"))
+
 if __name__ == "__main__":
     unittest.main()

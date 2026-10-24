@@ -5,7 +5,7 @@ description: Coordinate Arca planning, authorized OpenCode delegation, independe
 
 # Coordinate the Development Loop
 
-Orchestrate approved Issue work through OpenCode; Arca does not implement or silently dispatch. Keep **one substantive stage per response** until an explicitly approved broader workflow exists. Never create unapproved external effects, commit/push, Merge or release; preserve exact grant and the next human-owned boundary. SwitchBoard/MUSUBI handles ongoing Ask monitoring.
+Orchestrate approved Issue work through OpenCode; Arca does not implement or silently dispatch. Use `@opencode-bridge` for authorized transport; if unavailable before a send, give a complete manual packet, never duplicate an uncertain delivery. Keep **one substantive stage per response** until an explicitly approved broader workflow exists. Never create unapproved external effects, commit/push, Merge or release; preserve exact grant and the next human-owned boundary. SwitchBoard/MUSUBI handles ongoing Ask monitoring.
 
 ## Fast path — choose one stage
 
