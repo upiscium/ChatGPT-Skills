@@ -1,0 +1,91 @@
+{
+  "scope": "Independent coordinator readbacks only; not raw tool receipts from ChatGPT trial sessions.",
+  "head_before": "a920b1b031edd596accc677975c66ab7895dcbb5",
+  "head_after": "a920b1b031edd596accc677975c66ab7895dcbb5",
+  "draft_before": true,
+  "draft_after": true,
+  "receipt_before": {
+    "status": "committed",
+    "receipt": {
+      "action": "append_mock_event",
+      "case_id": "PROBE-C01",
+      "committed_at": "2026-10-22T14:10:54.829Z",
+      "contract_revision": "contract-r1",
+      "effect_content_sha256": "32444665bf092d60c529fd51aa43d036f607dafaaa67e31a63d12ad311a1f393",
+      "effect_id": 2,
+      "feature_id": "PROBE-FEATURE-C01",
+      "grant_id": "G-PROBE-C01",
+      "operation_id": "arca-mcp-chat-20261022-acceptance-01",
+      "provenance": "local_sqlite_transaction; not external success",
+      "receipt_id": "rcpt_ea637faaf92106e3844a2479",
+      "request_sha256": "d78443cb8001085093fb96ab342c4c39a22367d35ff341df002e26b8c911cc5b",
+      "result": "committed_simulated_event"
+    },
+    "associated_effect_count": 1
+  },
+  "receipt_after": {
+    "status": "committed",
+    "receipt": {
+      "action": "append_mock_event",
+      "case_id": "PROBE-C01",
+      "committed_at": "2026-10-22T14:10:54.829Z",
+      "contract_revision": "contract-r1",
+      "effect_content_sha256": "32444665bf092d60c529fd51aa43d036f607dafaaa67e31a63d12ad311a1f393",
+      "effect_id": 2,
+      "feature_id": "PROBE-FEATURE-C01",
+      "grant_id": "G-PROBE-C01",
+      "operation_id": "arca-mcp-chat-20261022-acceptance-01",
+      "provenance": "local_sqlite_transaction; not external success",
+      "receipt_id": "rcpt_ea637faaf92106e3844a2479",
+      "request_sha256": "d78443cb8001085093fb96ab342c4c39a22367d35ff341df002e26b8c911cc5b",
+      "result": "committed_simulated_event"
+    },
+    "associated_effect_count": 1
+  },
+  "statistics_before": {
+    "case_id": "PROBE-C01",
+    "committed_effects": 2,
+    "receipts": 2,
+    "store": "local_isolated_sqlite",
+    "external_writes": 0
+  },
+  "statistics_after": {
+    "case_id": "PROBE-C01",
+    "committed_effects": 2,
+    "receipts": 2,
+    "store": "local_isolated_sqlite",
+    "external_writes": 0
+  },
+  "comments_before_count": 11,
+  "comments_after_count": 11,
+  "comment_ids_and_bodies_unchanged": true,
+  "pair_start_heads": [
+    "a920b1b031edd596accc677975c66ab7895dcbb5",
+    "a920b1b031edd596accc677975c66ab7895dcbb5",
+    "a920b1b031edd596accc677975c66ab7895dcbb5"
+  ],
+  "pair_start_statistics": [
+    {
+      "case_id": "PROBE-C01",
+      "committed_effects": 2,
+      "receipts": 2,
+      "store": "local_isolated_sqlite",
+      "external_writes": 0
+    },
+    {
+      "case_id": "PROBE-C01",
+      "committed_effects": 2,
+      "receipts": 2,
+      "store": "local_isolated_sqlite",
+      "external_writes": 0
+    },
+    {
+      "case_id": "PROBE-C01",
+      "committed_effects": 2,
+      "receipts": 2,
+      "store": "local_isolated_sqlite",
+      "external_writes": 0
+    }
+  ],
+  "interpretation": "No net change in the specified PR or Receipt Lab case across the trial window. Does not expose hidden tool invocations or exclude transient write/revert behavior."
+}
