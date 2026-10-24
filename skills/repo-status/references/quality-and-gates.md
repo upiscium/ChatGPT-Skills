@@ -17,7 +17,7 @@ Verify that:
 - Planned, partial, absent, and unknown states are not collapsed together.
 - Active work is supported by current artifacts rather than open-Issue count alone; stale or idle partial work is not presented as ongoing activity.
 - Not-started claims are limited to accepted scope and the inspected branches, PRs, and tasks; inaccessible sources are disclosed.
-- Durable continuation records are located, pinned to a carrier, checked for drift, and automatically refreshed with the latest snapshot; missing carriers are reported as `bootstrap` rather than invented.
+- Durable continuation records are located, pinned to a carrier and checked for drift. Persist materially changed actionable state; reuse the prior marker for an unchanged snapshot. Report missing carriers as `bootstrap` rather than inventing them.
 - Roadmap position is tied to documented milestones and their exit criteria; missing roadmaps and parallel tracks are represented honestly.
 - The agreed next action, an unconfirmed plan, and assistant recommendations are distinguished; coordinator checkpoints and prior denials remain intact.
 - Every active gate preserves its prerequisite, authority, fallback, evidence, and revalidation.

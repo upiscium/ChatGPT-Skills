@@ -52,6 +52,28 @@ class AblationTests(unittest.TestCase):
                                run("B", memory="enabled")])
         self.assertEqual(x["comparisons"]["B-A"]["matched"], 0)
 
+    def test_matched_pairs_from_different_strata_are_not_pooled(self):
+        # Opposing effects must not disappear into a misleading zero mean.
+        for field, value in (("case_id", "T6"), ("history", "continued"),
+                             ("memory", "enabled"), ("model", "other-model"),
+                             ("snapshot", "fixture-r2"), ("toolset", "other-tools")):
+            with self.subTest(field=field):
+                rows = [run("A", outcome="fail", evidence_ref="regression A1"),
+                        run("B", outcome="pass", evidence_ref="regression B1"),
+                        run("A", trial=2, outcome="pass", evidence_ref="regression A2",
+                            **{field: value}),
+                        run("B", trial=2, outcome="fail", evidence_ref="regression B2",
+                            **{field: value})]
+                with self.assertRaisesRegex(ValueError, "mixed comparison strata"):
+                    ablation.aggregate(rows)
+
+    def test_repeated_trials_in_one_stratum_can_be_summarized(self):
+        rows = [run("A", trial=t, tool_calls=1) for t in (1, 2, 3)]
+        rows += [run("B", trial=t, tool_calls=2) for t in (1, 2, 3)]
+        x = ablation.aggregate(rows)["comparisons"]["B-A"]
+        self.assertEqual(x["matched"], 3)
+        self.assertEqual(x["metrics"]["tool_calls"]["mean_delta"], 1)
+
     def test_missing_evidence_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "evidence_ref"):
             ablation.aggregate([run(outcome="pass")])

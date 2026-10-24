@@ -70,6 +70,16 @@ def aggregate(rows: list[dict]) -> dict:
             raise ValueError("duplicate condition for the same matched trial")
         group[row["condition"]] = row
 
+    # Matching within a trial is not enough: a single mean must not pool
+    # distinct cases, Memory regimes, models, fixtures or toolsets.
+    matched_strata = set()
+    for group in buckets.values():
+        if "B" in group and ("A" in group or "C" in group):
+            matched_strata.add(tuple(group["B"][f] for f in COMMON if f != "trial"))
+    if len(matched_strata) > 1:
+        raise ValueError("mixed comparison strata; summarize each case, history, "
+                         "Memory state, model, snapshot and toolset separately")
+
     comparisons = {}
     for label, before, after in (("B-A", "A", "B"), ("C-B", "B", "C")):
         matched = [(v[before], v[after]) for v in buckets.values()

@@ -29,7 +29,7 @@ For `restore`, `bootstrap`, or `audit`, return:
 ## Evidence and drift
 ```
 
-For `record`, return the intended marker and human summary before writing, then report `saved` or `pending-write` with the carrier URL and read-back verification. Automatic workflow checkpoints may write and verify without a separate prompt, but must never invent facts; restore and pin live state first. If the user asks only to continue, restore first and then automatically record the resulting checkpoint.
+For `record`, return the intended marker and human summary before writing, then report `saved` or `pending-write` with the carrier URL and read-back verification. Automatic workflow checkpoints may write and verify without a separate prompt, but must never invent facts; restore and pin live state first. If the user asks only to continue, restore first; record only materially changed state or a recoverability-critical transition. Reuse the prior marker for unchanged Next/status.
 
 ## Integrate with repository workflows
 

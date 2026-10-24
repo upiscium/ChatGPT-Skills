@@ -40,3 +40,7 @@ The resulting mean deltas are descriptive. B-A measures explicit invocation,
 not necessarily actual Plugin availability. Condition C requires independent
 proof the Plugin was unavailable; don't use C just because it was not named.
 Never pool records with different Memory state, model, fixture or common tools.
+The aggregator rejects multiple matched strata in one input; use one JSONL
+file per case/history/Memory/model/snapshot/toolset, with repeated trials in
+that same stratum. Record model effort and Plugin version in the model and
+toolset identifiers so unlike settings cannot be paired or pooled.
