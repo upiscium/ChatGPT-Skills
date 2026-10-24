@@ -7,6 +7,10 @@ description: Review the merged state of a GitHub repository against documented p
 
 Assess the integrated product against authoritative intent after merge and produce structured candidates that `@issue-filer` can safely turn into the next Issues. Treat tests as evidence of behavior, never as the source of product requirements.
 
+## User-goal acceptance (preferred for KAGARI delivery)
+
+Read [user-goal acceptance](references/user-goal-acceptance.md) for an actual delivered Issue. Compare original human-approved user intent to observed functionality and KAGARI Task Evidence; technical tests and Task PASS alone are not user-goal acceptance. Route an in-spec defect to the owning Task Orchestrator without starting a second Arca technical Reviewer. Ask the User only when the Issue specification itself fails the original goal, or the user must authorize the next Issue/phase. The merged-repository-wide technical audit below is an explicit legacy mode, not mandatory for routine Task corrections.
+
 ## Explain any human approval request
 
 When actually requesting a human decision or handing off a user-run action, use `@human-review approval-brief`. Include **今回やった内容**, **今回承認してほしい内容**, **承認によって影響がある範囲**, and **否認した場合の対応** in the same message. Name the action/actor, target/revision and reason for the gate; distinguish completed work from proposals. Use the brief only to explain a needed decision, without an additional queue scan/write or confirmation for already authorized work. Preserve the stated denial response at continuation.
