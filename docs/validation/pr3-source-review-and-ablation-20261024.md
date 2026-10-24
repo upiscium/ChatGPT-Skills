@@ -1,5 +1,7 @@
 # PR #3 — source review and ablation feasibility, 2026-10-24
 
+> Later update: [12 actual ChatGPT trial responses and independent scoring](pr3-ablation-20261024/results.md) supersede the earlier API-only execution limitation and zero-trial status below. The earlier evidence remains historical.
+
 ## Scope and conclusion
 
 Repository: upiscium/ChatGPT-Skills. Base: `fad2a799fa0533a55006ae1f97778846a9bb9ce5`.

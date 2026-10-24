@@ -1,0 +1,142 @@
+{
+  "T1": {
+    "status": "descriptive",
+    "runs": 6,
+    "unknown_outcomes": 0,
+    "comparisons": {
+      "B-A": {
+        "matched": 3,
+        "scored": 3,
+        "mean_pass_rate_delta": -0.6666666666666666,
+        "metrics": {
+          "tool_calls": {
+            "paired": 0,
+            "mean_delta": null
+          },
+          "skill_bytes": {
+            "paired": 0,
+            "mean_delta": null
+          },
+          "tokens": {
+            "paired": 0,
+            "mean_delta": null
+          },
+          "unnecessary_asks": {
+            "paired": 3,
+            "mean_delta": 0
+          },
+          "duplicate_writes": {
+            "paired": 0,
+            "mean_delta": null
+          }
+        }
+      },
+      "C-B": {
+        "matched": 0,
+        "scored": 0,
+        "mean_pass_rate_delta": null,
+        "metrics": {
+          "tool_calls": {
+            "paired": 0,
+            "mean_delta": null
+          },
+          "skill_bytes": {
+            "paired": 0,
+            "mean_delta": null
+          },
+          "tokens": {
+            "paired": 0,
+            "mean_delta": null
+          },
+          "unnecessary_asks": {
+            "paired": 0,
+            "mean_delta": null
+          },
+          "duplicate_writes": {
+            "paired": 0,
+            "mean_delta": null
+          }
+        }
+      }
+    },
+    "limitations": "A is not necessarily Plugin-off; Memory causality and actual token usage cannot be inferred from this file."
+  },
+  "T6": {
+    "status": "descriptive",
+    "runs": 6,
+    "unknown_outcomes": 6,
+    "comparisons": {
+      "B-A": {
+        "matched": 3,
+        "scored": 0,
+        "mean_pass_rate_delta": null,
+        "metrics": {
+          "tool_calls": {
+            "paired": 0,
+            "mean_delta": null
+          },
+          "skill_bytes": {
+            "paired": 0,
+            "mean_delta": null
+          },
+          "tokens": {
+            "paired": 0,
+            "mean_delta": null
+          },
+          "unnecessary_asks": {
+            "paired": 3,
+            "mean_delta": 0
+          },
+          "duplicate_writes": {
+            "paired": 0,
+            "mean_delta": null
+          }
+        }
+      },
+      "C-B": {
+        "matched": 0,
+        "scored": 0,
+        "mean_pass_rate_delta": null,
+        "metrics": {
+          "tool_calls": {
+            "paired": 0,
+            "mean_delta": null
+          },
+          "skill_bytes": {
+            "paired": 0,
+            "mean_delta": null
+          },
+          "tokens": {
+            "paired": 0,
+            "mean_delta": null
+          },
+          "unnecessary_asks": {
+            "paired": 0,
+            "mean_delta": null
+          },
+          "duplicate_writes": {
+            "paired": 0,
+            "mean_delta": null
+          }
+        }
+      }
+    },
+    "limitations": "A is not necessarily Plugin-off; Memory causality and actual token usage cannot be inferred from this file.",
+    "ui_worked_seconds": {
+      "A": [
+        14,
+        9,
+        9
+      ],
+      "B": [
+        14,
+        17,
+        14
+      ]
+    },
+    "ui_worked_seconds_mean": {
+      "A": 10.666666666666666,
+      "B": 15
+    }
+  }
+}
