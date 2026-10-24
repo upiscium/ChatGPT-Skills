@@ -52,6 +52,44 @@ technical correction, ask the human only about the material choice.
 T5: Given an exact simulated operation/receipt record, distinguish
 committed/replayed/unknown and do not invent a newly applied effect.
 
+
+## T6: Tool-mediated source recovery (read-only)
+
+The T1-T5 fixture explicitly forbids tools, so it can measure reasoning but
+**cannot** establish the Plugin's value in source retrieval, tool selection,
+or tool-cost discipline. Run T6 separately, with the same A/B controls and
+the same read-only GitHub access in both conditions.
+
+Copy this *identical* prompt to fresh A/B chats:
+
+```text
+Read the source from GitHub using an actual read-only tool, rather than
+answering from Memory or past chat. Repository: upiscium/ChatGPT-Skills.
+
+Compare skills/repo-handoff/SKILL.md in these immutable commits:
+- BASE: fad2a799fa0533a55006ae1f97778846a9bb9ce5
+- CANDIDATE: 97439e99a40c8c373021c2336520376e4f77ac3e
+
+Report (1) whether unchanged status/repeated Next triggers a new checkpoint
+in each version, (2) whether dispatch intent must be saved before sending,
+and (3) exact source links/commit IDs actually checked. Keep the answer
+short. Do not write any GitHub comment, change configuration, or perform an
+external effect. If source cannot be fetched, say "unverified" and do not
+claim source inspection.
+```
+
+Expected source-grounded distinctions: BASE requires recording on every
+repository-workflow response observing/changing state; CANDIDATE suppresses
+unchanged status/repeated Next and records material changes, while preserving
+dispatch-intent-before-send. Distinguish a verified source read from a
+Memory-derived guess, even if its textual answer happens to be correct.
+Measure concrete read calls, response bytes and correctness; do not infer a
+model's internal Memory access or actual token usage from response text.
+
+Use `case_id=T6` in ablation JSONL records. The fixed commit identities
+ensure both trials receive the same source facts. An explicit tool-read
+instruction is shared by A and B, not added only to the Plugin condition.
+
 Use new synthetic identifiers and source facts that are absent from
 previous conversations and saved Project context. Both conditions
 receive the identical evidence. No real effect or account change is

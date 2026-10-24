@@ -7,6 +7,13 @@ model, Project and Memory setting. Make two A/B pairs with reversed order
 before trying broader scenarios; three matched pairs per case are needed
 before drawing any conclusion.
 
+For a **tool-mediated** comparison, also run T6 from
+[plugin-ablation.md](plugin-ablation.md) in a separate A/B pair. Both
+conditions must use the same GitHub read permissions. Grade tool-source
+grounding separately from answer plausibility; a correct answer copied from
+Memory without a verified source read is not a PASS for T6. Record actual
+tool invocation and obtained commit references, or mark unknown.
+
 For each response, score PASS only if all required fixture answers are
 correct; score FAIL with a short factual evidence reference; otherwise
 UNKNOWN. Do not infer Plugin invocation merely from the prompt wording.
