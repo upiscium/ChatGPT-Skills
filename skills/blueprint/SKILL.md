@@ -44,7 +44,7 @@ Restate the underlying problem separately from the proposed solution. Ask the us
 
 Ask only questions whose answers can materially change scope, architecture, risk, or acceptance criteria.
 
-- Ask one focused group of at most three questions per turn.
+- Group materially needed questions by user-visible outcome. Keep ordinary groups small, but do not silently omit critical requirements to satisfy a fixed number. Do not include irrelevant production-only security/recovery extras in an isolated MVI.
 - Prioritize blocking questions over exhaustive questionnaires.
 - Offer concrete options with tradeoffs when the user may not know the design space.
 - Explain assumptions in plain language.
@@ -100,6 +100,8 @@ Do not finalize the plan until:
 
 If the user asks to proceed despite open questions, retain material human-owned gates and propose only bounded discovery or another admissible fallback. Do not convert an unresolved approval into an executable assumption.
 
+Before finalizing Issue specifications, provide a first human-alignment summary of expected user-visible behavior, material assumptions, included/excluded scope and target completeness. Iterate only genuinely unresolved choices; reuse a previous exact agreement without another approval ritual.
+
 ## Produce the design contract and Issue candidates
 
 Use `references/design-brief-template.md`. Give the brief a stable ID and revision, approval status and source. Distinguish design approval from authorization to file Issues, dispatch, implement or publish.
@@ -119,7 +121,7 @@ Do not let an existing implementation plan, deadline, apparent agreement, delega
 
 Do not write implementation code or modify the repository unless the user separately asks.
 
-Offer `@issue-filer` for explicitly selected approved candidates, then `@patch-plan` for the resulting filed Issues. Do not create Issues or an OpenCode execution packet inside this skill. On an existing canonical carrier, persist a **new or materially revised** brief, decision provenance or next gate through `@repo-handoff`; an unchanged brief reuses the prior marker without writing. If no carrier exists, return a bootstrap reference without creating one.
+Offer issue-filer for explicitly selected approved function-level Issue candidates. The redesigned default handoff is to KAGARI only for a separately Human-authorized selected Issue set; KAGARI owns technical execution planning/review/correction. patch-plan remains legacy OpenCode compatibility. Do not create Issues or an OpenCode execution packet inside this skill. On an existing canonical carrier, persist a **new or materially revised** brief, decision provenance or next gate through `@repo-handoff`; an unchanged brief reuses the prior marker without writing. If no carrier exists, return a bootstrap reference without creating one.
 
 ## Quality gate
 
