@@ -57,5 +57,29 @@ class ArcaPolicyContractTests(unittest.TestCase):
         self.assertIn("material changes to approved risk are human-owned", sweep)
 
 
+    def test_all_checkpoint_entrypoints_follow_changed_state_rule(self):
+        """Static consistency check only: each route must explicitly exempt unchanged outcomes."""
+        expected = {
+            "issue-filer/SKILL.md": "unchanged duplicate lookup",
+            "blueprint/SKILL.md": "unchanged brief reuses the prior marker",
+            "security-plan/SKILL.md": "unchanged planning observation creates no marker",
+            "security-audit/SKILL.md": "Unchanged read-only rechecks create no marker",
+            "repo-review/SKILL.md": "unchanged review reuses the prior marker",
+            "patch-plan/SKILL.md": "reuse the existing marker without writing",
+            "handover/SKILL.md": "Otherwise link the prior marker without another write",
+            "change-review/SKILL.md": "Unchanged rechecks reuse the previous marker",
+        }
+        for path, rule in expected.items():
+            with self.subTest(skill=path):
+                self.assertIn(rule, skill(path))
+
+    def test_required_transitions_are_not_removed(self):
+        """Do not optimize away dispatch intent or actionable state recording."""
+        handoff = skill("repo-handoff/SKILL.md")
+        self.assertIn("dispatch-intent recording **before** send", handoff)
+        self.assertIn("newly discovered failure", handoff)
+        self.assertIn("material dependency/base change", handoff)
+        self.assertIn("do not suppress evidence to meet a token budget", handoff)
+
 if __name__ == "__main__":
     unittest.main()
