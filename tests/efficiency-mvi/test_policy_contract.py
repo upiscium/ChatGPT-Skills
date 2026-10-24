@@ -26,8 +26,8 @@ class ArcaPolicyContractTests(unittest.TestCase):
         loop = skill("dev-loop/SKILL.md")
         handoff = skill("repo-handoff/SKILL.md")
         self.assertIn("Always save/read back dispatch intent before sending", loop)
-        self.assertIn("dispatch-intent recording **before** send", handoff)
-        self.assertIn("never disclose secrets", loop)
+        self.assertIn("dispatch intent before sending", handoff.lower())
+        self.assertIn("Never disclose secrets", loop)
         self.assertIn("silently merge or release", loop)
         self.assertIn("material change to the accepted threat model remains human-owned", loop)
 
@@ -76,10 +76,37 @@ class ArcaPolicyContractTests(unittest.TestCase):
     def test_required_transitions_are_not_removed(self):
         """Do not optimize away dispatch intent or actionable state recording."""
         handoff = skill("repo-handoff/SKILL.md")
-        self.assertIn("dispatch-intent recording **before** send", handoff)
+        self.assertIn("dispatch intent before sending", handoff.lower())
         self.assertIn("newly discovered failure", handoff)
         self.assertIn("material dependency/base change", handoff)
         self.assertIn("do not suppress evidence to meet a token budget", handoff)
+
+    def test_large_skill_entrypoints_are_lazy_and_links_exist(self):
+        """Static routing check: short root and real separately readable references."""
+        from re import findall
+        for name in ("dev-loop", "repo-handoff", "patch-plan", "repo-status", "change-review"):
+            with self.subTest(skill=name):
+                root = ROOT / "skills" / name
+                source = (root / "SKILL.md").read_text(encoding="utf-8")
+                self.assertLess(len(source.encode("utf-8")), 4200)
+                links = findall(r"\]\((references/[^)]+)\)", source)
+                self.assertGreaterEqual(len(links), 3)
+                for link in links:
+                    self.assertTrue((root / link).is_file(), (name, link))
+
+    def test_relocated_stage_contracts_survive(self):
+        self.assertIn("Complete at most one substantive stage per response",
+                      skill("dev-loop/references/governance.md"))
+        self.assertIn("Before external dispatch, save and read back",
+                      skill("repo-handoff/references/checkpoint-policy.md"))
+        self.assertIn("## Prepare Agent Core execution",
+                      skill("patch-plan/references/agent-core.md"))
+        self.assertIn("## Prepare generic SubAgent execution",
+                      skill("patch-plan/references/generic-worktree.md"))
+        self.assertIn("## 1. 実装済みで利用可能な機能・内容",
+                      skill("repo-status/references/five-view-format.md"))
+        self.assertIn("## Classify findings",
+                      skill("change-review/references/review-method.md"))
 
 if __name__ == "__main__":
     unittest.main()
