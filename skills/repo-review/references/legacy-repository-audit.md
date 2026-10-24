@@ -4,7 +4,7 @@ Assess the integrated product against authoritative intent after merge and produ
 
 ## User-goal acceptance (preferred for KAGARI delivery)
 
-Read [user-goal acceptance](references/user-goal-acceptance.md) for an actual delivered Issue. Compare original human-approved user intent to observed functionality and KAGARI Task Evidence; technical tests and Task PASS alone are not user-goal acceptance. Route an in-spec defect to the owning Task Orchestrator without starting a second Arca technical Reviewer. Ask the User only when the Issue specification itself fails the original goal, or the user must authorize the next Issue/phase. The merged-repository-wide technical audit below is an explicit legacy mode, not mandatory for routine Task corrections.
+Read [user-goal acceptance](user-goal-acceptance.md) for an actual delivered Issue. Compare original human-approved user intent to observed functionality and KAGARI Task Evidence; technical tests and Task PASS alone are not user-goal acceptance. Route an in-spec defect to the owning Task Orchestrator without starting a second Arca technical Reviewer. Ask the User only when the Issue specification itself fails the original goal, or the user must authorize the next Issue/phase. The merged-repository-wide technical audit below is an explicit legacy mode, not mandatory for routine Task corrections.
 
 ## Explain any human approval request
 
