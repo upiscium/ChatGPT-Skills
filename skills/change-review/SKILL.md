@@ -165,7 +165,7 @@ Keep existing `PR-*` finding IDs when reviewing a PR. Use stable `CHG-*` IDs for
 
 ## Emit a durable checkpoint
 
-Return a pinned state delta with mode, run/revision, manifest/digest or PR/base/head, criterion evidence, verdict, base sensitivity, human decisions and next gate. A batch reviewer returns it to the sole coordinator writer; standalone reviews use `@repo-handoff` to record on the existing canonical carrier without changing its unrelated runs or pending coordinator action. Read back any marker written, or expose `bootstrap|pending-write`. No review submission, approval or protected publication checkpoint is implied.
+Return a pinned state delta with mode, run/revision, manifest/digest or PR/base/head, criterion evidence, verdict, base sensitivity, human decisions and next gate. A batch reviewer returns it to the sole coordinator writer; standalone reviews use `@repo-handoff` to record a **new or materially changed** result on the existing canonical carrier without changing unrelated runs or pending coordinator action. Unchanged rechecks reuse the previous marker. Read back any marker written, or expose `bootstrap|pending-write`. No review submission, approval or protected publication checkpoint is implied.
 
 After the full required report/evidence is saved outside the cleanup set, let the coordinator invoke `@workspace-cleanup` for eligible review-only runtimes, panes and worktrees. This housekeeping does not require a passing review verdict or merge. Preserve the sole uncommitted source snapshot and shared/active consumers; include cleanup results or retained owner/reason/revisit trigger in the delta. Do not end a reviewer before its result handoff is durable.
 
