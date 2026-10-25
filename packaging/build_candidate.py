@@ -1,0 +1,73 @@
+"""Build a deterministic source-only Arca candidate ZIP, without installing it."""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import zipfile
+
+ROOT = Path(__file__).resolve().parents[1]
+MANIFEST_DIR = ROOT / "packaging" / "arca-development"
+
+
+def entries():
+    """Return (archive name, on-disk source) for the actual candidate package."""
+    manifests = {
+        "plugin.json": MANIFEST_DIR / "plugin.json",
+        ".codex-plugin/plugin.json": MANIFEST_DIR / ".codex-plugin" / "plugin.json",
+    }
+    files = dict(manifests)
+    skill_roots = sorted((ROOT / "skills").glob("*/SKILL.md"))
+    if not skill_roots:
+        raise ValueError("No Skill entrypoints found")
+    for path in (ROOT / "skills").rglob("*"):
+        if path.is_file():
+            files[path.relative_to(ROOT).as_posix()] = path
+    for name, path in files.items():
+        if not path.is_file():
+            raise FileNotFoundError(f"{name}: {path}")
+    top = json.loads(manifests["plugin.json"].read_text(encoding="utf-8"))
+    codex = json.loads(manifests[".codex-plugin/plugin.json"].read_text(encoding="utf-8"))
+    for key in ("name", "version", "description", "author", "repository"):
+        if top.get(key) != codex.get(key):
+            raise ValueError(f"Manifest mismatch: {key}")
+    if top["extensions"]["com.openai"]["interface"] != codex["interface"]:
+        raise ValueError("Manifest UI mismatch")
+    if codex["skills"] != "./skills":
+        raise ValueError("Unexpected Skill package root")
+    return sorted(files.items()), len(skill_roots), top["version"]
+
+
+def build(output: Path):
+    file_entries, skill_count, version = entries()
+    output = output.expanduser().resolve()
+    if output.exists():
+        raise FileExistsError(f"Refusing to overwrite an existing artifact: {output}")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
+        for name, source in file_entries:
+            info = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
+            info.create_system = 3
+            info.external_attr = (0o644 << 16)
+            archive.writestr(info, source.read_bytes(), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
+    return {
+        "file": str(output),
+        "sha256": hashlib.sha256(output.read_bytes()).hexdigest(),
+        "bytes": output.stat().st_size,
+        "files": len(file_entries),
+        "skills": skill_count,
+        "candidate_version": version,
+        "installed_plugin_modified": False,
+    }
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Assemble a local, uninstalled Arca vNext candidate ZIP")
+    parser.add_argument("--out", type=Path, required=True, help="New output ZIP path (will not overwrite)")
+    options = parser.parse_args()
+    print(json.dumps(build(options.out), indent=2, ensure_ascii=False))
+
+
+if __name__ == "__main__":
+    main()
