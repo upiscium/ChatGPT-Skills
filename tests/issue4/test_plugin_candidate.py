@@ -107,6 +107,24 @@ class PluginCandidateTests(unittest.TestCase):
         finally:
             os.unlink(probe)
 
+    def test_plugin_listing_and_product_policy_are_compatible(self):
+        import yaml
+        with zipfile.ZipFile(self.output) as archive:
+            top = json.loads(archive.read('plugin.json'))
+            sub = json.loads(archive.read('.codex-plugin/plugin.json'))
+            short = top['extensions']['com.openai']['interface']['shortDescription']
+            self.assertLessEqual(len(short), 30)
+            self.assertEqual(short, sub['interface']['shortDescription'])
+            for name in archive.namelist():
+                if not name.endswith('/agents/openai.yaml'):
+                    continue
+                with self.subTest(skill=name):
+                    meta = yaml.safe_load(archive.read(name))
+                    policy = meta.get('policy', {})
+                    self.assertNotIn('products', policy, 'No unrequested product restrictions')
+                    if 'allow_implicit_invocation' in policy:
+                        self.assertIsInstance(policy['allow_implicit_invocation'], bool)
+
     def test_manifest_consistency_and_no_execution_capability(self):
         with zipfile.ZipFile(self.output) as archive:
             top = json.loads(archive.read("plugin.json"))

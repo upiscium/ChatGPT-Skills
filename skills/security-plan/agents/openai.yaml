@@ -4,9 +4,4 @@ interface:
   default_prompt: Use @security-plan to turn this security audit into
     a safe, testable patch implementation plan.
 policy:
-  products:
-  - chatgpt
-  - codex
-  - api
-  - atlas
   allow_implicit_invocation: true

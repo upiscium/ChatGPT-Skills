@@ -3,9 +3,4 @@ interface:
   short_description: "Assess KAGARI delivery against original user goals"
   default_prompt: "Use $repo-review to compare actual delivered user-visible behavior and KAGARI Evidence against the approved original goal. Run a legacy merged-repository audit only when explicitly requested."
 policy:
-  products:
-  - "chatgpt"
-  - "codex"
-  - "api"
-  - "atlas"
   allow_implicit_invocation: true
