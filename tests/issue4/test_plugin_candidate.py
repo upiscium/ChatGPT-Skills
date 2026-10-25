@@ -127,7 +127,7 @@ class PluginCandidateTests(unittest.TestCase):
                     shutil.copytree(ROOT / "packaging", fixture / "packaging")
                     skill = fixture / "skills/probe/SKILL.md"
                     skill.parent.mkdir(parents=True)
-                    skill.write_text("---\\nname: probe\\ndescription: Disposable packaging fixture\\n---\\n")
+                    skill.write_text("---\nname: probe\ndescription: Disposable packaging fixture\n---\n")
 
                     def git(*args):
                         subprocess.run(["git", "-C", str(fixture), *args], check=True,
@@ -140,7 +140,7 @@ class PluginCandidateTests(unittest.TestCase):
                         "commit", "-qm", "Disposable local test fixture")
                     git("update-index", flag, path)
                     target = fixture / path
-                    probe = b"\\n \\t" if target.suffix == ".json" else b"\\nUNCOMMITTED LOCAL PROBE\\n"
+                    probe = b"\n \t" if target.suffix == ".json" else b"\nUNCOMMITTED LOCAL PROBE\n"
                     target.write_bytes(target.read_bytes() + probe)
                     output = fixture / "candidate.zip"
                     result = subprocess.run(
