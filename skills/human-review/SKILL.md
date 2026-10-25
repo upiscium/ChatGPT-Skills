@@ -9,6 +9,10 @@ Produce a concise, evidence-backed approval brief, decision queue or independent
 
 For an accepted isolated MVI, judge security and assurance choices against its **documented threat model and actual effect scope**. Record production-only hardening as deferred rather than blocking the MVI, unless the user changes the agreed boundary. Do not treat a reviewer severity label as automatic permission to expand the MVI or demand new approval. Preserve explicit material risk, irreversible/external action and release gates.
 
+## Optional feature contracts — no extra gates
+
+When a feature spans several Issues or has a material user-visible scope/acceptance change, use [Feature Contract](references/feature-contract.md) to bind the original approved goal, only the necessary [Scope Change](references/scope-change-gate.md) to route material deviations, and [Feature Acceptance](references/feature-acceptance-gate.md) to distinguish KAGARI technical completion from original user-goal success. For a bounded already-approved Issue, reuse its existing goal/ACs rather than creating a new Epic, contract database, interview or repeated approval. These references do **not** authorize KAGARI dispatch, Merge, release or Plugin update. KAGARI owns Task technical repair and runtime Ask; MUSUBI is its UI.
+
 ## Select the operation
 
 - `approval-brief`: explain a concrete decision or action already identified by the calling workflow. Read [references/approval-request.md](references/approval-request.md) and return its four-field brief in the user's language. Use the supplied current evidence and resolve only material gaps. Do not start a repository-wide review, create a queue, write a checkpoint or perform the proposed action merely to format the request; the caller keeps its existing authority and recording rules.

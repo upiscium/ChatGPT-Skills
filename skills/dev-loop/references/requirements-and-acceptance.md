@@ -13,6 +13,8 @@ MUSUBI: https://github.com/upiscium/MUSUBI/issues/1
 ## First human alignment — original intent
 Use blueprint and goal alignment. Extract desired user-visible outcomes, target actors, scenarios, operating assumptions, in-scope behavior, non-goals and measurable acceptance. Group material questions without an arbitrary count or production-only checklist. Summarize agreed behavior and boundaries. Iterate only unresolved material differences; reuse exact recorded approval.
 
+Use `@human-review`'s Feature Contract reference only when material feature-level goal, revision or assurance scope needs a shared anchor across Issues. An existing approved Epic/brief is sufficient; do not turn contract formatting into a new authority gate. Material proposed scope drift follows its Scope Change reference: in-spec technical corrections remain with KAGARI, unrelated improvements are deferred, and only changed original user intent needs Human alignment.
+
 ## Function-level GitHub Issues
 Use issue-filer, not a new specification database. Each coherent Issue unit carries original approved goal/revision, exact expected function and user scenario, exclusions, stable observable ACs, dependencies and evidence expectations. Issue creation is separate from Task execution authorization.
 

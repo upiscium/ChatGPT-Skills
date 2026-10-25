@@ -29,4 +29,4 @@ Record scope/snapshot and one disposition per real candidate:
 
 No candidate: record `none-found` for the inspected scope when a checkpoint is already required; do not claim universal absence of missed decisions. Omit a ceremonial user-facing section. Preserve the exact `review-queue` no-review response. Keep original evidence, confidence and affected next-action gate; never clear it merely because the sweep ran.
 
-Send the delta to the existing workflow/coordinator writer. Do not create a new carrier, parallel ledger, queue scan or checkpoint write just for this reference. Detection does not grant retroactive authority, publication, Merge, deployment or installation. SwitchBoard/MUSUBI retains ongoing Ask monitoring and notifications.
+Send the delta to the existing workflow/coordinator writer. Do not create a new carrier, parallel ledger, queue scan or checkpoint write just for this reference. Detection does not grant retroactive authority, publication, Merge, deployment or installation. KAGARI owns runtime Ask state and answers; MUSUBI displays the common Task/Ask UI. Arca does not run a separate Ask watcher or notification broker.

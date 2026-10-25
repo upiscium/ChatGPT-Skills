@@ -17,6 +17,8 @@ When actually requesting a human decision or handing off a user-run action, use 
 
 At a new design/workstream or material revision, apply `@human-review`'s `references/goal-alignment.md`: separate the underlying objective and measurable user/research outcome from technical ACs, and retain non-goals and the known resource envelope. Use its `references/decision-sweep.md` before a substantive repository-turn final to catch unasked direction, scope or responsibility choices. Do not add an interview or approval round when current contracts already resolve them.
 
+For a material multi-Issue feature, reuse an applicable approved Feature Contract through `@human-review`'s `references/feature-contract.md`. For a smaller requirement, its existing Design Brief/Issue ACs are sufficient; do not create a new Epic or approval solely to fit a format.
+
 Choose the smallest useful artifact from the actual uncertainty:
 
 - Feasibility investigation: state the question, bounded probe, evidence needed and stop point. A successful probe is evidence, not approval to turn it into a product.

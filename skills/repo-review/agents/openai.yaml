@@ -2,8 +2,6 @@ interface:
   display_name: "User Goal Acceptance"
   short_description: "Assess KAGARI delivery against original user goals"
   default_prompt: "Use $repo-review to compare actual delivered user-visible behavior and KAGARI Evidence against the approved original goal. Run a legacy merged-repository audit only when explicitly requested."
-  icon_small: "assets/icon.svg"
-  icon_large: "assets/icon.svg"
 policy:
   products:
   - "chatgpt"
