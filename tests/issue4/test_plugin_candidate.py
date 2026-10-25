@@ -117,6 +117,39 @@ class PluginCandidateTests(unittest.TestCase):
         self.assertEqual(top["extensions"]["com.openai"]["interface"]["capabilities"], [])
         self.assertNotIn("OpenCode coordination", top["extensions"]["com.openai"]["interface"]["longDescription"])
 
+    def test_hidden_local_edits_are_rejected_before_archive_creation(self):
+        import shutil
+        for flag in ("--assume-unchanged", "--skip-worktree"):
+            for path in ("skills/probe/SKILL.md", "packaging/arca-development/plugin.json",
+                         "packaging/arca-development/.codex-plugin/plugin.json"):
+                with self.subTest(flag=flag, path=path), tempfile.TemporaryDirectory() as directory:
+                    fixture = Path(directory)
+                    shutil.copytree(ROOT / "packaging", fixture / "packaging")
+                    skill = fixture / "skills/probe/SKILL.md"
+                    skill.parent.mkdir(parents=True)
+                    skill.write_text("---\\nname: probe\\ndescription: Disposable packaging fixture\\n---\\n")
+
+                    def git(*args):
+                        subprocess.run(["git", "-C", str(fixture), *args], check=True,
+                                       capture_output=True)
+
+                    git("init", "-q")
+                    git("add", ".")
+                    git("-c", "user.name=Packaging Fixture", "-c",
+                        "user.email=fixture@example.invalid", "-c", "commit.gpgsign=false",
+                        "commit", "-qm", "Disposable local test fixture")
+                    git("update-index", flag, path)
+                    target = fixture / path
+                    probe = b"\\n \\t" if target.suffix == ".json" else b"\\nUNCOMMITTED LOCAL PROBE\\n"
+                    target.write_bytes(target.read_bytes() + probe)
+                    output = fixture / "candidate.zip"
+                    result = subprocess.run(
+                        [sys.executable, str(fixture / "packaging/build_candidate.py"),
+                         "--out", str(output)], capture_output=True, text=True)
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn("Candidate source differs from Git HEAD", result.stderr)
+                    self.assertFalse(output.exists())
+
     def test_reproducible_and_non_overwriting_archive(self):
         copy = Path(self.temp.name) / "second.zip"
         subprocess.run([sys.executable, str(BUILDER), "--out", str(copy)], check=True, capture_output=True)

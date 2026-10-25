@@ -42,11 +42,21 @@ def entries():
     skill_roots = sorted(name for name in files if name.startswith("skills/") and name.endswith("/SKILL.md"))
     if not skill_roots:
         raise ValueError("No Git-tracked Skill entrypoints found")
+    payloads = {}
     for name, path in files.items():
         if not path.is_file():
             raise FileNotFoundError(f"{name}: {path}")
-    top = json.loads(manifests["plugin.json"].read_text(encoding="utf-8"))
-    codex = json.loads(manifests[".codex-plugin/plugin.json"].read_text(encoding="utf-8"))
+        # Git's stat/index flags can hide local edits from `git diff`. Compare
+        # actual bytes with HEAD and retain those same bytes for ZIP assembly.
+        payload = path.read_bytes()
+        committed = subprocess.check_output(
+            ["git", "-C", str(ROOT), "show", f"HEAD:{path.relative_to(ROOT).as_posix()}"]
+        )
+        if payload != committed:
+            raise ValueError(f"Candidate source differs from Git HEAD: {path.relative_to(ROOT)}")
+        payloads[name] = payload
+    top = json.loads(payloads["plugin.json"])
+    codex = json.loads(payloads[".codex-plugin/plugin.json"])
     for key in ("name", "version", "description", "author", "repository"):
         if top.get(key) != codex.get(key):
             raise ValueError(f"Manifest mismatch: {key}")
@@ -54,7 +64,7 @@ def entries():
         raise ValueError("Manifest UI mismatch")
     if codex["skills"] != "./skills":
         raise ValueError("Unexpected Skill package root")
-    return sorted(files.items()), len(skill_roots), top["version"]
+    return sorted(payloads.items()), len(skill_roots), top["version"]
 
 
 def build(output: Path):
@@ -68,7 +78,7 @@ def build(output: Path):
             info = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
             info.create_system = 3
             info.external_attr = (0o644 << 16)
-            archive.writestr(info, source.read_bytes(), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
+            archive.writestr(info, source, compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
     return {
         "file": str(output),
         "sha256": hashlib.sha256(output.read_bytes()).hexdigest(),
