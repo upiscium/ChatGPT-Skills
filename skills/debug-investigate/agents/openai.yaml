@@ -1,8 +1,7 @@
 interface:
-  display_name: Debug Investigation
-  short_description: Trace failures and prepare evidence for a bounded repair
-  default_prompt: Use $debug-investigate to trace this failure, compare hypotheses
-    and prepare the next bounded investigation or repair handoff.
+  display_name: "Debug Investigation (Explicit)"
+  short_description: "Explicit bounded diagnosis; KAGARI Tasks own ordinary defects"
+  default_prompt: "Use $debug-investigate for an explicitly requested bounded diagnosis or selected legacy investigation. Return ordinary KAGARI delivery defects and diagnostic evidence to the existing Task; do not start a parallel repair loop."
   icon_small: assets/icon.svg
   icon_large: assets/icon.svg
 policy:
@@ -11,4 +10,4 @@ policy:
   - codex
   - api
   - atlas
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

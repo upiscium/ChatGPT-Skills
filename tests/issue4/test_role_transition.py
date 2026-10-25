@@ -50,7 +50,8 @@ class RoleTransitionTests(unittest.TestCase):
         self.assertTrue(review['policy']['allow_implicit_invocation'])
     def test_legacy_orchestration_reviewers_do_not_implicitly_route(self):
         import yaml
-        for name in ('opencode-bridge', 'opencode-reviewer', 'change-review'):
+        for name in ('opencode-bridge', 'opencode-reviewer', 'change-review',
+                     'debug-investigate'):
             with self.subTest(skill=name):
                 data=yaml.safe_load(source('skills/' + name + '/agents/openai.yaml'))
                 self.assertIs(data['policy']['allow_implicit_invocation'], False)

@@ -1,6 +1,6 @@
 ---
 name: blueprint
-description: Turn a vague idea, desired capability or workflow pain into a human-approved design brief, stable acceptance criteria and bounded Issue candidates through an adaptive interview. Use to discover requirements, challenge a proposed solution, define an MVP or decide technical design before issue-filer and patch-plan prepare execution.
+description: Turn a vague idea, desired capability or workflow pain into a human-approved design brief, stable acceptance criteria and bounded Issue candidates through an adaptive interview. Use to discover requirements, challenge a proposed solution, define an MVP or decide technical design before Issue filing and authorized KAGARI execution. Legacy execution planning requires explicit selection.
 ---
 
 # Build a Blueprint
@@ -109,7 +109,7 @@ Use `references/design-brief-template.md`. Give the brief a stable ID and revisi
 Make the approved design traceable:
 
 - Identify coherent capability/change units and their dependencies, not a second executable task plan.
-- Name components and interfaces when verified; leave exact execution steps/commands to `@patch-plan` after Issue selection.
+- Name components and interfaces when verified; KAGARI/Task Orchestrator owns execution planning for the Human-authorized Issue set. Use `@patch-plan` only for explicitly selected legacy OpenCode work.
 - Separate discovery questions from approved implementation scope.
 - Include tests alongside the behavior they validate.
 - Include security, failure handling, observability, compatibility, rollout, and rollback where relevant.
