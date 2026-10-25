@@ -1,8 +1,7 @@
 interface:
-  display_name: Development Loop
-  short_description: Coordinate OpenCode runs, reviews and human merge gates
-  default_prompt: Use $dev-loop to advance the current authorized OpenCode checkpoint
-    and record its verified state.
+  display_name: "Requirements and Acceptance"
+  short_description: "Align user goals, specify Issues, assess KAGARI results"
+  default_prompt: "Use $dev-loop to align user requirements, prepare approved function-level Issue specifications, and evaluate delivered behavior against the original user goal. Do not start legacy OpenCode orchestration unless explicitly requested and authorized."
   icon_small: assets/icon.svg
   icon_large: assets/icon.svg
 policy:

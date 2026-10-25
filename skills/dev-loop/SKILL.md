@@ -1,11 +1,11 @@
 ---
 name: dev-loop
-description: Coordinate Arca planning, authorized OpenCode delegation, independent change review and human-executed merge through one verified checkpoint at a time. Use to start, resume or advance parallel Issue workstreams with next, collect a run, or generate only guarded Ready/Merge commands. Ask monitoring belongs to SwitchBoard, not this skill.
+description: Align user requirements, prepare approved Issue specifications, and evaluate KAGARI delivery against original user goals. Legacy OpenCode orchestration remains explicit-only.
 ---
 
 # Coordinate the Development Loop
 
-Orchestrate approved Issue work through OpenCode; Arca does not implement or silently dispatch. Use `@opencode-bridge` for authorized transport; if unavailable before a send, give a complete manual packet, never duplicate an uncertain delivery. For the new requirements/acceptance lane, combine authorized read-only and specification steps without an arbitrary one-stage limit; existing legacy OpenCode runs retain their exact stage boundaries. Never create unapproved external effects, commit/push, Merge or release; preserve exact grant and the next human-owned boundary. KAGARI owns native Task/Ask; MUSUBI is its mobile-first UI. Legacy SwitchBoard is not a new-MVI prerequisite.
+Arca defaults to human-aligned requirements, Issue specifications and user-goal acceptance. KAGARI owns authorized Task execution. For an explicitly selected legacy run, use `@opencode-bridge` for authorized OpenCode transport; if unavailable before a send, give a complete manual packet, never duplicate an uncertain delivery. For the new requirements/acceptance lane, combine authorized read-only and specification steps without an arbitrary one-stage limit; existing legacy OpenCode runs retain their exact stage boundaries. Never create unapproved external effects, commit/push, Merge or release; preserve exact grant and the next human-owned boundary. KAGARI owns native Task/Ask; MUSUBI is its mobile-first UI. Legacy SwitchBoard is not a new-MVI prerequisite.
 
 ## Default — user requirements to accepted results
 

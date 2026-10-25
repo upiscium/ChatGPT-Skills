@@ -29,4 +29,23 @@ class RoleTransitionTests(unittest.TestCase):
     def test_no_arbitrary_single_stage_default(self):
         g=source('skills/dev-loop/references/governance.md')
         self.assertIn('without one-substantive-stage-per-response throttling',g)
+    def test_skill_ui_routing_and_legacy_invocation(self):
+        import yaml
+        def agent(name):
+            return yaml.safe_load(source('skills/' + name + '/agents/openai.yaml'))
+        dev = agent('dev-loop')
+        review = agent('repo-review')
+        patch = agent('patch-plan')
+        self.assertIn('approved function-level Issue specifications',
+                      dev['interface']['default_prompt'])
+        self.assertNotIn('advance the current authorized OpenCode checkpoint',
+                         dev['interface']['default_prompt'])
+        self.assertIn('actual delivered user-visible behavior',
+                      review['interface']['default_prompt'])
+        self.assertNotIn('review this merged repository',
+                         review['interface']['default_prompt'])
+        self.assertIn('Legacy', patch['interface']['display_name'])
+        self.assertFalse(patch['policy']['allow_implicit_invocation'])
+        self.assertTrue(dev['policy']['allow_implicit_invocation'])
+        self.assertTrue(review['policy']['allow_implicit_invocation'])
 if __name__=='__main__': unittest.main()

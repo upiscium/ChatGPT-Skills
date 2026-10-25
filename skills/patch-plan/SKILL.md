@@ -1,6 +1,6 @@
 ---
 name: patch-plan
-description: Convert selected filed GitHub Issues into dependency-aware OpenCode execution packets with explicit operation grants and stop points. Use to plan parallel implementation through the live repository Agent Core lifecycle or isolated generic worktrees, including prepublication delivery without assuming commit, push or PR authorization.
+description: Plan bounded OpenCode execution packets only for explicitly authorized legacy Issue workflows. The default Arca-to-KAGARI requirements and acceptance lane does not invoke this Skill.
 ---
 
 # Plan Review Patches
