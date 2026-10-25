@@ -1,7 +1,7 @@
 {
   "interface": {
     "displayName": "Arca Development",
-    "shortDescription": "Requirements, Issues and goal acceptance",
+    "shortDescription": "Requirements & Acceptance",
     "longDescription": "Align user requirements, author human-approved GitHub Issue specifications and evaluate KAGARI delivery against original user goals.",
     "developerName": "upiscium",
     "category": "Productivity",

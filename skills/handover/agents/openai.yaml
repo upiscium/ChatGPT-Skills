@@ -5,9 +5,4 @@ interface:
   icon_large: "assets/icon.svg"
   default_prompt: "Use $handover to prepare this conversation for continuation in a new chat."
 policy:
-  products:
-  - chatgpt
-  - codex
-  - api
-  - atlas
   allow_implicit_invocation: true

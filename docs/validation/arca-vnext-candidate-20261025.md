@@ -20,6 +20,16 @@ python3 -m unittest discover -s tests/issue4 -p 'test_*.py' -v
 
 Output is a deterministic archive with only the two manifests and **Git-tracked, unchanged `skills/` files** from the current checkout; locally untracked scratch files are excluded and modified tracked sources cause an explicit build failure. Run it from a Git checkout at the intended commit. No source tests, evidence, external connectors, production configuration or plugin-update side effects are included. The build refuses to overwrite an existing ZIP.
 
+## Isolated Plugin acceptance package
+
+For a separate private test Plugin that cannot be confused with the currently installed `arca-development` identity, build:
+
+```bash
+python3 packaging/build_candidate.py --isolated-preview --out /tmp/arca-development-vnext-isolated.zip
+```
+
+This mode changes **only** the two manifest identity fields (`name` and `displayName`) to `arca-development-vnext-isolated` / `Arca vNext Isolated`. Every Skill file is byte-identical to the normal reviewed candidate. A newly created private test Plugin and its account-side installation still require a separately authorized and supported upload workflow. No production release, update or KAGARI Task is implied.
+
 ## Acceptance that is still missing
 
 1. Independent source/packaging review of this candidate's exact commit, plus static packaging tests and deterministic build.
