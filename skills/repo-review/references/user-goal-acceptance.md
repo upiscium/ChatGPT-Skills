@@ -5,6 +5,8 @@ This is Arca's user-facing acceptance evaluation, not Task Orchestrator code rev
 ## Evidence
 Pin the original human-approved goal/source/revision; the selected Issue specifications, ACs and exclusions; and actual KAGARI Task Evidence or user-visible operation. Do not infer practical user success from green CI, source code or Task PASS. Missing Evidence is unknown.
 
+For feature-level completion across Issues, use `@human-review`'s `references/feature-acceptance-gate.md` to keep original user minimum behavior separate from code/PR/release status. This is a read-only evaluation and does not create a second technical Reviewer or new approval for an already resolved decision.
+
 ## Classify original user outcomes
 - goal-satisfied: the observed workflow achieves the original user-approved outcome with sufficient actual evidence.
 - in-spec-defect: implementation violates an already approved Issue/AC. Return exact reproduction, criterion and evidence to the existing KAGARI Task for ordinary technical repair; Arca does not conduct its own code review.

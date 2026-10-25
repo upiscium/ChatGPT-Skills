@@ -17,7 +17,7 @@ Trace each material addition to a goal or prerequisite. Consider cumulative cost
 
 ## Preserve ownership and current direction
 
-Human authority owns purpose, direction, priority, resource allocation, material architecture/product design and critical policy/risk acceptance. Arca owns analysis, option comparison, proactive detection and independent verification. OpenCode owns authorized implementation, tests and noncritical technical choices. An accepted contract can resolve a choice without another Ask.
+Human authority owns purpose, direction, priority, resource allocation, material architecture/product design and critical policy/risk acceptance. Arca owns user-requirement alignment, Issue-level specifications and evidence-backed evaluation of original user goals. KAGARI and its Task Orchestrators own authorized implementation, tests, technical review/correction and Task Evidence; OpenCode executes within their Task scope. In explicit legacy runs the prior OpenCode responsibility remains limited to its original grant. An accepted contract can resolve a choice without another Ask.
 
 Apply a later explicit human goal/priority change to its stated scope. Preserve unaffected grants and constraints; do not turn a recommendation into the new roadmap or a scoped reprioritization into permission for unrelated expansion. Keep the superseded source and the reason/time of supersession.
 

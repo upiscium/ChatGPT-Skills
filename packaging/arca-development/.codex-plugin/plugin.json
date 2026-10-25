@@ -1,0 +1,24 @@
+{
+  "interface": {
+    "displayName": "Arca Development",
+    "shortDescription": "Requirements, Issues and goal acceptance",
+    "longDescription": "Align user requirements, author human-approved GitHub Issue specifications and evaluate KAGARI delivery against original user goals.",
+    "developerName": "upiscium",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": [
+      "Align this request with the intended user-visible behavior and draft function-level Issue specifications.",
+      "Compare delivered KAGARI Task Evidence against the original approved user goal and report acceptance gaps.",
+      "Show current functionality and next human-owned decision without starting any Task."
+    ]
+  },
+  "name": "arca-development",
+  "version": "0.2.0-rc.1",
+  "description": "Human-aligned requirements, Issue specifications and user-goal acceptance for KAGARI-based autonomous development.",
+  "author": {
+    "name": "upiscium"
+  },
+  "repository": "https://github.com/upiscium/ChatGPT-Skills",
+  "keywords": [],
+  "skills": "./skills"
+}
