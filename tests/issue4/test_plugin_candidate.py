@@ -125,6 +125,29 @@ class PluginCandidateTests(unittest.TestCase):
                     if 'allow_implicit_invocation' in policy:
                         self.assertIsInstance(policy['allow_implicit_invocation'], bool)
 
+    def test_isolated_preview_is_distinct_but_skills_are_identical(self):
+        preview = Path(self.temp.name) / 'isolated-preview.zip'
+        result = subprocess.run(
+            [sys.executable, str(BUILDER), '--isolated-preview', '--out', str(preview)],
+            check=True, capture_output=True, text=True)
+        summary = json.loads(result.stdout)
+        self.assertEqual(summary['isolation_profile'], 'separate-private-preview')
+        with zipfile.ZipFile(self.output) as original, zipfile.ZipFile(preview) as isolated:
+            self.assertEqual(set(original.namelist()), set(isolated.namelist()))
+            plugin = json.loads(isolated.read('plugin.json'))
+            overlay = json.loads(isolated.read('.codex-plugin/plugin.json'))
+            self.assertEqual(plugin['name'], 'arca-development-vnext-isolated')
+            self.assertEqual(overlay['name'], plugin['name'])
+            self.assertEqual(plugin['extensions']['com.openai']['interface']['displayName'],
+                             'Arca vNext Isolated')
+            self.assertEqual(overlay['interface'],
+                             plugin['extensions']['com.openai']['interface'])
+            for path in original.namelist():
+                with self.subTest(path=path):
+                    if path not in ('plugin.json', '.codex-plugin/plugin.json'):
+                        self.assertEqual(original.read(path), isolated.read(path))
+        self.assertFalse(summary['installed_plugin_modified'])
+
     def test_manifest_consistency_and_no_execution_capability(self):
         with zipfile.ZipFile(self.output) as archive:
             top = json.loads(archive.read("plugin.json"))

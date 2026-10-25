@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_DIR = ROOT / "packaging" / "arca-development"
 
 
-def entries():
+def entries(isolated_preview: bool = False):
     """Return (archive name, on-disk source) for the actual candidate package."""
     manifests = {
         "plugin.json": MANIFEST_DIR / "plugin.json",
@@ -64,11 +64,23 @@ def entries():
         raise ValueError("Manifest UI mismatch")
     if codex["skills"] != "./skills":
         raise ValueError("Unexpected Skill package root")
+    if isolated_preview:
+        # A distinct private test identity prevents accidental collision with
+        # the user's installed production Arca Development plugin.
+        if top["name"] != "arca-development":
+            raise ValueError("Unexpected source Plugin identity")
+        preview_name = "arca-development-vnext-isolated"
+        preview_display = "Arca vNext Isolated"
+        top["name"] = codex["name"] = preview_name
+        top["extensions"]["com.openai"]["interface"]["displayName"] = preview_display
+        codex["interface"]["displayName"] = preview_display
+        payloads["plugin.json"] = (json.dumps(top, indent=2, ensure_ascii=False) + "\n").encode()
+        payloads[".codex-plugin/plugin.json"] = (json.dumps(codex, indent=2, ensure_ascii=False) + "\n").encode()
     return sorted(payloads.items()), len(skill_roots), top["version"]
 
 
-def build(output: Path):
-    file_entries, skill_count, version = entries()
+def build(output: Path, isolated_preview: bool = False):
+    file_entries, skill_count, version = entries(isolated_preview=isolated_preview)
     output = output.expanduser().resolve()
     if output.exists():
         raise FileExistsError(f"Refusing to overwrite an existing artifact: {output}")
@@ -87,14 +99,18 @@ def build(output: Path):
         "skills": skill_count,
         "candidate_version": version,
         "installed_plugin_modified": False,
+        "isolation_profile": "separate-private-preview" if isolated_preview else "none",
     }
 
 
 def main():
     parser = argparse.ArgumentParser(description="Assemble a local, uninstalled Arca vNext candidate ZIP")
     parser.add_argument("--out", type=Path, required=True, help="New output ZIP path (will not overwrite)")
+    parser.add_argument("--isolated-preview", action="store_true",
+                        help="Change only Plugin identity metadata to avoid updating installed Arca")
     options = parser.parse_args()
-    print(json.dumps(build(options.out), indent=2, ensure_ascii=False))
+    print(json.dumps(build(options.out, isolated_preview=options.isolated_preview),
+                     indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":
