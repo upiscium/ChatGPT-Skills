@@ -1,8 +1,7 @@
 interface:
-  display_name: Patch Plan
-  short_description: Plan Issue execution with explicit grants and stop points
-  default_prompt: Use $patch-plan to prepare scoped OpenCode packets for these Issues,
-    preserving publication gates.
+  display_name: "Patch Plan (Legacy)"
+  short_description: "Explicit-only legacy OpenCode execution packet planner"
+  default_prompt: "Use $patch-plan only for an explicitly selected and authorized legacy OpenCode Issue workflow. For new Arca requests, specify approved Issues for KAGARI instead."
   icon_small: assets/icon.svg
   icon_large: assets/icon.svg
 policy:
@@ -11,4 +10,4 @@ policy:
   - codex
   - api
   - atlas
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

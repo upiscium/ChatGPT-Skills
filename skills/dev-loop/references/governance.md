@@ -12,7 +12,7 @@ When actually requesting a human decision or handing off a user-run action, use 
 
 ## Select the entrypoint
 
-- Normal loop: restore the current workstream and perform only the requested or previously announced stage.
+- New user requests: use requirements-and-acceptance.md. Previously authorized legacy runs: restore exact workstream/grant and perform only the selected existing operation.
 - `merge-command-only`: for “このPRのマージコマンドだけ出して” or the former `@pr-merge` intent, read [references/merge-command.md](merge-command.md) and handle only the named PR. Do not start a repository review, create Issues or initiate a whole loop.
 - Status/collection request: inspect the existing run; do not launch or resume work implicitly.
 - Cleanup request: use `@workspace-cleanup` for the selected run/repository/host scope; inventory first, apply only eligible actions, and preserve unrelated work.
@@ -24,23 +24,23 @@ Use the model, reasoning effort and variant configured by OpenCode for authorize
 ## Separate authority
 
 Human: goals, material architecture/scope/compatibility/security decisions, risk acceptance, publication grants and final Ready/Merge actions.
-Arca: recover contracts, prepare packets, coordinate authorized dispatch, collect evidence, independently review and expose decisions.
-OpenCode: implement and validate only inside the current run grant through repository-owned APIs. Never launch standalone Codex CLI inside OpenCode.
-SwitchBoard: ongoing Ask detection and notifications. Arca/OpenCode have no Ask watcher/polling responsibility; a notice is not approval or a resolved answer. Do not claim SwitchBoard setup or delivery without evidence.
+Arca: elicit original requirements, produce human-approved Issue specifications and judge delivered user-visible behavior against original intent; no routine technical code review/correction ownership.
+KAGARI/Task Orchestrator: execute exact approved Issue sets, run tests/technical review/corrections and own Task/Evidence/native Ask; OpenCode executes within Task authority.
+MUSUBI: mobile-first view and reply UI for KAGARI's common Task/Ask state, not a separate execution or permission broker.
 
 An implementation and its tests cannot jointly redefine ambiguous intent. Require human-authored/approved goals and stable AC IDs. Escalate material unknowns instead of selecting the easiest interpretation. Human ownership also includes priority and resource allocation; Arca must proactively detect consequential choices, not merely relay executor questions.
 
-Apply `@human-review`'s `references/goal-alignment.md` at new workstreams, material changes and important PR/release milestones. Before each substantive turn's final, apply its `references/decision-sweep.md` to newly seen contracts, actual scope/resources, evidence and next action even without `NEEDS_DECISION`. Reuse a current nested sweep; unchanged pure observations are exempt. At significant scope/architecture milestones, route a bounded retrospective `missed-decision-audit` to a fresh reviewer context and collect its delta separately from implementation verification. Keep SwitchBoard/MUSUBI monitoring ownership and existing stage/operation grants.
+Apply `@human-review`'s `references/goal-alignment.md` at new workstreams, material changes and important PR/release milestones. Before each substantive turn's final, apply its `references/decision-sweep.md` to newly seen contracts, actual scope/resources, evidence and next action even without `NEEDS_DECISION`. Reuse a current nested sweep; unchanged pure observations are exempt. At significant scope/architecture milestones, route a bounded retrospective `missed-decision-audit` to a fresh reviewer context and collect its delta separately from implementation verification. Keep KAGARI native Ask ownership, MUSUBI UI responsibility and existing exact grants. Legacy SwitchBoard observations confer no action authority.
 
 ## Checkpoint semantics
 
-Complete at most one substantive stage per response, record it and stop. A stage may contain the explicitly selected independent batch, never undisclosed later waves.
+For the default requirements/acceptance lane, combine approved bounded evidence and specification steps without one-substantive-stage-per-response throttling; stop at human alignment, exact Issue-set execution authorization and next-phase decisions. Existing legacy OpenCode runs retain their original operation grants and stage stops.
 
 - `next`, `continue` or `Accept` applies only to the exact previously explained action, target, revision and grant. Present the four-field approval brief when this is a request for authority; a bare next/approve prompt has no implicit scope. Preserve concrete prior authorization and scoped denials. Re-read live evidence and repository gates immediately before acting.
 - A prior plan/ledger, readiness result or notification is not executable authority. If identity/scope changes, show the new state and request the necessary decision.
 - While a run is sent, running, waiting or delivery-unknown, inspect/reconcile it; never launch a duplicate.
 - Next after a command handoff verifies user execution; it never performs Ready/Merge.
-- Preserve completed independent work when another stream is blocked. Do not run continuously through multiple stages.
+- Preserve completed independent work when another stream is blocked. Do not cross a new Issue set, next phase, scope change or release gate without the actual human-owned decision.
 
 Restore the canonical state needed for the selected action. Record a checkpoint through `@repo-handoff` when newly verified facts materially change authority, run status, next action or recovery, not after unchanged reads. No carrier means `bootstrap`, no hidden tracking Issue. Always save/read back dispatch intent before sending; a failed necessary recording remains visible.
 

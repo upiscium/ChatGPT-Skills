@@ -94,7 +94,7 @@ Use `none` or `unknown` explicitly. Omit this section only when no action-bindin
 - Design approval status:
 - Issue filing authorization: granted for this unit | not granted
 
-Use bounded discovery candidates when an unknown blocks design. Never hide an unresolved human choice in an implementation task. Hand selected authorized candidates to issue-filer; execution steps belong to patch-plan after Issues exist.
+Use bounded discovery candidates when an unknown blocks design. Never hide an unresolved human choice in an implementation task. Hand selected authorized candidates to issue-filer. After the Human authorizes the exact Issue set, KAGARI/Task Orchestrator owns execution planning; patch-plan applies only to explicitly selected legacy OpenCode work. Issue creation alone never authorizes execution.
 
 ## 12. Test strategy
 ### Unit

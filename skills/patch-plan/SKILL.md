@@ -1,9 +1,11 @@
 ---
 name: patch-plan
-description: Convert selected filed GitHub Issues into dependency-aware OpenCode execution packets with explicit operation grants and stop points. Use to plan parallel implementation through the live repository Agent Core lifecycle or isolated generic worktrees, including prepublication delivery without assuming commit, push or PR authorization.
+description: Plan bounded OpenCode execution packets only for explicitly authorized legacy Issue workflows. The default Arca-to-KAGARI requirements and acceptance lane does not invoke this Skill.
 ---
 
 # Plan Review Patches
+
+**Legacy compatibility:** Arca Issue #4 now defaults to requirement alignment, function-level Issue specification and user-goal acceptance. KAGARI owns the new execution plan and technical review/correction. Use this OpenCode execution-packet planner only when an existing legacy operation has been explicitly selected; it is not the default next step after Issue filing.
 
 Convert only selected, filed Issues and approved Feature Contracts into bounded, self-contained OpenCode execution plans. `@blueprint` owns accepted feature design/ACs; Arca plans their execution, `@opencode-bridge` transports packets without granting authority, and OpenCode implements inside its grant. Publication, Merge, real external effects and material human-owned changes remain separate decisions.
 

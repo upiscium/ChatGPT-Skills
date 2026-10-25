@@ -1,11 +1,13 @@
 ---
 name: debug-investigate
-description: Investigate a concrete test, CI, build, runtime or performance failure through bounded reproduction, boundary tracing and discriminating hypotheses. Use when the cause is unclear, a fix failed or repeated guesses are not working. Produce evidence and a scoped investigation or repair handoff; do not implement repairs, publish changes or monitor OpenCode.
+description: Explicitly requested bounded diagnosis of a test, CI, build, runtime or performance failure, or investigation in an explicitly selected legacy OpenCode workflow. For ordinary KAGARI delivery defects, return the failure to its owning Task rather than starting an independent Arca diagnosis or repair loop. Do not implement repairs, publish changes or monitor OpenCode.
 ---
 
 # Investigate a Failure
 
-Find what failed and why before selecting a repair. Own diagnosis and evidence; send authorized implementation to OpenCode through `@patch-plan`, `@dev-loop` and `@opencode-bridge`. Do not turn a plausible explanation into a confirmed cause.
+For an ordinary in-spec defect in a KAGARI-owned Issue, return the criterion, reproduction and available evidence to its existing Task. KAGARI/Task Orchestrator owns diagnosis, implementation, tests, technical review and correction; do not start a parallel Arca diagnostic loop.
+
+Use the investigation steps below only when the User explicitly requests an independent bounded diagnosis or selects a legacy investigation. An independent diagnosis returns evidence to the existing KAGARI Task without granting repair execution. Only an explicitly selected legacy OpenCode workflow hands authorized repairs through `@patch-plan`, `@dev-loop` and `@opencode-bridge`. Do not turn a plausible explanation into a confirmed cause.
 
 Read [references/investigation-record.md](references/investigation-record.md) for the compact report. Read `@change-review`'s `references/verification.md` when checking result claims. [references/superpowers-notice.md](references/superpowers-notice.md) records the adapted source and license.
 
@@ -55,7 +57,7 @@ Return the observed failure, cause status (`confirmed|supported|unresolved`), ev
 - Unknown cause: produce a bounded investigation packet, not a guessed executable repair.
 - A material design choice: route to `@blueprint` or `@human-review` with evidence and concrete options.
 
-Use `@repo-handoff` for an existing canonical carrier when recording is authorized under the active instructions; otherwise return a continuation delta or `bootstrap`/`pending-write`. Keep raw sensitive logs out of public records. Diagnosis does not grant dispatch, code edits, commit, push, PR, Ready or Merge. SwitchBoard owns ongoing Ask monitoring.
+Use `@repo-handoff` for an existing canonical carrier when recording is authorized under the active instructions; otherwise return a continuation delta or `bootstrap`/`pending-write`. Keep raw sensitive logs out of public records. Diagnosis does not grant dispatch, code edits, commit, push, PR, Ready or Merge. KAGARI owns Task Ask and MUSUBI is its UI; SwitchBoard monitoring applies only to the explicitly selected legacy workflow.
 
 ## Final check
 
