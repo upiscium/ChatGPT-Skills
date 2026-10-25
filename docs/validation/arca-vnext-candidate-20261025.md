@@ -18,7 +18,7 @@ python3 -m unittest discover -s tests/efficiency-mvi -p 'test_*.py' -v
 python3 -m unittest discover -s tests/issue4 -p 'test_*.py' -v
 ```
 
-Output is a deterministic archive with only the two manifests and current `skills/` files; no source tests, evidence, external connectors, production configuration or plugin-update side effects. The build refuses to overwrite an existing ZIP.
+Output is a deterministic archive with only the two manifests and **Git-tracked, unchanged `skills/` files** from the current checkout; locally untracked scratch files are excluded and modified tracked sources cause an explicit build failure. Run it from a Git checkout at the intended commit. No source tests, evidence, external connectors, production configuration or plugin-update side effects are included. The build refuses to overwrite an existing ZIP.
 
 ## Acceptance that is still missing
 

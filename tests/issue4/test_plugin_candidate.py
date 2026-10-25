@@ -83,6 +83,30 @@ class PluginCandidateTests(unittest.TestCase):
                         dest = posixpath.normpath(posixpath.join(posixpath.dirname(posixpath.dirname(path)), meta["interface"][icon]))
                         self.assertIn(dest, names, (path, icon))
 
+    def test_untracked_local_skill_files_are_not_packaged(self):
+        import os
+        directory = ROOT / "skills" / "blueprint" / "references"
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", dir=directory,
+            prefix=".arca-vnext-untracked-", suffix=".md", delete=False
+        ) as fixture:
+            fixture.write("not part of the committed source\n")
+            probe = Path(fixture.name)
+        try:
+            result = Path(self.temp.name) / "ignore-local.zip"
+            subprocess.run(
+                [sys.executable, str(BUILDER), "--out", str(result)],
+                check=True, capture_output=True
+            )
+            with zipfile.ZipFile(result) as archive:
+                self.assertNotIn(probe.relative_to(ROOT).as_posix(), archive.namelist())
+                self.assertEqual(
+                    archive.read("skills/blueprint/SKILL.md"),
+                    (ROOT / "skills/blueprint/SKILL.md").read_bytes()
+                )
+        finally:
+            os.unlink(probe)
+
     def test_manifest_consistency_and_no_execution_capability(self):
         with zipfile.ZipFile(self.output) as archive:
             top = json.loads(archive.read("plugin.json"))

@@ -5,6 +5,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import subprocess
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -17,13 +18,30 @@ def entries():
         "plugin.json": MANIFEST_DIR / "plugin.json",
         ".codex-plugin/plugin.json": MANIFEST_DIR / ".codex-plugin" / "plugin.json",
     }
+    # Ship only the committed source. Local scratch files under skills/ are not part
+    # of a GitHub-pinned candidate, even if they happen to exist in this checkout.
+    tracked = subprocess.check_output(
+        ["git", "-C", str(ROOT), "ls-files", "-z", "--", "skills"]
+    )
+    changed = subprocess.run(
+        ["git", "-C", str(ROOT), "diff", "--quiet", "HEAD", "--",
+         "skills", "packaging/arca-development"],
+        check=False,
+    )
+    if changed.returncode:
+        raise ValueError("Tracked candidate sources differ from Git HEAD; commit or restore before building")
     files = dict(manifests)
-    skill_roots = sorted((ROOT / "skills").glob("*/SKILL.md"))
+    for entry in tracked.split(b"\0"):
+        if not entry:
+            continue
+        name = entry.decode("utf-8")
+        path = ROOT / name
+        if not path.is_file():
+            raise FileNotFoundError(f"Git-tracked Skill file missing: {name}")
+        files[name] = path
+    skill_roots = sorted(name for name in files if name.startswith("skills/") and name.endswith("/SKILL.md"))
     if not skill_roots:
-        raise ValueError("No Skill entrypoints found")
-    for path in (ROOT / "skills").rglob("*"):
-        if path.is_file():
-            files[path.relative_to(ROOT).as_posix()] = path
+        raise ValueError("No Git-tracked Skill entrypoints found")
     for name, path in files.items():
         if not path.is_file():
             raise FileNotFoundError(f"{name}: {path}")
