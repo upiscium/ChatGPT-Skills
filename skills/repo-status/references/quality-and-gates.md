@@ -4,7 +4,7 @@
 - Do not perform a general defect hunt; use `@repo-review` when the goal is finding Bugs or Feature Requests.
 - Do not generate an implementation plan; use `@patch-plan` or `@blueprint` after the user selects work.
 - Use `@repo-handoff` for automatic persistence of the owned snapshot fields without overwriting coordinator runs or next actions. Do not replace `@handover` or preserve private conversation context in a public record.
-- Ask monitoring/notification belongs to SwitchBoard, not this status snapshot. Do not infer a run failed because the connection is unavailable, or claim monitoring is configured without evidence.
+- On the default vNext path, KAGARI owns native Task/Ask monitoring and MUSUBI is the UI/notification consumer. SwitchBoard monitors only an explicitly selected legacy OpenCode workflow. This status snapshot neither monitors nor answers Ask; do not infer a run failed because the connection is unavailable or claim monitoring/notifications are configured without evidence.
 - Route security-sensitive details to `@security-audit`; summarize only the existence and handling status of restricted work.
 
 ## Quality gate
