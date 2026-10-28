@@ -102,7 +102,7 @@ Use this reference when serializing or validating a `codex-repo-state:v1` marker
       "question": {"id": "none", "revision": 1, "status": "none"},
       "executor_report_ref": "none",
       "verified_result_ref": "none",
-      "monitoring": {"owner": "SwitchBoard", "correlation_ref": "unknown", "delivery_state": "unknown"}
+      "monitoring": {"owner": "KAGARI", "notification_consumer": "MUSUBI", "correlation_ref": "unknown", "delivery_state": "unknown"}
     }
   ],
   "decisions": [
@@ -144,6 +144,8 @@ Use this reference when serializing or validating a `codex-repo-state:v1` marker
 ```
 
 Rules:
+
+- In the vNext default lane, the example `monitoring.owner` denotes KAGARI's native Task/Ask current-state and reply owner; `notification_consumer` denotes MUSUBI's UI/notification role, not a second Task authority. An explicitly selected legacy OpenCode workflow may record `owner: SwitchBoard`. Do not rewrite historical markers or infer configured monitoring from a schema example.
 
 - Keep `sequence` monotonic per carrier and use UTC ISO-8601 `updated_at`.
 - Set `recording.mode` to `automatic` for ordinary workflow checkpoints, `manual` only for an explicit repair/backfill, and `none` only for a read-only bootstrap with no carrier. Set `recording.status` to `saved`, `pending-write`, or `bootstrap`; never report `saved` without a marker read-back.
