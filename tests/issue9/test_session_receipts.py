@@ -94,6 +94,24 @@ class SessionReceiptTests(unittest.TestCase):
                 }[field]
                 self.evidence_file.unlink()
 
+    def test_missing_native_session_agent_binds_from_assistant_metadata(self):
+        # Some OpenCode responses omit the optional Session.agent field;
+        # actual assistant metadata can still prove the exact role.
+        self.snapshot["session"].pop("agent")
+        code, result = self.call()
+        self.assertEqual(code, 0)
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(result["model_observed"], "openai/fixture-model")
+
+    def test_missing_session_agent_without_assistant_evidence_is_unknown(self):
+        self.snapshot["session"].pop("agent")
+        self.snapshot["messages"] = []
+        code, result = self.call()
+        self.assertEqual(code, 75)
+        self.assertEqual(result["status"], "unknown")
+        self.assertEqual(result["reason"], "agent_not_observed")
+        self.assertNotIn("completed", result["evidence"])
+
     def test_invalid_payload_cannot_prove_model_started(self):
         self.snapshot["messages"][0]["parts"] = [{"type": "text"}]
         code, result = self.call()
@@ -150,6 +168,31 @@ class SessionReceiptTests(unittest.TestCase):
 
     def test_evidence_inside_product_worktree_is_not_read(self):
         self.evidence_file = self.work / "evidence.json"
+        code, result = self.call()
+        self.assertEqual(code, 75)
+        self.assertEqual(result["status"], "unknown")
+
+    def test_symlinked_parent_alias_cannot_hide_worktree_local_evidence(self):
+        source = self.work / "evidence.json"
+        source.write_text(json.dumps(self.snapshot))
+        source.chmod(0o600)
+        alias = Path(self.temp.name) / "work-alias"
+        alias.symlink_to(self.work, target_is_directory=True)
+        self.evidence_file = alias / source.name
+        self.assertFalse(self.evidence_file.is_symlink())
+        self.assertFalse(self.evidence_file.is_relative_to(self.work))
+        code, result = self.call()
+        self.assertEqual(code, 75)
+        self.assertEqual(result["status"], "unknown")
+
+    def test_parent_dotdot_alias_cannot_hide_worktree_local_evidence(self):
+        source = self.work / "evidence.json"
+        source.write_text(json.dumps(self.snapshot))
+        source.chmod(0o600)
+        outer = Path(self.temp.name) / "outer"
+        outer.mkdir()
+        self.evidence_file = outer / ".." / "work" / source.name
+        self.assertFalse(self.evidence_file.is_relative_to(self.work))
         code, result = self.call()
         self.assertEqual(code, 75)
         self.assertEqual(result["status"], "unknown")

@@ -42,10 +42,17 @@ def _receipt(observation_id: str, session_id: str, status: str,
 
 
 def _read_private_file(path: Path, directory: Path) -> dict:
-    if not path.is_absolute() or path.is_symlink() or path.is_relative_to(directory):
-        raise ValueError("evidence file must be private and outside the Product directory")
+    if not path.is_absolute() or path.is_symlink():
+        raise ValueError("evidence file must be an absolute non-symlink file")
+    # Lexical is_relative_to() misses aliases through symlinked ancestors or
+    # ".." components. Canonicalize both roots before enforcing isolation,
+    # and open the resolved target to avoid following the untrusted alias.
+    canonical_directory = directory.resolve(strict=True)
+    canonical_file = path.resolve(strict=True)
+    if canonical_file.is_relative_to(canonical_directory):
+        raise ValueError("evidence file must be outside the Product worktree")
     flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
-    fd = os.open(path, flags)
+    fd = os.open(canonical_file, flags)
     try:
         info = os.fstat(fd)
         if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid()
@@ -122,7 +129,7 @@ def observe(args: argparse.Namespace) -> tuple[dict, int]:
                 or session.get("id") != args.session_id
                 or session.get("title") != args.expected_title
                 or session.get("directory") != str(args.directory)
-                or session.get("agent") != args.agent):
+                or session.get("agent") not in (None, args.agent)):
             return _receipt(args.observation_id, args.session_id, "blocked",
                             evidence, "session_binding_mismatch"), 75
         evidence.append("session_created")
@@ -135,6 +142,12 @@ def observe(args: argparse.Namespace) -> tuple[dict, int]:
         pending = any(isinstance(p, dict) and p.get("sessionID") == args.session_id
                       for p in permissions + questions)
         started, completed, model = _model_observation(doc.get("messages"), args.agent)
+        # OpenCode Session.agent may be omitted by some compatible versions.
+        # Without it, only actual assistant metadata can establish this role;
+        # a Session title alone must never satisfy role acceptance.
+        if session.get("agent") is None and not started:
+            return _receipt(args.observation_id, args.session_id, "unknown",
+                            evidence, "agent_not_observed"), 75
         if started:
             evidence.append("model_started")
         if pending:
