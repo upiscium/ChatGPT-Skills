@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-"""Read-only, bounded OpenCode/KAGARI Session API receipt observer.
+"""Validate bounded, privately captured KAGARI/OpenCode Session evidence.
 
-Never starts a model, launches a process, writes a Product file or answers Ask.
-The caller retains process/Task authority and preserves the returned receipt.
+No HTTP, credentials, model calls, subprocesses, Session mutation or host effects.
+This validates observations; Task/run ownership is verified separately by KAGARI.
 """
 from __future__ import annotations
 
 import argparse
-import base64
 from datetime import datetime, timezone
 import json
 import os
@@ -15,27 +14,26 @@ from pathlib import Path
 import re
 import stat
 import sys
-from urllib.error import HTTPError, URLError
-from urllib.parse import quote, urlencode
-from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_opener
 
 SESSION = re.compile(r"ses_[A-Za-z0-9]+\Z")
 SAFE_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,95}\Z")
 ROLE = re.compile(r"[A-Za-z0-9_-]{1,64}\Z")
-MAX_RESPONSE = 1024 * 1024
+SCHEMA = "kagari-opencode-observation-v1"
+MAX_BYTES = 1024 * 1024
 
 
-class _NoRedirect(HTTPRedirectHandler):
-    def redirect_request(self, req, fp, code, msg, headers, newurl):
-        return None
-
-
-def _receipt(run_id: str, session_id: str, status: str, evidence: list[str],
-             reason: str | None = None, model: str | None = None) -> dict:
-    result = {"schema": "arca-opencode-session-receipt-v1",
-              "run_id": run_id, "session_id": session_id,
-              "observed_at_utc": datetime.now(timezone.utc).isoformat(),
-              "status": status, "evidence": evidence}
+def _receipt(observation_id: str, session_id: str, status: str,
+             evidence: list[str], reason: str | None = None,
+             model: str | None = None) -> dict:
+    result = {
+        "schema": "arca-opencode-session-receipt-v1",
+        "observation_id": observation_id,
+        "session_id": session_id,
+        "task_binding": "not_verified_by_observer",
+        "source_authenticity": "not_verified_by_observer",
+        "observed_at_utc": datetime.now(timezone.utc).isoformat(),
+        "status": status, "evidence": evidence,
+    }
     if reason is not None:
         result["reason"] = reason
     if model is not None:
@@ -43,156 +41,136 @@ def _receipt(run_id: str, session_id: str, status: str, evidence: list[str],
     return result
 
 
-def _read_secret(path: Path) -> str:
-    if not path.is_absolute() or path.is_symlink():
-        raise ValueError("credential file not a trusted absolute regular file")
-    info = path.stat()
-    if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid()
-            or stat.S_IMODE(info.st_mode) != 0o600):
-        raise ValueError("credential file requires owner and 0600")
-    value = path.read_text().strip()
-    if not value or len(value) > 1024 or "\n" in value:
-        raise ValueError("invalid credential file")
-    return value
+def _read_private_file(path: Path, directory: Path) -> dict:
+    if not path.is_absolute() or path.is_symlink() or path.is_relative_to(directory):
+        raise ValueError("evidence file must be private and outside the Product directory")
+    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
+    fd = os.open(path, flags)
+    try:
+        info = os.fstat(fd)
+        if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid()
+                or stat.S_IMODE(info.st_mode) != 0o600
+                or info.st_size > MAX_BYTES):
+            raise ValueError("evidence file must be owner-private bounded regular file")
+        data = os.read(fd, MAX_BYTES + 1)
+        if len(data) > MAX_BYTES:
+            raise ValueError("evidence exceeds bound")
+    finally:
+        os.close(fd)
+    doc = json.loads(data)
+    if not isinstance(doc, dict) or doc.get("schema") != SCHEMA:
+        raise ValueError("invalid observation schema")
+    return doc
 
 
-def _get(opener, base: str, path: str, directory: str, auth: str):
-    url = base + path + "?" + urlencode({"directory": directory})
-    req = Request(url, headers={"Authorization": auth, "Accept": "application/json"},
-                  method="GET")
-    with opener.open(req, timeout=5) as result:
-        body = result.read(MAX_RESPONSE + 1)
-        if len(body) > MAX_RESPONSE:
-            raise ValueError("response exceeds private observation limit")
-        return json.loads(body)
-
-
-def _model_observation(messages, role: str) -> tuple[bool, bool, str | None]:
+def _model_observation(messages, agent: str) -> tuple[bool, bool, str | None]:
     if not isinstance(messages, list):
-        raise ValueError("unexpected Session message collection")
-    started = False
-    completed = False
-    last_model = None
-    for message in messages:
-        if not isinstance(message, dict):
-            raise ValueError("invalid Session message shape")
-        info = message.get("info")
-        if not isinstance(info, dict) or info.get("role") != "assistant":
+        raise ValueError("invalid message collection")
+    started, completed, model = False, False, None
+    for msg in messages:
+        if not isinstance(msg, dict):
+            raise ValueError("invalid message")
+        info = msg.get("info")
+        if not isinstance(info, dict):
+            raise ValueError("invalid message info")
+        if info.get("role") != "assistant":
+            completed = False
             continue
-        if info.get("agent") != role:
-            raise ValueError("assistant role binding mismatch")
-        # A prior completed turn cannot certify a later unfinished turn.
+        if info.get("agent") != agent:
+            raise ValueError("assistant agent mismatch")
         completed = False
-        provider = info.get("providerID")
-        model = info.get("modelID")
+        provider, model_id = info.get("providerID"), info.get("modelID")
         if not (isinstance(provider, str) and provider
-                and isinstance(model, str) and model):
+                and isinstance(model_id, str) and model_id):
             continue
-        parts = message.get("parts")
+        parts = msg.get("parts")
         if not isinstance(parts, list):
             continue
-        valid_output = any(isinstance(part, dict)
-                           and part.get("type") == "text"
-                           and isinstance(part.get("text"), str)
-                           and bool(part["text"]) for part in parts)
-        valid_tool = any(isinstance(part, dict)
-                         and part.get("type") == "tool"
-                         and isinstance(part.get("tool"), str)
-                         and bool(part["tool"]) for part in parts)
-        if valid_output or valid_tool:
+        text = any(isinstance(p, dict) and p.get("type") == "text"
+                   and isinstance(p.get("text"), str) and bool(p["text"])
+                   for p in parts)
+        tool = any(isinstance(p, dict) and p.get("type") == "tool"
+                   and isinstance(p.get("tool"), str) and bool(p["tool"])
+                   for p in parts)
+        if text or tool:
             started = True
-            last_model = provider + "/" + model
-        if info.get("finish") == "stop" and valid_output and info.get("error") is None:
+            model = provider + "/" + model_id
+        if info.get("finish") == "stop" and text and info.get("error") is None:
             completed = True
-    # A newer user message awaiting model processing makes the previous
-    # assistant completion inapplicable to the current Session state.
-    if messages and (not isinstance(messages[-1].get("info"), dict)
-                     or messages[-1]["info"].get("role") != "assistant"):
-        completed = False
-    return started, completed, last_model
+    return started, completed, model
 
 
 def observe(args: argparse.Namespace) -> tuple[dict, int]:
-    if (not SAFE_ID.fullmatch(args.run_id)
+    if (not SAFE_ID.fullmatch(args.observation_id)
             or not SESSION.fullmatch(args.session_id)
             or not ROLE.fullmatch(args.agent)
             or not isinstance(args.expected_title, str)
             or not 1 <= len(args.expected_title) <= 128
-            or not 0 < args.port < 65536
             or not args.directory.is_absolute() or args.directory.is_symlink()
             or not args.directory.is_dir()):
-        return _receipt(args.run_id, args.session_id, "blocked", [], "invalid_arguments"), 64
-    try:
-        secret = _read_secret(args.password_file)
-    except (ValueError, OSError):
-        return _receipt(args.run_id, args.session_id, "blocked", [], "invalid_credentials"), 64
-
-    base = f"http://127.0.0.1:{args.port}"
-    authorization = "Basic " + base64.b64encode(("opencode:" + secret).encode()).decode()
-    opener = build_opener(ProxyHandler({}), _NoRedirect())
-    path = "/session/" + quote(args.session_id, safe="")
-    folder = str(args.directory)
+        return _receipt(args.observation_id, args.session_id, "blocked", [],
+                        "invalid_arguments"), 64
     evidence: list[str] = []
     try:
-        health = _get(opener, base, "/global/health", folder, authorization)
+        doc = _read_private_file(args.evidence_file, args.directory)
+        health = doc.get("health")
         if not isinstance(health, dict) or health.get("healthy") is not True:
             raise ValueError("unhealthy")
         evidence.append("opencode_initialized")
-        session = _get(opener, base, path, folder, authorization)
+        session = doc.get("session")
         if (not isinstance(session, dict)
                 or session.get("id") != args.session_id
-                or session.get("directory") != folder
-                or session.get("agent") != args.agent
-                or session.get("title") != args.expected_title):
-            return _receipt(args.run_id, args.session_id, "blocked", evidence,
-                            "session_binding_mismatch"), 75
+                or session.get("title") != args.expected_title
+                or session.get("directory") != str(args.directory)
+                or session.get("agent") != args.agent):
+            return _receipt(args.observation_id, args.session_id, "blocked",
+                            evidence, "session_binding_mismatch"), 75
         evidence.append("session_created")
-        statuses = _get(opener, base, "/session/status", folder, authorization)
-        messages = _get(opener, base, path + "/message", folder, authorization)
-        permissions = _get(opener, base, "/permission", folder, authorization)
-        questions = _get(opener, base, "/question", folder, authorization)
-        if not (isinstance(statuses, dict) and isinstance(permissions, list)
-                and isinstance(questions, list)):
-            raise ValueError("invalid observation collection")
-        # Other concurrent Sessions' pending Asks are unrelated.
-        pending = any(isinstance(v, dict) and v.get("sessionID") == args.session_id
-                      for v in permissions + questions)
-        started, completed, model = _model_observation(messages, args.agent)
+        statuses = doc.get("statuses")
+        permissions = doc.get("permissions")
+        questions = doc.get("questions")
+        if not (isinstance(statuses, dict)
+                and isinstance(permissions, list) and isinstance(questions, list)):
+            raise ValueError("invalid collections")
+        pending = any(isinstance(p, dict) and p.get("sessionID") == args.session_id
+                      for p in permissions + questions)
+        started, completed, model = _model_observation(doc.get("messages"), args.agent)
         if started:
             evidence.append("model_started")
         if pending:
-            return _receipt(args.run_id, args.session_id, "awaiting_human",
+            return _receipt(args.observation_id, args.session_id, "awaiting_human",
                             evidence, model=model), 75
+        # OpenCode 1.18.35 GET /session/status maps only non-idle Sessions;
+        # an absent entry means idle in this API, not missing evidence.
         runtime = statuses.get(args.session_id)
         if runtime is not None and (not isinstance(runtime, dict)
                                     or runtime.get("type") not in ("busy", "idle")):
-            raise ValueError("unknown runtime status")
+            raise ValueError("invalid runtime status")
         if isinstance(runtime, dict) and runtime.get("type") == "busy":
-            return _receipt(args.run_id, args.session_id, "running",
+            return _receipt(args.observation_id, args.session_id, "running",
                             evidence, model=model), 75
         if started and completed:
             evidence.append("completed")
-            return _receipt(args.run_id, args.session_id, "completed",
+            return _receipt(args.observation_id, args.session_id, "completed",
                             evidence, model=model), 0
-        return _receipt(args.run_id, args.session_id, "unknown",
+        return _receipt(args.observation_id, args.session_id, "unknown",
                         evidence, "no_verified_completion", model), 75
-    except (HTTPError, URLError, TimeoutError, OSError, ValueError, json.JSONDecodeError):
-        return _receipt(args.run_id, args.session_id, "unknown",
+    except (OSError, ValueError, UnicodeError, json.JSONDecodeError):
+        return _receipt(args.observation_id, args.session_id, "unknown",
                         evidence, "observation_unavailable"), 75
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--run-id", required=True)
+    parser.add_argument("--observation-id", required=True)
     parser.add_argument("--session-id", required=True)
     parser.add_argument("--directory", type=Path, required=True)
-    parser.add_argument("--agent", required=True)
     parser.add_argument("--expected-title", required=True)
-    parser.add_argument("--port", type=int, required=True)
-    parser.add_argument("--password-file", type=Path, required=True)
+    parser.add_argument("--agent", required=True)
+    parser.add_argument("--evidence-file", type=Path, required=True)
     args = parser.parse_args()
     receipt, status = observe(args)
-    print(json.dumps(receipt, ensure_ascii=True, sort_keys=True))
+    print(json.dumps(receipt, sort_keys=True, ensure_ascii=True))
     return status
 
 
