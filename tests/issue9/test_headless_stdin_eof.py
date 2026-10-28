@@ -99,6 +99,8 @@ class HeadlessStdinEOFTests(unittest.TestCase):
         self.assertIn("session_created", transport)
         self.assertIn("Do not kill by name", transport)
         self.assertIn("scripts/run-headless.sh", transport)
+        self.assertIn("scripts/run-headless-receipt.py", transport)
+        self.assertIn("scripts/run-headless-receipt.py", bridge)
 
 
 if __name__ == "__main__":

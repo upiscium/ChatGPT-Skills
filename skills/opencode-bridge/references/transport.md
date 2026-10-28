@@ -22,6 +22,24 @@ sh /verified/plugin/scripts/run-headless.sh /verified/bin/opencode --dir /verifi
 
 It forwards exact arguments and exit status, requires an absolute executable path, closes fd 0, and adds no model/variant/permission flags. The example paths are placeholders, not approved host locations: verify executable, worktree, packet and grant before actual use. If that packaged script is not present remotely, use the explicit `</dev/null` launch form; do not assume a plugin-local file exists on another computer. Avoid untrusted `PATH` substitution and arbitrary shell interpolation. This is a noninteractive CLI rule; do not redirect the stdin of an intentionally interactive TUI or change its permission policy.
 
+### Receipt-aware unattended runs
+
+The shell helper above is **only an EOF-safe transport**; it cannot prove that OpenCode started a Session. For autonomous CLI dispatch, use either a verified native Session API with read-back of real Session/status/messages, **or** the packaged Python 3.11+ [`scripts/run-headless-receipt.py`](../scripts/run-headless-receipt.py) when that source and interpreter are verified available on the authorized target. An unattended shell invocation without one of these observation channels is not a completed dispatch receipt.
+
+```sh
+python3 /verified/plugin/scripts/run-headless-receipt.py \
+  --run-id <unique-authorized-run-id> \
+  --state-root /verified/owner-private-0700-state \
+  --cwd /verified/issue-worktree \
+  --binary /verified/bin/opencode \
+  --startup-seconds 20 --runtime-seconds 600 -- \
+  --file /verified/authorized-packet.md "Run the authorized packet"
+```
+
+The state root must already exist, be owned by the caller, and have mode `0700`. The helper atomically allocates one exclusive run-ID directory; it refuses reuse without reconciliation. It writes owner-private (`0600`) `receipt.jsonl` records, `stdout.jsonl`, and `stderr.log`, all outside the Product worktree; stdout/stderr may contain private data and **must not** be published or copied into an Issue. The exact Python interpreter, script, binary, cwd, packet and operation grant must be verified independently; the script never installs anything or changes OpenCode's model/permissions. It rejects `--auto`, model/variant overrides, alternate `--dir`, continuation and non-JSON format overrides. Native configured model and CLI agent role still apply.
+
+Receipts are observations, not declarations of completion. `launch_intent` is saved before the effect; `process_spawned` records the actual PID; `opencode_initialized` follows a valid OpenCode JSON stream event; `session_created` means a valid `sessionID` was *observed in that stream* (not a guarantee of durable host ownership); `model_started` requires a matching assistant text/tool event; `completed` requires all preceding evidence and process exit 0. `exited_failure`, `exited_without_verified_completion_unknown`, `startup_stalled_unknown`, `runtime_stalled_unknown`, and `output_unbounded_unknown` must **never** be treated as PASS. A timeout returns code 75 **without terminating the child**, preserving exact process/run identity and the evidence files. Before retry or cleanup, reconcile session/child/Git/Task authority and use verified owned-resource cleanup; a different run ID alone is never retry authorization. No native Ask is auto-approved.
+
 **Startup is not receipt.** Separate `process_spawned`, `opencode_initialized`, `session_created`, `model_started`, and `completed` evidence. A live PID with 0-byte stdout/stderr and no session ID is *not* accepted or running work. At the bounded receipt deadline classify it as `startup_stalled/unknown`, inspect run-scoped sanitized logs/FD and current worktree, and do not resend. After proving exact process ownership and no session/in-flight effects, use the existing owned-resource cleanup gate to release only that failed launch; then a *new* run and separately verified dispatch intent may be considered. Do not kill by name or alter shared OpenCode servers.
 
 ## Dispatch safeguards
