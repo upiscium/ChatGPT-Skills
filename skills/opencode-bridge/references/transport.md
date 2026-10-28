@@ -22,23 +22,27 @@ sh /verified/plugin/scripts/run-headless.sh /verified/bin/opencode --dir /verifi
 
 It forwards exact arguments and exit status, requires an absolute executable path, closes fd 0, and adds no model/variant/permission flags. The example paths are placeholders, not approved host locations: verify executable, worktree, packet and grant before actual use. If that packaged script is not present remotely, use the explicit `</dev/null` launch form; do not assume a plugin-local file exists on another computer. Avoid untrusted `PATH` substitution and arbitrary shell interpolation. This is a noninteractive CLI rule; do not redirect the stdin of an intentionally interactive TUI or change its permission policy.
 
-### Receipt-aware unattended runs
+### Receipt-aware unattended runs through the native Session API
 
-The shell helper above is **only an EOF-safe transport**; it cannot prove that OpenCode started a Session. For autonomous CLI dispatch, use either a verified native Session API with read-back of real Session/status/messages, **or** the packaged Python 3.11+ [`scripts/run-headless-receipt.py`](../scripts/run-headless-receipt.py) when that source and interpreter are verified available on the authorized target. An unattended shell invocation without one of these observation channels is not a completed dispatch receipt.
+The shell helper is **only an EOF-safe transport** and does not prove a Session exists. For autonomous KAGARI-managed Tasks, use KAGARI's existing issue-bound `opencode serve` + Session API to create and own the exact Task Session. Do **not** implement an additional CLI subprocess/log supervisor in Arca: it duplicates KAGARI process ownership and risks unbounded capture and uncertain child cleanup.
+
+For read-only receipt collection, when a verified authenticated loopback OpenCode server already exists, the packaged Python 3.11+ [`scripts/observe-session.py`](../scripts/observe-session.py) can observe its *existing* Session. It only issues bounded authenticated GETs: `/global/health`, `/session/<id>`, `/session/status`, `/session/<id>/message`, `/permission` and `/question`. No Session/model/process is created, no native Ask is answered, and no files are written by the probe.
 
 ```sh
-python3 /verified/plugin/scripts/run-headless-receipt.py \
-  --run-id <unique-authorized-run-id> \
-  --state-root /verified/owner-private-0700-state \
-  --cwd /verified/issue-worktree \
-  --binary /verified/bin/opencode \
-  --startup-seconds 20 --runtime-seconds 600 -- \
-  --file /verified/authorized-packet.md "Run the authorized packet"
+python3 /verified/plugin/scripts/observe-session.py \
+  --run-id <existing-authorized-run-id> \
+  --session-id <actual-session-id> --agent <verified-role> \
+  --expected-title <actual-bound-session-title> \
+  --directory /verified/issue-worktree --port <loopback-port> \
+  --password-file /verified/owner-private-0600-password \
+  > /verified/private-evidence/run-receipt.json
 ```
 
-The state root must already exist, be owned by the caller, and have mode `0700`. The helper atomically allocates one exclusive run-ID directory; it refuses reuse without reconciliation. It writes owner-private (`0600`) `receipt.jsonl` records, `stdout.jsonl`, and `stderr.log`, all outside the Product worktree; stdout/stderr may contain private data and **must not** be published or copied into an Issue. The exact Python interpreter, script, binary, cwd, packet and operation grant must be verified independently; the script never installs anything or changes OpenCode's model/permissions. It rejects `--auto`, model/variant overrides, alternate `--dir`, continuation and non-JSON format overrides. Native configured model and CLI agent role still apply.
+Example paths and identifiers above are placeholders, not permission to launch a server, access an unrelated Session or assume the packaged script exists remotely. Verify the real API schema, target directory, exact Session ID/title/role, user grant, credential file owner/mode, and that the loopback server is already authorized before use. The probe refuses non-loopback URLs, redirects and proxies; it never sends credentials to a public host or echoes assistant content/credential values. Store the normalized JSON receipt outside the Product Worktree with appropriate private permissions.
 
-Receipts are observations, not declarations of completion. `launch_intent` is saved before the effect; `process_spawned` records the actual PID; `opencode_initialized` follows a valid OpenCode JSON stream event; `session_created` means a valid `sessionID` was *observed in that stream* (not a guarantee of durable host ownership); `model_started` requires a matching assistant text/tool event; `completed` requires all preceding evidence and process exit 0. `exited_failure`, `exited_without_verified_completion_unknown`, `startup_stalled_unknown`, `runtime_stalled_unknown`, and `output_unbounded_unknown` must **never** be treated as PASS. A timeout returns code 75 **without terminating the child**, preserving exact process/run identity and the evidence files. Before retry or cleanup, reconcile session/child/Git/Task authority and use verified owned-resource cleanup; a different run ID alone is never retry authorization. No native Ask is auto-approved.
+The **underlying KAGARI launcher** owns `process_spawned` identity and recovery facts. The probe reports `opencode_initialized` only from a healthy server response, `session_created` only from exact Session ID/title/Worktree/role readback (an observation, not the authority for creation), `model_started` only from structurally valid matching assistant messages, and `completed` only from an observed terminal assistant `finish=stop`, validated output, idle Session, and no pending native Ask. Otherwise it returns `running`, `awaiting_human`, `blocked` or `unknown` with non-success exit. An absent or unreachable server, malformed response or stale Session is never treated as completed. The coordinator owns durable run/Task correlation and never blindly retries based on a failed probe.
+
+If a standalone noninteractive `opencode run` must be used outside a KAGARI Session server, keep stdin EOF via `</dev/null` or the verified POSIX shell helper. **Without an independently verified Session or equivalent structured receipt, its process PID, output and exit status are not sufficient to claim a successfully acknowledged autonomous Task.** Use a separate authorized observation route or report `unknown`; never add broad permissions, substitute a model, or auto-retry.
 
 **Startup is not receipt.** Separate `process_spawned`, `opencode_initialized`, `session_created`, `model_started`, and `completed` evidence. A live PID with 0-byte stdout/stderr and no session ID is *not* accepted or running work. At the bounded receipt deadline classify it as `startup_stalled/unknown`, inspect run-scoped sanitized logs/FD and current worktree, and do not resend. After proving exact process ownership and no session/in-flight effects, use the existing owned-resource cleanup gate to release only that failed launch; then a *new* run and separately verified dispatch intent may be considered. Do not kill by name or alter shared OpenCode servers.
 
