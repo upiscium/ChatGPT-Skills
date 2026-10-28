@@ -30,6 +30,7 @@ class SessionReceiptTests(unittest.TestCase):
             "statuses": {},  # OpenCode 1.18.35 omits *idle* Sessions.
             "messages": [{
                 "info": {"role": "assistant", "agent": "reviewer",
+                         "sessionID": SID,
                          "providerID": "openai", "modelID": "fixture-model",
                          "finish": "stop"},
                 "parts": [{"type": "text", "text": "PRIVATE_CONTENT"}],
@@ -111,6 +112,23 @@ class SessionReceiptTests(unittest.TestCase):
         self.assertEqual(result["status"], "unknown")
         self.assertEqual(result["reason"], "agent_not_observed")
         self.assertNotIn("completed", result["evidence"])
+
+    def test_other_session_message_cannot_prove_this_session_complete(self):
+        self.snapshot["messages"][0]["info"]["sessionID"] = "ses_unrelatedA1"
+        code, receipt = self.call()
+        self.assertEqual(code, 75)
+        self.assertEqual(receipt["status"], "unknown")
+        self.assertNotIn("completed", receipt["evidence"])
+
+    def test_missing_message_session_id_keeps_compatible_role_checks(self):
+        # A source without optional Session metadata remains explicitly
+        # unauthenticated; it must still pass assistant agent and role checks.
+        self.snapshot["messages"][0]["info"].pop("sessionID")
+        code, receipt = self.call()
+        self.assertEqual(code, 0)
+        self.assertEqual(receipt["status"], "completed")
+        self.assertEqual(receipt["source_authenticity"],
+                         "not_verified_by_observer")
 
     def test_invalid_payload_cannot_prove_model_started(self):
         self.snapshot["messages"][0]["parts"] = [{"type": "text"}]

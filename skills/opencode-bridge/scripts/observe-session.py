@@ -70,7 +70,7 @@ def _read_private_file(path: Path, directory: Path) -> dict:
     return doc
 
 
-def _model_observation(messages, agent: str) -> tuple[bool, bool, str | None]:
+def _model_observation(messages, agent: str, session_id: str) -> tuple[bool, bool, str | None]:
     if not isinstance(messages, list):
         raise ValueError("invalid message collection")
     started, completed, model = False, False, None
@@ -80,6 +80,11 @@ def _model_observation(messages, agent: str) -> tuple[bool, bool, str | None]:
         info = msg.get("info")
         if not isinstance(info, dict):
             raise ValueError("invalid message info")
+        # Native OpenCode message metadata normally carries sessionID.
+        # Legacy/normalized evidence may omit it, but a contradictory ID
+        # cannot justify progress or completion for the requested Session.
+        if info.get("sessionID") is not None and info["sessionID"] != session_id:
+            raise ValueError("message belongs to a different Session")
         if info.get("role") != "assistant":
             completed = False
             continue
@@ -141,7 +146,7 @@ def observe(args: argparse.Namespace) -> tuple[dict, int]:
             raise ValueError("invalid collections")
         pending = any(isinstance(p, dict) and p.get("sessionID") == args.session_id
                       for p in permissions + questions)
-        started, completed, model = _model_observation(doc.get("messages"), args.agent)
+        started, completed, model = _model_observation(doc.get("messages"), args.agent, args.session_id)
         # OpenCode Session.agent may be omitted by some compatible versions.
         # Without it, only actual assistant metadata can establish this role;
         # a Session title alone must never satisfy role acceptance.
