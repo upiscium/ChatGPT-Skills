@@ -13,6 +13,8 @@ Read [references/transport.md](references/transport.md) before remote access. Re
 
 For an authorized OpenCode launch, dispatch or execution-resuming reply, apply [references/model-selection.md](references/model-selection.md): use the model, reasoning effort and variant already configured by OpenCode. Omit model/effort overrides from CLI arguments, API fields and packets. Observe the actual selection without changing it.
 
+Before any direct noninteractive `opencode run` (including Remote Desktop Commander launches), enforce [mandatory stdin EOF](references/transport.md): use `stdin=subprocess.DEVNULL`, an explicit shell `</dev/null`, or the verified packaged headless helper. A process that remains at `init` without a session is not a successful dispatch. Prefer KAGARI-owned Task/Session APIs when available; do not bypass their authority or create duplicate jobs.
+
 ## Explain any human approval request
 
 When actually requesting a human decision or handing off a user-run action, use `@human-review approval-brief`. Include **今回やった内容**, **今回承認してほしい内容**, **承認によって影響がある範囲**, and **否認した場合の対応** in the same message. Name the action/actor, target/revision and reason for the gate; distinguish completed work from proposals. Use the brief only to explain a needed decision, without an additional queue scan/write or confirmation for already authorized work. Preserve the stated denial response at continuation.

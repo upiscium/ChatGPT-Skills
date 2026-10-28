@@ -14,6 +14,10 @@ opencode serve --help
 
 Do not use `debug agent --tool` merely to inspect configuration: that option executes a tool. Keep discovery read-only. Retain raw output privately when needed; print only relevant names, modes, descriptions, model settings and permissions. Agent-list permission arrays can run into the next header without a newline in 1.18.30. A line-start-only filter can silently omit roles; confirm absence against unfiltered output or structured `/agent` data.
 
+## Noninteractive reviewer startup invariant
+
+Before any direct noninteractive `opencode run --agent ...` on a verified primary/all role, apply the mandatory [stdin EOF contract](../../opencode-bridge/references/transport.md): close stdin at process creation (`stdin=subprocess.DEVNULL` or shell `</dev/null`), even when using an argv prompt or `--file`. Prefer the repository-owned KAGARI launcher or verified Session API where supported; a CLI startup without an actual Session/role receipt is not review execution. Never use `--auto` as a workaround, and never redirect an interactive TUI's stdin.
+
 ## Choose the route
 
 | Effective role/runtime | Supported choice | Check before calling it started |
