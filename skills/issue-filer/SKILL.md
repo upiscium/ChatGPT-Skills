@@ -28,6 +28,18 @@ Do not create issues when the user asked only for review, recommendations, draft
 
 For user-requirement features, keep one coherent function-level user outcome per Issue: original approved goal/revision, usage assumptions, specific user-visible behavior, explicit scope/non-goals, stable observable ACs, dependencies and evidence. Do not substitute OpenCode execution steps for user requirements.
 
+### Standalone Issue provenance (required before filing)
+
+Evaluate the **individual Issue body alone**, as it will appear on GitHub or in an isolated handoff; do not rely on shared introductory text, a parent Design Brief, or another Issue to carry its Human approval limits. For each design unit, carry into that Issue:
+
+- The original approved user goal and source/revision, the exact approval scope and the candidate's `DES-*` identifier, plus what is and is not authorized for Issue filing and Task execution.
+- Its own user scenario, In/Out, observable AC IDs, dependencies and evidence. For **material** ACs, scope exclusions and inferred dependencies, distinguish `confirmed` (traceable to an approved requirement/decision) from `derived-unconfirmed` (traceable proposal, not a Human-approved condition).
+- For every material `derived-unconfirmed` restriction or decision, keep its unresolved question, Human owner, effect on the affected AC/In/Out and the action-binding stop or permitted fallback **inside this Issue body**. An unapproved restriction (for example, who can view other users' bookings) must not silently become a confirmed Out or an unconditional implementation criterion when copied or deduplicated.
+- Cross-check every claimed **original approved goal**, `confirmed` AC, mandatory dependency, permitted implementation fallback and revalidation check against the actual approved text. A `derived-unconfirmed` qualifier in one section cannot excuse a contradictory owner-only view claim in another. Keep viewing permissions separate from editing permissions: owner-only edit does **not** authorize owner-only visibility. If the viewing boundary remains open, record the Human choice and stop the affected viewing-policy implementation rather than requiring owner filtering or all-employee visibility as a default.
+- Preserve the specific prerequisites and revalidation needed before filing or KAGARI Task dispatch. A proposal may remain visible as **not executable**; keep independent approved functionality actionable where it does not depend on that decision.
+
+If the detached candidate lacks an approval source or loses the parent document's material qualifier, return `not-filed` and identify the missing provenance/decision instead of reconstructing consent from the proposed text. Add the confirmed qualifier only from the actual Human-approved source; do not manufacture approval or request a second decision that was already granted. Explicit Issue filing authority is still required and never implies implementation/Task authority.
+
 ## Check repository conventions
 
 1. Read contribution guidance, issue templates, and relevant project documentation.
@@ -74,6 +86,7 @@ For a feature request, include:
 ```
 
 Under `Source review` or `Source design`, include the F/DES ID, source revision/approval scope, inspected branch/SHA, related artifacts and pinned evidence. Preserve stable AC IDs. Clearly label proposed designs and inferred reproduction; never present them as confirmed facts. Filing permission is not dispatch, implementation, commit, push or PR permission.
+When preparing the final body, re-check the standalone provenance and `derived-unconfirmed` qualifiers after any extraction, deduplication or rewrite; if a material Human-owned choice lost its qualifier, hold that Issue rather than filing a misleading scope.
 
 When a caller supplies a `@repo-handoff` workflow ID or canonical carrier, preserve that durable reference in `Source review` and return the created Issue URL as the new workstream carrier. After an Issue is created or a deduplicated result materially changes the carrier/next action, persist the new state marker via `@repo-handoff` and read it back. An unchanged duplicate lookup reuses the existing marker without writing. This marker records the result and next gate; it does not expand the user's authorization to create additional Issues or change their content.
 
