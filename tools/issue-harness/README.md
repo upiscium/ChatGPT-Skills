@@ -19,7 +19,7 @@ Requirements: Python 3.11+. From the extracted directory:
 
 ```bash
 python make_fixtures.py                    # Rebuilds fictional snapshots and SHA-256 manifest
-python -m pytest -q                     # Requires pytest; 37 tests as of this snapshot
+python -m pytest -q                     # Requires pytest; 44 tests as of this snapshot
 python -m arca_issue_harness.cli validate \
   --snapshots-dir fixtures/snapshots \
   --source-id BP-NC-ROOM-01/r1 \
@@ -81,6 +81,12 @@ establish end-to-end completeness of the three-feature suite.
 These are **manual, source-grounded structured translations** of the five observed failures, not an automatic semantic analysis of the six raw ChatGPT responses. The optional `legacy_revalidation_coverage` field exists **only** for regression-characterization input: if present, the checker requires coverage of every prohibited action. If it is absent, the renderer generates the complete action table from the pinned source. It never assumes that an earlier free-text output was inspected.
 
 The proof-of-concept deliberately makes *false acceptance of inferred rules* harder by requiring exact matches for `confirmed`. This can produce false negatives for legitimate paraphrases and does **not** establish semantic equivalence between a candidate and the original user's intent. Human alignment and actual approval remain outside the model and this mechanical MVI.
+
+Inline model-authored Markdown syntax is escaped before rendering: an Issue
+candidate cannot insert an active image/link or emphasis by placing Markdown
+in its text fields. This limits presentation injection in the generated draft;
+it does not substitute for semantic validation or an authenticated publishing
+boundary.
 
 ## Security and operational boundaries
 

@@ -54,9 +54,14 @@ def _short_text(value: Any, location: str, errors: list[dict[str, str]]) -> str:
 
 
 def _md(value: str) -> str:
-    """Keep untrusted single-line text from forging Markdown structure."""
-    return (value.replace("\\", "\\\\").replace("`", "\\`")
-            .replace("|", "\\|").replace("<", "&lt;").replace(">", "&gt;"))
+    """Render untrusted single-line text literally, not as active Markdown."""
+    escaped = (value.replace("\\", "\\\\").replace("&", "&amp;")
+               .replace("<", "&lt;").replace(">", "&gt;"))
+    # Both inline links/images and emphasis can otherwise be injected into
+    # the supposedly deterministic standalone Issue rendering.
+    for mark in chr(96) + "*_[]()!|~":
+        escaped = escaped.replace(mark, "\\" + mark)
+    return escaped
 
 
 def _keys(value: Any, allowed: set[str], required: set[str], location: str,

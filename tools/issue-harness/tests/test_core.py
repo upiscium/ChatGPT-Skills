@@ -282,3 +282,19 @@ def test_synthetic_source_inventory_preserves_fixed_prompt_behavior(source, expe
     assert snapshot['draft_scope'] == 'draft-only'
     assert len(snapshot['project_non_goals']) == 5
     assert snapshot['human_decisions']
+
+def test_renderer_does_not_activate_model_supplied_links_images_or_emphasis():
+    value = candidate('C02_DES-002_valid.json')
+    payload = 'Approval **confirmed** ![pixel](https://example.invalid/track) [click](https://example.invalid/)'
+    value['title'] = payload
+    value['scenario'] = payload
+    value['evidence'].append(payload)
+    result = render('BP-NC-ROOM-01/r1', value)
+    assert result['valid'] and result['status'] == 'READY_DRAFT_ONLY'
+    markdown = result['markdown']
+    assert payload not in markdown
+    assert '![pixel](' not in markdown
+    assert '[click](' not in markdown
+    assert '\\*\\*confirmed\\*\\*' in markdown
+    assert '\\!\\[pixel\\]\\(' in markdown
+    assert '\\[click\\]\\(' in markdown
