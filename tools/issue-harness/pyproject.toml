@@ -11,7 +11,7 @@ dependencies = []
 
 [project.optional-dependencies]
 mcp = ["mcp>=2,<3"]
-test = ["pytest>=8"]
+test = ["pytest>=8", "mistune>=3,<4"]
 
 [project.scripts]
 arca-issue-harness = "arca_issue_harness.cli:main"

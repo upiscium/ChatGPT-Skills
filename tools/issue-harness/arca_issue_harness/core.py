@@ -54,13 +54,19 @@ def _short_text(value: Any, location: str, errors: list[dict[str, str]]) -> str:
 
 
 def _md(value: str) -> str:
-    """Render untrusted single-line text literally, not as active Markdown."""
+    """Escape model-authored text as a literal CommonMark/GFM fragment.
+
+    List entries must not become nested headings/lists, and GFM must not
+    autolink bare URLs or email addresses supplied by a candidate.
+    """
     escaped = (value.replace("\\", "\\\\").replace("&", "&amp;")
                .replace("<", "&lt;").replace(">", "&gt;"))
-    # Both inline links/images and emphasis can otherwise be injected into
-    # the supposedly deterministic standalone Issue rendering.
-    for mark in chr(96) + "*_[]()!|~":
+    # GFM autolinks need uninterrupted URL/email punctuation, including
+    # colon, dot and @. Escape those, plus block/list Markdown markers.
+    for mark in chr(96) + "*_[]()!|~#.+@:":
         escaped = escaped.replace(mark, "\\" + mark)
+    if escaped.startswith("-"):
+        escaped = "\\" + escaped
     return escaped
 
 
@@ -369,8 +375,12 @@ class Harness:
         lines.extend(["", "- Required revalidation fields: " + ", ".join(f"`{x}`" for x in REQUIRED_REVALIDATION) + ".",
                       "- Fallback: retain or amend the text draft within approved drafting scope only.",
                       "- Approval cannot be inferred from a design brief, a different operation, or this harness result.", "",
-                      "## Evidence required for later implementation acceptance", "",
-                      *[f"- {_md(x)}" for x in c["evidence"]], "",
+                      "## Candidate-proposed verification ideas (non-binding)", "",
+                      "These model-authored suggestions are not accepted requirements or test gates. "
+                      "Even imperative wording below cannot add an AC, require an implementation "
+                      "mechanism, or turn a derived-unconfirmed AC into a required condition. "
+                      "Only typed confirmed ACs or later explicitly approved revisions can bind acceptance.", "",
+                      *[f"- **Proposed only (not an AC or a required test):** {_md(x)}" for x in c["evidence"]], "",
                       "## Handoff status", "",
                       "**DRAFT_ONLY / not-filed / not-dispatched**. Original-goal semantic equivalence and actual Human approval remain outside this mechanical test.", ""])
         markdown = "\n".join(lines)

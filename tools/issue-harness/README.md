@@ -19,7 +19,7 @@ Requirements: Python 3.11+. From the extracted directory:
 
 ```bash
 python make_fixtures.py                    # Rebuilds fictional snapshots and SHA-256 manifest
-python -m pytest -q                     # Requires pytest; 44 tests as of this snapshot
+python -m pytest -q                     # Requires pytest; 63 tests as of this snapshot
 python -m arca_issue_harness.cli validate \
   --snapshots-dir fixtures/snapshots \
   --source-id BP-NC-ROOM-01/r1 \
@@ -82,11 +82,17 @@ These are **manual, source-grounded structured translations** of the five observ
 
 The proof-of-concept deliberately makes *false acceptance of inferred rules* harder by requiring exact matches for `confirmed`. This can produce false negatives for legitimate paraphrases and does **not** establish semantic equivalence between a candidate and the original user's intent. Human alignment and actual approval remain outside the model and this mechanical MVI.
 
-Inline model-authored Markdown syntax is escaped before rendering: an Issue
-candidate cannot insert an active image/link or emphasis by placing Markdown
-in its text fields. This limits presentation injection in the generated draft;
-it does not substitute for semantic validation or an authenticated publishing
-boundary.
+Candidate-authored evidence strings are **non-binding suggestions**, never
+implementation acceptance criteria or mandatory test gates; even imperative
+wording cannot promote a derived-unconfirmed AC. Only typed confirmed ACs
+or a later separately approved revision can establish binding acceptance.
+
+Inline model-authored Markdown is escaped before rendering, including block
+headings/list markers inside list entries and GFM bare URLs/emails, as well as
+explicit links/images, emphasis and raw HTML. The test suite parses rendered
+Markdown with a GitHub-style URL linkifier to detect injected structure and
+active links. This limits presentation injection in draft output but cannot
+prove semantic correctness or authenticate a Human grant.
 
 ## Security and operational boundaries
 

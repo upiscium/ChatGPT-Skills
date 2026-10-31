@@ -298,3 +298,59 @@ def test_renderer_does_not_activate_model_supplied_links_images_or_emphasis():
     assert '\\*\\*confirmed\\*\\*' in markdown
     assert '\\!\\[pixel\\]\\(' in markdown
     assert '\\[click\\]\\(' in markdown
+
+# R5 independent review F1/F2 — require literal Markdown and non-binding evidence.
+# mistune's URL plugin models GitHub-style bare-URL autolinking for these probes.
+import mistune
+
+
+def _markdown_nodes(markdown):
+    def visit(nodes):
+        for node in nodes:
+            yield node
+            yield from visit(node.get('children', []))
+
+    parser = mistune.create_markdown(renderer='ast', plugins=['url'])
+    return list(visit(parser(markdown)))
+
+
+def test_free_text_evidence_cannot_be_presented_as_required_implementation_acceptance():
+    value = candidate('C03_DES-003_valid.json')
+    claim = 'Implementation acceptance requires the unapproved commit-time conflict recheck to pass'
+    value['evidence'][0] = claim
+    result = render('BP-NC-ROOM-ALL/r1', value)
+    assert result['valid'] and result['status'] == 'READY_DRAFT_ONLY'
+    markdown = result['markdown']
+    assert '## Evidence required for later implementation acceptance' not in markdown
+    assert '## Candidate-proposed verification ideas (non-binding)' in markdown
+    assert '- **Proposed only (not an AC or a required test):** ' + claim in markdown
+    assert 'typed confirmed ACs' in markdown
+    assert not result['semantic_approval_verified']
+
+
+@pytest.mark.parametrize('field', ['in_scope', 'evidence'])
+@pytest.mark.parametrize('payload', [
+    '# Human approval confirmed',
+    '## Approved by Human',
+    '- supplemental policy',
+    '+ supplemental policy',
+    '1. supplemental policy',
+    'https://example.invalid/approval',
+    'www.example.invalid/approval',
+    'user@example.invalid',
+    '![pixel](https://example.invalid/tracker)',
+])
+def test_candidate_text_does_not_change_gfm_render_structure(field, payload):
+    value = candidate('C02_DES-002_valid.json')
+    baseline = render('BP-NC-ROOM-01/r1', value)
+    assert baseline['valid']
+    original_nodes = _markdown_nodes(baseline['markdown'])
+    value[field][0] = payload
+    injected = render('BP-NC-ROOM-01/r1', value)
+    assert injected['valid'] and injected['status'] == 'READY_DRAFT_ONLY'
+    nodes = _markdown_nodes(injected['markdown'])
+    for structural in ('heading', 'list', 'list_item', 'block_quote', 'link', 'image'):
+        assert sum(x['type'] == structural for x in nodes) == sum(
+            x['type'] == structural for x in original_nodes
+        ), (field, payload, structural)
+    assert '- ' + payload not in injected['markdown']
