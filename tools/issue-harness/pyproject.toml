@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "arca-issue-harness"
+version = "0.1.0"
+description = "Read-only, source-bound Issue draft validation and deterministic Markdown rendering"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+mcp = ["mcp>=2,<3"]
+test = ["pytest>=8", "mistune>=3,<4"]
+
+[project.scripts]
+arca-issue-harness = "arca_issue_harness.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["arca_issue_harness*"]

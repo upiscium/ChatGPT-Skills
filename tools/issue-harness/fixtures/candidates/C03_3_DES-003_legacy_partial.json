@@ -1,0 +1,65 @@
+{
+  "schema_version": "arca.issue-harness.candidate.v1",
+  "id": "DES-003",
+  "revision": "r1",
+  "title": "本人予約の開始前日時変更",
+  "desired_outcome": "本人だけが開始前に予約日時を変更できる",
+  "scenario": "社員が全員閲覧可能な一覧から自分の予約を選び、開始前に日時を変更する",
+  "in_scope": [
+    "本人による予約日時変更",
+    "他人の予約の変更を禁止"
+  ],
+  "candidate_exclusions": [
+    "他人の予約の変更処理は本Issueで許可しない"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-003-01",
+      "text": "本人の予約だけを開始前に日時変更できます。",
+      "status": "confirmed",
+      "source_claim_id": "SRC-C03-005"
+    },
+    {
+      "id": "AC-003-02",
+      "text": "ただし他人の予約を編集・変更することは禁止です。",
+      "status": "confirmed",
+      "source_claim_id": "SRC-C03-002"
+    },
+    {
+      "id": "AC-003-06",
+      "text": "日時変更の確定直前に本人・開始前・重複の条件を再確認する",
+      "status": "derived-unconfirmed",
+      "decision_id": "DEC-RECHECK"
+    }
+  ],
+  "dependencies": [
+    {
+      "text": "確定時再検証方式",
+      "ac_refs": [
+        "AC-003-06"
+      ],
+      "binding": "required"
+    }
+  ],
+  "business_revalidations": [
+    {
+      "text": "競合更新に対する確定時再検証",
+      "ac_refs": [
+        "AC-003-06"
+      ],
+      "binding": "required"
+    }
+  ],
+  "human_decision_ids": [
+    "DEC-RECHECK",
+    "DEC-DISPLAY"
+  ],
+  "evidence": [
+    "権限による変更拒否のテスト",
+    "未承認の競合再検証は実装テストの必須条件としない"
+  ],
+  "legacy_revalidation_coverage": [
+    "issue_filing",
+    "task_dispatch"
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "schema_version": "arca.issue-harness.candidate.v1",
+  "id": "DES-002",
+  "revision": "r1",
+  "title": "全社員による予約一覧と選択",
+  "desired_outcome": "全社員が他人の予約も閲覧・選択できる",
+  "scenario": "社員が他社員の予約を参照し、編集権限がないことを確認する",
+  "in_scope": [
+    "全社員による予約参照",
+    "他人の予約を変更する権限は付与しない"
+  ],
+  "candidate_exclusions": [
+    "日時変更処理そのものは別Issue"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-002-01",
+      "text": "全社員は他の社員の予約を含む全予約を閲覧できます。",
+      "status": "confirmed",
+      "source_claim_id": "SRC-C03-001"
+    },
+    {
+      "id": "AC-002-02",
+      "text": "ただし他人の予約を編集・変更することは禁止です。",
+      "status": "confirmed",
+      "source_claim_id": "SRC-C03-002"
+    },
+    {
+      "id": "AC-002-03",
+      "text": "予約者欄の開示範囲を仕様化する",
+      "status": "derived-unconfirmed",
+      "decision_id": "DEC-DISPLAY"
+    }
+  ],
+  "dependencies": [
+    {
+      "text": "表示項目の決定",
+      "ac_refs": [
+        "AC-002-03"
+      ],
+      "binding": "conditional"
+    }
+  ],
+  "business_revalidations": [],
+  "human_decision_ids": [
+    "DEC-RECHECK",
+    "DEC-DISPLAY"
+  ],
+  "evidence": [
+    "全社員閲覧テストと他人変更拒否テスト"
+  ],
+  "legacy_revalidation_coverage": [
+    "task_dispatch"
+  ]
+}
