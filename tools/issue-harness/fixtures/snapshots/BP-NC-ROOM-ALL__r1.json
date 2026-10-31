@@ -1,0 +1,43 @@
+{
+  "schema_version": "arca.issue-harness.snapshot.v1",
+  "source_id": "BP-NC-ROOM-ALL/r1",
+  "original_goal": "全社員は他の社員の予約を含む全予約を閲覧できます。ただし他人の予約を編集・変更することは禁止です。",
+  "approval_provenance": "Fixed synthetic prompt reports Human approval for specification drafts only; original approval record not independently verified",
+  "draft_scope": "draft-only",
+  "project_non_goals": [
+    "予約取消",
+    "通知",
+    "管理者機能",
+    "外部カレンダー",
+    "課金"
+  ],
+  "source_claims": [
+    {
+      "id": "SRC-C03-001",
+      "text": "全社員は他の社員の予約を含む全予約を閲覧できます。"
+    },
+    {
+      "id": "SRC-C03-002",
+      "text": "ただし他人の予約を編集・変更することは禁止です。"
+    }
+  ],
+  "human_decisions": [
+    {
+      "id": "DEC-RECHECK",
+      "question": "予約変更確定時の競合再検証手順を追加の必須ACとするか",
+      "impact": "具体的な競合再検証方式は未承認; 必須実装条件へ昇格させない"
+    },
+    {
+      "id": "DEC-DISPLAY",
+      "question": "閲覧できる予約の具体的表示項目を確定するか",
+      "impact": "全社員閲覧権限は確認済みだが表示項目は別判断"
+    }
+  ],
+  "prohibited_actions": [
+    "issue_filing",
+    "task_dispatch",
+    "code_change",
+    "merge",
+    "release"
+  ]
+}

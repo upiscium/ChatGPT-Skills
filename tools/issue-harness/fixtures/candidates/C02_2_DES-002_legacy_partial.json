@@ -1,0 +1,50 @@
+{
+  "schema_version": "arca.issue-harness.candidate.v1",
+  "id": "DES-002",
+  "revision": "r1",
+  "title": "既存会議室予約の一覧と選択",
+  "desired_outcome": "社員がスマホWebの一覧から目的の既存予約を選べる",
+  "scenario": "社員が既存予約を開き対象を選び、日時変更へ進む前に対象を確認する",
+  "in_scope": [
+    "予約一覧表示",
+    "目的予約の選択"
+  ],
+  "candidate_exclusions": [
+    "予約変更処理そのものは本Issueの担当外"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-002-01",
+      "text": "既存予約を一覧から選択して予約日時を変更できることが必須です。",
+      "status": "confirmed",
+      "source_claim_id": "SRC-C02-001"
+    },
+    {
+      "id": "AC-002-02",
+      "text": "他人の予約を表示するかの抽出条件を定める",
+      "status": "derived-unconfirmed",
+      "decision_id": "DEC-VISIBILITY"
+    }
+  ],
+  "dependencies": [
+    {
+      "text": "一覧権限の確定",
+      "ac_refs": [
+        "AC-002-02"
+      ],
+      "binding": "conditional"
+    }
+  ],
+  "business_revalidations": [],
+  "human_decision_ids": [
+    "DEC-VISIBILITY"
+  ],
+  "evidence": [
+    "独立Issue本文の出典と停止条件",
+    "スマホWebでの一覧表示と選択の観測証拠"
+  ],
+  "legacy_revalidation_coverage": [
+    "issue_filing",
+    "code_change"
+  ]
+}
