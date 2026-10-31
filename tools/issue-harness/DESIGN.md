@@ -39,3 +39,13 @@ Actual canonical source acquisition, semantic goal evaluation, explicit Human al
 - Prior R4 targeted report: `ARCA-I4-R4-NORMALCHAT-TARGETED-R1`, 18 detached DES verdicts 13 PASS / 5 PARTIAL.
 - Prototype source tests: see `tests/test_core.py`; snapshot digests in `fixtures/snapshot_digests.json`.
 - Fixed source: [ChatGPT-Skills Draft PR #12](https://github.com/upiscium/ChatGPT-Skills/pull/12), left untouched.
+
+
+## Source characterization after namespace hardening (2026-10-31)
+
+The MVI enforces local ID identity (DES-002 -> AC-002-*) to prevent
+standalone Issue drafts accidentally inheriting another function's AC.
+Synthetic snapshots now carry all behavior text from the two fixed R4 booking
+prompts as one-line original goals, with a bounded set of exact, verbatim
+source claims. These fixtures remain source-reported, not an independently
+authenticated Human approval record; full semantic goal alignment is deferred.

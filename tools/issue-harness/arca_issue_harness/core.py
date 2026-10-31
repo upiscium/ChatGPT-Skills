@@ -217,6 +217,14 @@ class Harness:
                 errors.append(_issue("AC_ID", loc, "Expected AC-NNN-NN ID."))
             elif ac_id in status_map:
                 errors.append(_issue("DUPLICATE_AC", loc, "AC IDs must be unique."))
+            # Each standalone DES owns a local AC namespace. A syntactically
+            # valid AC from another DES is not an authorized cross-Issue link.
+            candidate_id = candidate.get("id")
+            if (isinstance(ac_id, str) and AC_RE.fullmatch(ac_id)
+                    and isinstance(candidate_id, str) and CANDIDATE_RE.fullmatch(candidate_id)
+                    and ac_id.split("-")[1] != candidate_id.split("-")[1]):
+                errors.append(_issue("AC_NAMESPACE", loc + ".id",
+                                     "AC ID must use the exact numeric namespace of its DES candidate."))
             _short_text(ac.get("text"), loc + ".text", errors)
             status = ac.get("status")
             if status not in ("confirmed", "derived-unconfirmed"):

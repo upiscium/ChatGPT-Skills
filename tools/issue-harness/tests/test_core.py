@@ -244,3 +244,41 @@ def test_confirmed_goal_cannot_support_unstated_required_mechanism():
     result = verify('BP-NC-ROOM-ALL/r1', value)
     assert not result['valid']
     assert 'UNSUPPORTED_REQUIRED_RULE' in codes(result)
+
+
+@pytest.mark.parametrize("bad_id", ["AC-003-01", "AC-0002-01", "AC-999-01"])
+def test_ac_ids_must_belong_to_exact_des_namespace(bad_id):
+    value = candidate('C02_DES-002_valid.json')
+    value['acceptance_criteria'][0]['id'] = bad_id
+    result = render('BP-NC-ROOM-01/r1', value)
+    assert result['status'] == 'BLOCKED'
+    assert 'AC_NAMESPACE' in codes(result)
+    assert result['markdown'] is None
+
+
+def test_valid_ac_namespace_for_all_sample_candidates():
+    cases = [
+        ('BP-NC-ROOM-01/r1', 'C02_DES-002_valid.json'),
+        ('BP-NC-ROOM-ALL/r1', 'C03_DES-002_valid.json'),
+        ('BP-NC-ROOM-ALL/r1', 'C03_DES-003_valid.json'),
+    ]
+    for source, filename in cases:
+        value = candidate(filename)
+        assert all(ac['id'].split('-')[1] == value['id'].split('-')[1]
+                   for ac in value['acceptance_criteria'])
+        assert verify(source, value)['valid']
+
+
+@pytest.mark.parametrize('source,expected_claims', [
+    ('BP-NC-ROOM-01/r1', {'SRC-C02-001', 'SRC-C02-002', 'SRC-C02-003', 'SRC-C02-004', 'SRC-C02-005'}),
+    ('BP-NC-ROOM-ALL/r1', {'SRC-C03-001', 'SRC-C03-002', 'SRC-C03-003', 'SRC-C03-004', 'SRC-C03-005'}),
+])
+def test_synthetic_source_inventory_preserves_fixed_prompt_behavior(source, expected_claims):
+    path = FIX / 'snapshots' / (source.replace('/', '__') + '.json')
+    snapshot = json.loads(path.read_text(encoding='utf-8'))
+    claims = snapshot['source_claims']
+    assert {claim['id'] for claim in claims} == expected_claims
+    assert all(claim['text'] in snapshot['original_goal'] for claim in claims)
+    assert snapshot['draft_scope'] == 'draft-only'
+    assert len(snapshot['project_non_goals']) == 5
+    assert snapshot['human_decisions']

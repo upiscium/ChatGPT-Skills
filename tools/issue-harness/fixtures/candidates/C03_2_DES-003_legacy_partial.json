@@ -15,9 +15,9 @@
   "acceptance_criteria": [
     {
       "id": "AC-003-01",
-      "text": "全社員は他の社員の予約を含む全予約を閲覧できます。",
+      "text": "本人の予約だけを開始前に日時変更できます。",
       "status": "confirmed",
-      "source_claim_id": "SRC-C03-001"
+      "source_claim_id": "SRC-C03-005"
     },
     {
       "id": "AC-003-02",

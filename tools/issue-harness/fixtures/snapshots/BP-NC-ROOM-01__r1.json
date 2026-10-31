@@ -1,7 +1,7 @@
 {
   "schema_version": "arca.issue-harness.snapshot.v1",
   "source_id": "BP-NC-ROOM-01/r1",
-  "original_goal": "社員がスマホWebで自分の会議室予約を作成し、既存予約を一覧から選択して予約日時を変更できることが必須です。",
+  "original_goal": "社員がスマホWebで自分の会議室予約を作成し、既存予約を一覧から選択して予約日時を変更できることが必須です。予約項目は部屋、日付、開始、終了、予約者。終了は開始より後。予約の作成・日時変更とも同じ部屋の時間帯重複は禁止。変更できるのは予約者本人かつ元の予約開始前だけです。予約の一覧閲覧範囲は本人限定か全社員か未決定です。取消、通知、外部カレンダー、管理者操作、課金は対象外です。",
   "approval_provenance": "Fixed synthetic prompt reports Human approval for specification drafts only; original approval record not independently verified",
   "draft_scope": "draft-only",
   "project_non_goals": [
@@ -15,6 +15,22 @@
     {
       "id": "SRC-C02-001",
       "text": "既存予約を一覧から選択して予約日時を変更できることが必須です。"
+    },
+    {
+      "id": "SRC-C02-002",
+      "text": "予約項目は部屋、日付、開始、終了、予約者。"
+    },
+    {
+      "id": "SRC-C02-003",
+      "text": "終了は開始より後。"
+    },
+    {
+      "id": "SRC-C02-004",
+      "text": "予約の作成・日時変更とも同じ部屋の時間帯重複は禁止。"
+    },
+    {
+      "id": "SRC-C02-005",
+      "text": "変更できるのは予約者本人かつ元の予約開始前だけです。"
     }
   ],
   "human_decisions": [

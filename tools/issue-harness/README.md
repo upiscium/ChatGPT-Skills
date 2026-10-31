@@ -23,7 +23,7 @@ python -m pytest -q                     # Requires pytest; 37 tests as of this s
 python -m arca_issue_harness.cli validate \
   --snapshots-dir fixtures/snapshots \
   --source-id BP-NC-ROOM-01/r1 \
-  --source-sha256 0414d0dd845032fa60cc8926cd8ec66b676d7222d4e72d3c47c9c51e9466f335 \
+  --source-sha256 9fea79e192be88a36db69fc35c8dc396316e51f2d62dd0062b44508e104cf31b \
   --candidate fixtures/candidates/C02_DES-002_valid.json
 ```
 
@@ -35,7 +35,7 @@ For a known problematic case:
 python -m arca_issue_harness.cli validate \
   --snapshots-dir fixtures/snapshots \
   --source-id BP-NC-ROOM-ALL/r1 \
-  --source-sha256 8d8d5f9b2a08112ac56ba87946c9d80f3954889c1ed2913b52c615761774d78d \
+  --source-sha256 359490dfc57c35ecacab938f7a20ff0a48d2f06492fc62cd022340698e0f8abb \
   --candidate fixtures/candidates/C03_2_DES-003_legacy_partial.json
 ```
 
@@ -53,6 +53,20 @@ export ARCA_HARNESS_SNAPSHOTS_DIR="$PWD/fixtures/snapshots"
 ```
 
 This starts an **stdio MCP server** exposing exactly two Tools. The adapter targets the current official Python MCP SDK **v2** (`from mcp.server import MCPServer`, `mcp.run("stdio")`). It does not start an HTTP service, hold a GitHub token, or register with ChatGPT. For manual inspection, use MCP Inspector in an isolated setup with `mcp dev arca_issue_harness/server.py` or an equivalent SDK v2 host; use module execution for the documented runtime. This source package was checked with a mock SDK adapter, not a live MCP wire-protocol test. Ensure an SDK v2 install and actual client round-trip are verified before any hosted deployment.
+
+## AC namespace and source-claim fixture boundaries
+
+Each DES-NNN candidate owns only AC-NNN-* IDs. A validly formatted AC ID
+from another candidate is rejected with AC_NAMESPACE; cross-Issue references
+belong in an explicitly modeled dependency, not by silently renaming an AC.
+
+The C02/C03 synthetic snapshots now retain the complete behavioral paragraphs
+of their fixed fictional prompts and an expanded inventory of verbatim source
+claims for create/list/change, time ordering, conflict prevention and edit/view
+separation. Confirmed checks are still literal claim matches, not semantic
+proof or verified Human approval. A rendered DES can omit other feature claims
+because it is a single bounded function-level Issue, so this does not
+establish end-to-end completeness of the three-feature suite.
 
 ## Regression coverage and comparison limits
 
