@@ -292,12 +292,14 @@ def test_renderer_does_not_activate_model_supplied_links_images_or_emphasis():
     result = render('BP-NC-ROOM-01/r1', value)
     assert result['valid'] and result['status'] == 'READY_DRAFT_ONLY'
     markdown = result['markdown']
-    assert payload not in markdown
-    assert '![pixel](' not in markdown
-    assert '[click](' not in markdown
-    assert '\\*\\*confirmed\\*\\*' in markdown
-    assert '\\!\\[pixel\\]\\(' in markdown
-    assert '\\[click\\]\\(' in markdown
+    # Model-proposed URL-like text renders as an inert code span. The raw
+    # fragment *inside* code should be preserved, without active links/images.
+    assert markdown.count('`' + payload + '`') == 3
+    nodes = _markdown_nodes(markdown)
+    assert sum(x['type'] == 'link' for x in nodes) == 0
+    assert sum(x['type'] == 'image' for x in nodes) == 0
+    assert sum(x['type'] == 'codespan' for x in nodes) >= 3
+
 
 # R5 independent review F1/F2 — require literal Markdown and non-binding evidence.
 # mistune's URL plugin models GitHub-style bare-URL autolinking for these probes.
@@ -354,3 +356,105 @@ def test_candidate_text_does_not_change_gfm_render_structure(field, payload):
             x['type'] == structural for x in original_nodes
         ), (field, payload, structural)
     assert '- ' + payload not in injected['markdown']
+
+
+# R6: the previous Mistune URL-plugin oracle cannot detect GFM email links.
+# This test uses actual cmark-gfm C bindings and demonstrates that a backslash
+# before @ and . is NOT sufficient to stop postprocessed email autolinks.
+from html.parser import HTMLParser
+
+
+class _GfmElements(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.tags = []
+        self.data = []
+
+    def handle_starttag(self, tag, attrs):
+        self.tags.append((tag, dict(attrs)))
+
+    def handle_data(self, data):
+        self.data.append(data)
+
+
+def _gfm_elements(markdown):
+    import cmarkgfm
+    html = cmarkgfm.github_flavored_markdown_to_html(markdown)
+    parser = _GfmElements()
+    parser.feed(html)
+    return parser, html
+
+
+def test_actual_cmark_gfm_autolink_positive_controls():
+    email, _ = _gfm_elements('user@example.invalid')
+    escaped_email, _ = _gfm_elements(r'user\@example\.invalid')
+    url, _ = _gfm_elements('https://example.invalid/approval')
+    www, _ = _gfm_elements('www.example.invalid/approval')
+    assert ('a', {'href': 'mailto:user@example.invalid'}) in email.tags
+    assert ('a', {'href': 'mailto:user@example.invalid'}) in escaped_email.tags
+    assert any(t == 'a' for t, _ in url.tags)
+    assert any(t == 'a' for t, _ in www.tags)
+
+
+@pytest.mark.parametrize('field', ['in_scope', 'evidence', 'title', 'desired_outcome', 'scenario', 'ac_text'])
+@pytest.mark.parametrize('payload', [
+    'user@example.invalid',
+    'user+tag@example.invalid',
+    'Please contact user@example.invalid before approval',
+    'mailto:user@example.invalid',
+    'xmpp:user@example.invalid',
+    'www.example.invalid/approval',
+    'https://example.invalid/approval',
+    'user@example.invalid | bad',
+    'a |  user@example.invalid  | z',
+    'a||user@example.invalid|b',
+    'user@example.invalid | ### approved',
+    '`user@example.invalid`',
+    '``user@example.invalid``',
+    '`user@example.invalid``',
+])
+def test_candidate_autolinks_are_literal_in_actual_cmark_gfm(field, payload):
+    original = candidate('C02_DES-002_valid.json')
+    base = render('BP-NC-ROOM-01/r1', original)
+    assert base['valid']
+    baseline, _ = _gfm_elements(base['markdown'])
+    value = copy.deepcopy(original)
+    if field == 'ac_text':
+        # Model-derived text, not confirmed exact-source text.
+        value['acceptance_criteria'][1]['text'] = payload
+    elif field in ('in_scope', 'evidence'):
+        value[field][0] = payload
+    else:
+        value[field] = payload
+    result = render('BP-NC-ROOM-01/r1', value)
+    assert result['valid'] and result['status'] == 'READY_DRAFT_ONLY'
+    parsed, html = _gfm_elements(result['markdown'])
+    baseline_links = [(t,a) for t,a in baseline.tags if t in ('a', 'img')]
+    actual_links = [(t,a) for t,a in parsed.tags if t in ('a', 'img')]
+    assert actual_links == baseline_links, (field, payload, actual_links)
+    assert any(t == 'code' for t, _ in parsed.tags), (field, payload)
+    assert payload in ''.join(parsed.data), (field, payload, html)
+    if field == 'ac_text':
+        assert sum(t == 'td' for t,a in parsed.tags) == sum(t == 'td' for t,a in baseline.tags)
+    assert result['markdown_sha256'] == hashlib.sha256(result['markdown'].encode()).hexdigest()
+
+@pytest.mark.parametrize('payload', [
+    'user@example.invalid | bad',
+    'a |  user@example.invalid  | z',
+    'a||user@example.invalid|b',
+    '`user@example.invalid`',
+    '``user@example.invalid``',
+    'user@example.invalid | ### approved',
+])
+def test_inert_code_spans_do_not_split_table_cells(payload):
+    # Mistune can check table-cell structure here, but its URL plugin cannot
+    # prove GFM email safety. The actual C autolink oracle is tested above.
+    from arca_issue_harness.core import _md
+    markdown = '| Criterion | Status |\n|---|---|\n| ' + _md(payload) + ' | draft-only |\n'
+    ast = mistune.create_markdown(renderer='ast', plugins=['table', 'url'])(markdown)
+    assert len(ast) == 1 and ast[0]['type'] == 'table'
+    row = ast[0]['children'][1]['children'][0]
+    assert row['type'] == 'table_row' and len(row['children']) == 2
+    content = row['children'][0]['children']
+    assert ''.join(item.get('raw', '') for item in content) == payload
+    assert all(item['type'] not in ('link', 'image', 'heading', 'list') for item in content)

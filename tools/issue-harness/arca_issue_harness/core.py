@@ -53,16 +53,43 @@ def _short_text(value: Any, location: str, errors: list[dict[str, str]]) -> str:
     return value
 
 
-def _md(value: str) -> str:
-    """Escape model-authored text as a literal CommonMark/GFM fragment.
+def _gfm_code_span(value: str) -> str:
+    """Emit GFM-safe literal text without email/URL linkification.
 
-    List entries must not become nested headings/lists, and GFM must not
-    autolink bare URLs or email addresses supplied by a candidate.
+    cmark-gfm detects emails in decoded text nodes, so backslash escaping
+    @ and . is insufficient. Code spans are inert, but a raw pipe can split a
+    GFM table cell *before* code spans are recognized. Split at every pipe
+    and emit the separator outside code spans as an escaped table pipe.
     """
+    def atom(text: str) -> str:
+        if not text or not text.strip(" "):
+            return text
+        # A CommonMark code span trims one leading and trailing space when
+        # both exist. Keep boundary spaces outside the span so they survive.
+        left = len(text) - len(text.lstrip(" "))
+        right = len(text) - len(text.rstrip(" "))
+        core = text[left:len(text) - right if right else len(text)]
+        longest_run = max((len(m.group()) for m in re.finditer(r"`+", core)), default=0)
+        fence = "`" * (longest_run + 1)
+        padding = " " if core.startswith("`") or core.endswith("`") else ""
+        return (" " * left + fence + padding + core + padding + fence
+                + " " * right)
+
+    return r"\|".join(atom(part) for part in value.split("|"))
+
+
+def _md(value: str) -> str:
+    """Escape model-authored fragments without active CommonMark/GFM links.
+
+    The GFM autolink extension sees decoded text, so punctuation escaping
+    alone cannot make email addresses inert. Only autolink-shaped fragments
+    need a code span; ordinary prose continues to render as plain text.
+    """
+    if "@" in value or "://" in value or "www." in value:
+        return _gfm_code_span(value)
     escaped = (value.replace("\\", "\\\\").replace("&", "&amp;")
                .replace("<", "&lt;").replace(">", "&gt;"))
-    # GFM autolinks need uninterrupted URL/email punctuation, including
-    # colon, dot and @. Escape those, plus block/list Markdown markers.
+    # Keep block/list syntax and explicit Markdown links/images inactive.
     for mark in chr(96) + "*_[]()!|~#.+@:":
         escaped = escaped.replace(mark, "\\" + mark)
     if escaped.startswith("-"):

@@ -88,11 +88,16 @@ wording cannot promote a derived-unconfirmed AC. Only typed confirmed ACs
 or a later separately approved revision can establish binding acceptance.
 
 Inline model-authored Markdown is escaped before rendering, including block
-headings/list markers inside list entries and GFM bare URLs/emails, as well as
-explicit links/images, emphasis and raw HTML. The test suite parses rendered
-Markdown with a GitHub-style URL linkifier to detect injected structure and
-active links. This limits presentation injection in draft output but cannot
-prove semantic correctness or authenticate a Human grant.
+headings/list markers inside list entries and explicit links/images, emphasis
+and raw HTML. Fields containing `@`, `://` or `www.` are rendered in a
+backtick-length-safe **inline code span**: backslash escaping alone does not
+prevent cmark-gfm's postprocessing from linkifying decoded email text. This
+changes such fields' typography to monospace but preserves the visible text.
+Test-only dependency `cmarkgfm==2025.10.22` is used for positive/negative
+GFM autolink and rendered-structure checks. The existing Mistune URL-plugin
+checks cover only a subset of GFM and are not the email-link oracle. These
+local checks cannot prove GitHub.com's deployed rendering behavior, semantic
+correctness, or a Human grant.
 
 ## Security and operational boundaries
 
