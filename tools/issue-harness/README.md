@@ -19,7 +19,7 @@ Requirements: Python 3.11+. From the extracted directory:
 
 ```bash
 python make_fixtures.py                    # Rebuilds fictional snapshots and SHA-256 manifest
-python -m pytest -q                     # Requires pytest; 63 tests as of this snapshot
+python -m pytest -q                     # Requires pytest; check the actual result for test counts
 python -m arca_issue_harness.cli validate \
   --snapshots-dir fixtures/snapshots \
   --source-id BP-NC-ROOM-01/r1 \
@@ -52,7 +52,7 @@ export ARCA_HARNESS_SNAPSHOTS_DIR="$PWD/fixtures/snapshots"
 .venv/bin/python -m arca_issue_harness.server
 ```
 
-This starts an **stdio MCP server** exposing exactly two Tools. The adapter targets the current official Python MCP SDK **v2** (`from mcp.server import MCPServer`, `mcp.run("stdio")`). It does not start an HTTP service, hold a GitHub token, or register with ChatGPT. For manual inspection, use MCP Inspector in an isolated setup with `mcp dev arca_issue_harness/server.py` or an equivalent SDK v2 host; use module execution for the documented runtime. This source package was checked with a mock SDK adapter, not a live MCP wire-protocol test. Ensure an SDK v2 install and actual client round-trip are verified before any hosted deployment.
+This starts an **stdio MCP server** exposing exactly two Tools. The adapter targets the current official Python MCP SDK **v2** (`from mcp.server import MCPServer`, `mcp.run("stdio")`). It does not start an HTTP service, hold a GitHub token, or register with ChatGPT. For manual inspection, use MCP Inspector in an isolated setup with `mcp dev arca_issue_harness/server.py` or an equivalent SDK v2 host; use module execution for the documented runtime. The dependency-free Core test still uses a mock SDK registrar; the optional actual SDK v2 stdio client/server integration test is documented below. Run it with the SDK installed before claiming transport acceptance or attempting any separately authorized deployment.
 
 ## AC namespace and source-claim fixture boundaries
 
@@ -127,8 +127,10 @@ SDK v2 installed; e.g. in a disposable environment:
 This test invokes a real MCP SDK v2 Client using StdioServerParameters to
 launch the local server as a child process. It lists the exactly two permitted
 draft-only Tools, validates and renders three **structural, fictional**
-candidates, compares three Markdown SHA-256 digests, and confirms that
-source drift, invalid source IDs and forged approval fields fail closed.
+candidates, independently recalculates each of three rendered Markdown SHA-256
+values, checks the pinned source ID/digest and original-goal text, replays one
+render to check deterministic output, and confirms that source drift, invalid
+source IDs and forged approval fields fail closed.
 
 The candidate DES-001 is constructed from a DES-002 sample for **schema
 coverage only**, not semantic acceptance of an original user requirement.

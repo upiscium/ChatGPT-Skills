@@ -28,7 +28,7 @@ def _candidate(name: str) -> dict:
     return json.loads((FIX / "candidates" / name).read_text(encoding="utf-8"))
 
 
-def test_real_sdk_v2_stdio_six_calls_and_negative_boundaries() -> None:
+def test_real_sdk_v2_stdio_six_call_matrix_replay_and_negative_boundaries() -> None:
     pytest.importorskip("mcp", reason="optional MCP Python SDK v2 dependency")
     version = importlib.metadata.version("mcp")
     if int(version.split(".", 1)[0]) != 2:
@@ -40,6 +40,9 @@ def test_real_sdk_v2_stdio_six_calls_and_negative_boundaries() -> None:
     digest = json.loads((FIX / "snapshot_digests.json").read_text())[
         SOURCE_ID
     ]
+    snapshot_file = FIX / "snapshots" / "BP-NC-ROOM-ALL__r1.json"
+    snapshot = json.loads(snapshot_file.read_text(encoding="utf-8"))
+    assert sha256(snapshot_file.read_bytes()).hexdigest() == digest
     c2 = _candidate("C03_DES-002_valid.json")
     c3 = _candidate("C03_DES-003_valid.json")
     c1 = deepcopy(c2)
@@ -71,6 +74,7 @@ def test_real_sdk_v2_stdio_six_calls_and_negative_boundaries() -> None:
             cwd=str(ROOT),
         )
         results = {}
+        rendered = {}
         async with Client(server, read_timeout_seconds=15.0) as client:
             assert str(client.protocol_version) == "2026-07-28"
             listing = await client.list_tools()
@@ -90,18 +94,36 @@ def test_real_sdk_v2_stdio_six_calls_and_negative_boundaries() -> None:
                     assert isinstance(reply, dict), (name, candidate["id"])
                     assert reply["status"] == "READY_DRAFT_ONLY"
                     assert reply["valid"] is True
+                    assert reply["source_id"] == SOURCE_ID
+                    assert reply["source_sha256"] == digest
                     if name == "render_issue_draft":
                         markdown = reply["markdown"]
                         assert reply.get("semantic_approval_verified") is False
                         assert "not-filed" in markdown
                         assert "not-dispatched" in markdown
                         assert sha256(markdown.encode()).hexdigest() == reply["markdown_sha256"]
+                        assert f"- Source: `{SOURCE_ID}` (SHA-256 `{digest}`)" in markdown
+                        assert "- Original goal:" in markdown
+                        assert snapshot["original_goal"] in markdown
+                        rendered[candidate["id"]] = reply
                     results.setdefault(candidate["id"], set()).add(name)
             assert len(results) == 3
             assert all(
                 used == {"validate_issue_draft", "render_issue_draft"}
                 for used in results.values()
             )
+
+            # A separate round trip for the same input must be deterministic.
+            replay = await client.call_tool("render_issue_draft", {
+                "source_id": SOURCE_ID,
+                "source_sha256": digest,
+                "candidate": c2,
+            })
+            assert replay.is_error is False
+            replay_body = replay.structured_content
+            assert isinstance(replay_body, dict)
+            assert replay_body["markdown"] == rendered["DES-002"]["markdown"]
+            assert replay_body["markdown_sha256"] == rendered["DES-002"]["markdown_sha256"]
 
             # Drifted source does not generate a standalone Issue draft.
             drift = await client.call_tool("render_issue_draft", {
@@ -114,6 +136,7 @@ def test_real_sdk_v2_stdio_six_calls_and_negative_boundaries() -> None:
             assert drift_body and drift_body["status"] == "BLOCKED"
             assert drift_body["markdown"] is None
             assert drift_body["markdown_sha256"] is None
+            assert any(x["code"] == "SOURCE_DRIFT" for x in drift_body["findings"])
 
             # Validate must reject the same drift; rendering is not special.
             drift_validation = await client.call_tool("validate_issue_draft", {
@@ -124,6 +147,7 @@ def test_real_sdk_v2_stdio_six_calls_and_negative_boundaries() -> None:
             assert not drift_validation.is_error
             validation_body = drift_validation.structured_content
             assert validation_body and validation_body["status"] == "BLOCKED"
+            assert any(x["code"] == "SOURCE_DRIFT" for x in validation_body["findings"])
 
             # An unrecognized source ID must not grant access to other paths.
             wrong_source = await client.call_tool("render_issue_draft", {
@@ -135,6 +159,7 @@ def test_real_sdk_v2_stdio_six_calls_and_negative_boundaries() -> None:
             wrong_body = wrong_source.structured_content
             assert wrong_body and wrong_body["status"] == "BLOCKED"
             assert wrong_body["markdown"] is None
+            assert any(x["code"] == "INVALID_SOURCE_ID" for x in wrong_body["findings"])
 
             # Model-supplied "approved" fields do not grant Human authority.
             forged = deepcopy(c2)
