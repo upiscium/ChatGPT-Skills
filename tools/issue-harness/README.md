@@ -113,3 +113,27 @@ correctness, or a Human grant.
 2. Read-only Arca Plugin adapter: present structured draft data to MCP Tools, observe blocked findings, and keep the exact approved source snapshot separately pinned. Treat `READY_DRAFT_ONLY` as *a draft validation result*, not Human approval.
 3. Compare generated standalone bodies against the old C02/C03 cases with a separate actual Normal Chat trial. The pass criterion is that missing project non-goals/action gates and illegal derived-state promotions cannot cross the *handoff* boundary even if the LLM initially emits an incomplete draft.
 4. Only by separate authorization, add a guarded Issue-filing operation at the actual GitHub-write boundary. Require exact Human permission, source/Issue revision, body hash and pre-effect revalidation. Preserve existing KAGARI Contract/Task authority; do not rebuild it in this harness.
+
+### Isolated actual MCP SDK v2 stdio acceptance (optional)
+
+The normal Core unit suite includes an SDK-independent fake registrar, which
+does **not** prove that an MCP client connected over stdio. Run the additional
+reproducible integration check from this directory with the official Python
+SDK v2 installed; e.g. in a disposable environment:
+
+    python -m pip install -e '.[test,mcp]'
+    python -m pytest -q tests/test_sdk_v2_stdio_roundtrip.py
+
+This test invokes a real MCP SDK v2 Client using StdioServerParameters to
+launch the local server as a child process. It lists the exactly two permitted
+draft-only Tools, validates and renders three **structural, fictional**
+candidates, compares three Markdown SHA-256 digests, and confirms that
+source drift, invalid source IDs and forged approval fields fail closed.
+
+The candidate DES-001 is constructed from a DES-002 sample for **schema
+coverage only**, not semantic acceptance of an original user requirement.
+If mcp is absent, pytest skips the optional integration test; a skip is **not**
+an E2E PASS. No GitHub, KAGARI, Plugin, Tunnel or production action occurs.
+Even a successful stdio test does **not** demonstrate actual ChatGPT Normal
+Chat ↔ Tunnel Request-ID correlation, genuine Human approval, or source
+provenance. Those remain separate evidence gates.
