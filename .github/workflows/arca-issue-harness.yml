@@ -1,0 +1,35 @@
+name: Arca Issue Harness SDK v2 checks
+
+on:
+  pull_request:
+    paths:
+      - "tools/issue-harness/**"
+      - ".github/workflows/arca-issue-harness.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  isolated-sdk-v2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: tools/issue-harness
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install tested MCP SDK v2 and test dependencies
+        run: python -m pip install -e '.[test,mcp]' 'mcp==2.3.0' 'pytest==9.0.2'
+      - name: Core and SDK v2 regression tests
+        run: python -m pytest -q -rs tests/
+      - name: Require real stdio SDK test to pass, never skip
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pytest -q -rs tests/test_sdk_v2_stdio_roundtrip.py | tee /tmp/arca-sdkv2-stdio.log
+          grep -Eq '^1 passed in ' /tmp/arca-sdkv2-stdio.log
+          ! grep -Eiq '(skipped|deselected|xfailed|error)' /tmp/arca-sdkv2-stdio.log
