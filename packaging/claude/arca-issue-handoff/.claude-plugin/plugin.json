@@ -1,0 +1,8 @@
+{
+  "name": "arca-issue-handoff",
+  "version": "0.1.0-claude.1",
+  "description": "Claude Code-only, read-only R6 Issue draft validation and deterministic Markdown handoff; no GitHub filing, approval, or task dispatch",
+  "author": {
+    "name": "Arca Development"
+  }
+}

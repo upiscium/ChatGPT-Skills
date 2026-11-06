@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "arca-issue-harness": {
+      "type": "stdio",
+      "command": "bash",
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/scripts/run-mcp.sh"
+      ],
+      "env": {}
+    }
+  }
+}
