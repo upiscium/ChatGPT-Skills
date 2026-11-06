@@ -1,0 +1,107 @@
+name: Arca Claude Issue Handoff checks
+
+on:
+  pull_request:
+    paths:
+      - "packaging/claude/arca-issue-handoff/**"
+      - ".github/workflows/arca-claude-issue-handoff.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  claude-local-mcp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: packaging/claude/arca-issue-handoff
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install isolated verified test dependencies
+        run: python -m pip install "mcp==2.3.0" "pytest==9.0.2" "mistune==3.4.0" "cmarkgfm==2025.10.22"
+      - name: Validate source layout and launcher syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n scripts/run-mcp.sh
+          diff -u <(awk '{print $2}' manifest.sha256 | LC_ALL=C sort) <(find harness -type f | LC_ALL=C sort)
+          sha256sum -c --status manifest.sha256
+      - name: Core regressions
+        run: cd harness && python -B -m pytest -q -rs -p no:cacheprovider tests/
+      - name: Require genuine official SDK v2 stdio test (no skip)
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd harness && python -B -m pytest -q -rs -p no:cacheprovider tests/test_sdk_v2_stdio_roundtrip.py) | tee /tmp/arca-claude-r6-stdio.log
+          grep -Eq '^1 passed in ' /tmp/arca-claude-r6-stdio.log
+          if grep -Eiq 'skipped|deselected|xfailed|error' /tmp/arca-claude-r6-stdio.log; then exit 1; fi
+      - name: Verify Claude plugin R6 launcher through actual MCP client
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONDONTWRITEBYTECODE=1 python -B - <<'PY'
+          import os
+          import sys
+          import json
+          import anyio
+          import hashlib
+          from pathlib import Path
+          from mcp import Client, StdioServerParameters
+
+          root = Path.cwd()
+          source_id = "BP-NC-ROOM-ALL/r1"
+          digest = "359490dfc57c35ecacab938f7a20ff0a48d2f06492fc62cd022340698e0f8abb"
+          candidate = json.loads((root / "harness/fixtures/candidates/C03_DES-002_valid.json").read_text())
+          params = StdioServerParameters(
+              command="bash",
+              args=[str(root / "scripts/run-mcp.sh")],
+              cwd=str(root),
+              env={
+                  "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+                  "ARCA_R6_PYTHON": sys.executable,
+                  "CLAUDE_PLUGIN_ROOT": str(root),
+              },
+          )
+
+          async def check():
+              async with Client(params, read_timeout_seconds=15) as client:
+                  names = sorted(t.name for t in (await client.list_tools()).tools)
+                  assert names == ["render_issue_draft", "validate_issue_draft"]
+                  rendered = None
+                  for name in ("validate_issue_draft", "render_issue_draft"):
+                      receipt = await client.call_tool(name, {
+                          "source_id": source_id,
+                          "source_sha256": digest,
+                          "candidate": candidate,
+                      })
+                      assert not receipt.is_error
+                      data = receipt.structured_content
+                      assert data["valid"] is True and data["status"] == "READY_DRAFT_ONLY"
+                      assert data["source_id"] == source_id and data["source_sha256"] == digest
+                      if rendered is None:
+                          validated = data
+                      else:
+                          assert validated["candidate_digest"] == data["candidate_digest"]
+                      if name == "render_issue_draft":
+                          assert data["semantic_approval_verified"] is False
+                          assert hashlib.sha256(data["markdown"].encode()).hexdigest() == data["markdown_sha256"]
+                          rendered = data
+                      else:
+                          rendered = "validate done"
+                  rejection = await client.call_tool("render_issue_draft", {
+                      "source_id": source_id,
+                      "source_sha256": "0" * 64,
+                      "candidate": candidate,
+                  })
+                  assert not rejection.is_error
+                  blocked = rejection.structured_content
+                  assert blocked["status"] == "BLOCKED" and blocked["markdown"] is None
+                  assert any(x["code"] == "SOURCE_DRIFT" for x in blocked["findings"])
+                  print("CLAUDE_R6_STDIO_LAUNCHER=PASS")
+          anyio.run(check)
+          PY
