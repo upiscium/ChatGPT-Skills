@@ -14,6 +14,8 @@ jobs:
   claude-local-mcp:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
     defaults:
       run:
         working-directory: packaging/claude/arca-issue-handoff
