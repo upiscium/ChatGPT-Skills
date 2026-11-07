@@ -294,3 +294,31 @@ def test_self_consistent_forged_raw_is_still_not_authenticated(admission):
     assert outcome["origin_authenticated"] is False
     assert outcome["semantic_approval_verified"] is False
     assert outcome["authority"].startswith("none-issued")
+
+
+@pytest.mark.parametrize("separator", ["\u2028", "\u0085", "\x0c", "\u2029"])
+def test_visual_or_control_line_separator_cannot_truncate_claim(admission, separator):
+    """Previously splitlines() would create a spurious complete line."""
+    snap = json.loads(admission["curated_snapshot"].read_text())
+    original = snap["source_claims"][0]["text"]
+    assert len(original) > 20
+    truncated = original[:20]
+    snap["source_claims"][0]["text"] = truncated
+    raw_text = admission["raw_source"].read_text()
+    assert original + "\n" in raw_text
+    raw_text = raw_text.replace(original + "\n",
+                                truncated + separator + original[20:] + "\n", 1)
+    raw = raw_text.encode("utf-8")
+    admission["raw_source"].write_bytes(raw)
+    admission["curated_snapshot"].write_text(json.dumps(snap, ensure_ascii=False))
+    _blocked(admission | {"expected_raw_sha256": hashlib.sha256(raw).hexdigest()},
+             "RAW_SOURCE_CONTROL_CHAR")
+
+
+@pytest.mark.parametrize("newline", ["\r\n", "\r"])
+def test_standard_crlf_and_cr_source_lines_remain_supported(admission, newline):
+    raw = admission["raw_source"].read_bytes().replace(b"\n", newline.encode("ascii"))
+    admission["raw_source"].write_bytes(raw)
+    result = preflight(**(admission | {"expected_raw_sha256":
+                                   hashlib.sha256(raw).hexdigest()}))
+    assert result["status"] == "PREFLIGHT_PASS_NO_ADMISSION"

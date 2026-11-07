@@ -84,12 +84,29 @@ def _require_operator_directory(target: Path) -> None:
         raise AdmissionBlocked("TARGET_NOT_PRIVATE_OWNED_DIRECTORY")
 
 
+def require_literal_source_lines(raw_text: str) -> None:
+    """Reject controls that can hide conditions inside a rendered source line.
+
+    Only CR, LF and TAB are legitimate ASCII controls for this offline source
+    contract. Treat Unicode visual line separators and C1 controls as invalid
+    rather than letting str.splitlines()/strip() reinterpret source boundaries.
+    """
+    if any(
+        (ord(char) < 32 and char not in "\t\r\n")
+        or 0x7F <= ord(char) <= 0x9F
+        or char in "\u2028\u2029"
+        for char in raw_text
+    ):
+        raise AdmissionBlocked("RAW_SOURCE_CONTROL_CHAR")
+
+
 def _lexical_source_binding(raw_text: str, snap: dict[str, Any]) -> None:
+    require_literal_source_lines(raw_text)
     # Exact *line* matching (with an optional Markdown list marker) prevents
     # silently dropping a condition from the end of a quoted requirement.
     # Still NOT semantic proof: the line may be negated or superseded elsewhere.
     lines = set()
-    for line in raw_text.splitlines():
+    for line in raw_text.replace("\r\n", "\n").replace("\r", "\n").split("\n"):
         item = line.strip()
         item = re.sub(r"^(?:[-*+]\s+|[0-9]{1,3}[.)]\s+)", "", item)
         if item:
@@ -142,6 +159,49 @@ def _atomic_link_readonly(folder: Path, filename: str, contents: bytes) -> Path:
         tmp.unlink(missing_ok=True)
 
 
+def validate_snapshot_against_raw(
+    *, raw: bytes, snapshot_raw: bytes, source_id: str,
+) -> dict[str, Any]:
+    """Recheck a pinned pair without writing to the Source Registry.
+
+    Reuse exactly the same lexical, provenance and R6 schema rules at initial
+    preflight and later registry verify; only a disposable temp copy is made.
+    This is NOT an approval, authentic provider read or activation operation.
+    """
+    if not isinstance(source_id, str) or not SNAPSHOT_RE.fullmatch(source_id):
+        raise AdmissionBlocked("INVALID_SOURCE_ID")
+    if len(raw) > MAX_RAW_BYTES or len(snapshot_raw) > MAX_SNAPSHOT_BYTES:
+        raise AdmissionBlocked("OVERSIZE")
+    try:
+        raw_text = raw.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise AdmissionBlocked("RAW_SOURCE_NOT_UTF8") from exc
+    snapshot = _json_unique(snapshot_raw)
+    if snapshot.get("source_id") != source_id:
+        raise AdmissionBlocked("SNAPSHOT_ID_MISMATCH")
+    if snapshot.get("approval_provenance") != PROVENANCE_UNVERIFIED:
+        raise AdmissionBlocked("APPROVAL_PROVENANCE_UNSAFE")
+    _lexical_source_binding(raw_text, snapshot)
+    digest = hashlib.sha256(snapshot_raw).hexdigest()
+    filename = source_id.replace("/", "__") + ".json"
+    # Isolated private scratch directory: do not create temporary entries
+    # inside the persistent registry, even on verification failure.
+    with tempfile.TemporaryDirectory(prefix=".r6-schema-check-") as sandbox:
+        checked = Path(sandbox) / filename
+        checked.write_bytes(snapshot_raw)
+        try:
+            validated, findings = Harness(Path(sandbox))._load_snapshot(source_id, digest)
+        except (TypeError, ValueError, KeyError, AttributeError, OSError, RecursionError) as exc:
+            raise AdmissionBlocked("SOURCE_SCHEMA_REJECTED") from exc
+        if validated is None or findings:
+            raise AdmissionBlocked("SOURCE_SCHEMA_REJECTED")
+    return {
+        "snapshot_sha256": digest,
+        "lexical_source_claims_checked": len(snapshot["source_claims"]),
+        "lexical_non_goals_checked": len(snapshot["project_non_goals"]),
+    }
+
+
 def preflight(
     *,
     raw_source: Path,
@@ -159,44 +219,23 @@ def preflight(
     raw = _read_regular_no_symlink(raw_source, MAX_RAW_BYTES)
     if hashlib.sha256(raw).hexdigest() != expected_raw_sha256:
         raise AdmissionBlocked("RAW_SOURCE_DRIFT")
-    try:
-        raw_text = raw.decode("utf-8")
-    except UnicodeDecodeError as exc:
-        raise AdmissionBlocked("RAW_SOURCE_NOT_UTF8") from exc
     snapshot_raw = _read_regular_no_symlink(curated_snapshot, MAX_SNAPSHOT_BYTES)
-    snapshot = _json_unique(snapshot_raw)
-    if snapshot.get("source_id") != source_id:
-        raise AdmissionBlocked("SNAPSHOT_ID_MISMATCH")
-    # This is operator-reported provenance. Refuse any claim of independently
-    # verified Human action approval in the draft-only admission path.
-    provenance = snapshot.get("approval_provenance")
-    if provenance != PROVENANCE_UNVERIFIED:
-        raise AdmissionBlocked("APPROVAL_PROVENANCE_UNSAFE")
-    _lexical_source_binding(raw_text, snapshot)
-    digest = hashlib.sha256(snapshot_raw).hexdigest()
+    validated = validate_snapshot_against_raw(
+        raw=raw, snapshot_raw=snapshot_raw, source_id=source_id
+    )
+    digest = validated["snapshot_sha256"]
     filename = source_id.replace("/", "__") + ".json"
     final = operator_staging_dir / filename
     if final.exists() or final.is_symlink():
         raise AdmissionBlocked("DESTINATION_EXISTS")
-    # Use the exact existing R6 core as validator without changing source IDs,
-    # model-facing tools, or source admission authority.
-    with tempfile.TemporaryDirectory(prefix=".r6-schema-check-", dir=operator_staging_dir) as sandbox:
-        checked = Path(sandbox) / filename
-        checked.write_bytes(snapshot_raw)
-        try:
-            validated, findings = Harness(Path(sandbox))._load_snapshot(source_id, digest)
-        except (TypeError, ValueError, KeyError, AttributeError, OSError) as exc:
-            raise AdmissionBlocked("SOURCE_SCHEMA_REJECTED") from exc
-        if validated is None or findings:
-            raise AdmissionBlocked("SOURCE_SCHEMA_REJECTED")
     record: dict[str, Any] = {
         "status": "PREPARED_OPERATOR_ONLY" if prepare else "PREFLIGHT_PASS_NO_ADMISSION",
         "source_id": source_id,
         "raw_sha256": expected_raw_sha256,
         "snapshot_sha256": digest,
         "snapshot_filename": filename,
-        "lexical_source_claims_checked": len(snapshot["source_claims"]),
-        "lexical_non_goals_checked": len(snapshot["project_non_goals"]),
+        "lexical_source_claims_checked": validated["lexical_source_claims_checked"],
+        "lexical_non_goals_checked": validated["lexical_non_goals_checked"],
         "origin_authenticated": False,
         "semantic_approval_verified": False,
         "authority": "none-issued; explicit Human approval still required for any write",

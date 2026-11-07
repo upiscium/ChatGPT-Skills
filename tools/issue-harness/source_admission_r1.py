@@ -21,6 +21,7 @@ from typing import Any
 from source_admission import (
     AdmissionBlocked, MAX_RAW_BYTES, _json_unique,
     _read_regular_no_symlink, _require_operator_directory, preflight,
+    require_literal_source_lines, validate_snapshot_against_raw,
 )
 from arca_issue_harness.core import MAX_SNAPSHOT_BYTES, SHA_RE, SNAPSHOT_RE
 
@@ -67,7 +68,9 @@ def _read_capture(path: Path, expected_digest: str) -> tuple[dict[str, Any], byt
     num = capture.get("issue_number")
     node = capture.get("node_id")
     updated = capture.get("updated_at")
-    if not isinstance(repo, str) or not REPOSITORY_RE.fullmatch(repo):
+    if not isinstance(repo, str) or not REPOSITORY_RE.fullmatch(repo) or any(
+        part in {".", ".."} or part.startswith("-") for part in repo.split("/")
+    ):
         raise AdmissionBlocked("INVALID_PROVIDER_IDENTITY")
     if type(num) is not int or not (1 <= num <= 2**31 - 1):
         raise AdmissionBlocked("INVALID_PROVIDER_IDENTITY")
@@ -90,9 +93,14 @@ def _read_capture(path: Path, expected_digest: str) -> tuple[dict[str, Any], byt
     title = capture.get("title")
     body = capture.get("body")
     if not isinstance(title, str) or not (1 <= len(title) <= 1024) or any(
-        ord(x) < 32 for x in title
+        ord(x) < 32 or 0x7F <= ord(x) <= 0x9F or x in "\u2028\u2029"
+        for x in title
     ):
         raise AdmissionBlocked("INVALID_CAPTURE_TEXT")
+    try:
+        title.encode("utf-8")
+    except UnicodeEncodeError as exc:
+        raise AdmissionBlocked("INVALID_CAPTURE_TEXT") from exc
     if not isinstance(body, str) or not body:
         raise AdmissionBlocked("INVALID_CAPTURE_TEXT")
     try:
@@ -101,6 +109,7 @@ def _read_capture(path: Path, expected_digest: str) -> tuple[dict[str, Any], byt
         raise AdmissionBlocked("INVALID_CAPTURE_TEXT") from exc
     if byte_length > MAX_RAW_BYTES:
         raise AdmissionBlocked("INVALID_CAPTURE_TEXT")
+    require_literal_source_lines(body)
     # Explicitly normalized, operator-supplied capture. An actual GitHub API
     # fetch MUST occur separately under an approved trusted provider connector.
     return capture, raw
@@ -110,6 +119,10 @@ def _identity_matches(
     capture: dict[str, Any], *, repository: str, issue_number: int,
     node_id: str, updated_at: str,
 ) -> None:
+    if type(issue_number) is not int or any(
+        not isinstance(x, str) for x in (repository, node_id, updated_at)
+    ):
+        raise AdmissionBlocked("INVALID_PROVIDER_IDENTITY")
     if (capture["repository"], capture["issue_number"], capture["node_id"]) != (
         repository, issue_number, node_id
     ):
@@ -158,8 +171,6 @@ def _check_registry_revision(
     new_prefix, new_rev = source_id.rsplit("/r", 1)
     versions: list[tuple[int, str]] = []
     for path in sorted(registry_root.iterdir()):
-        if path.name.startswith(".r6-schema-check-"):
-            continue
         if not path.is_dir() or path.is_symlink():
             raise AdmissionBlocked("REGISTRY_UNKNOWN_ENTRY")
         match = re.fullmatch(r"(BP-[A-Za-z0-9_-]{2,60})__r([1-9][0-9]*)", path.name)
@@ -171,7 +182,7 @@ def _check_registry_revision(
         known = verify_bundle(registry_root=registry_root, source_id=entry_id)
         same_prefix = match.group(1) == new_prefix
         same_node = known["github_node_id"] == node_id
-        same_issue = (known["github_repository"] == repository and
+        same_issue = (known["github_repository"].casefold() == repository.casefold() and
                       known["github_issue_number"] == issue_number)
         same_provider = same_issue and same_node
         if same_prefix and not same_provider:
@@ -292,6 +303,12 @@ def _preflight_capture_unlocked(
                 os.fsync(dirfd)
             finally:
                 os.close(dirfd)
+            # Persist the newly created directory entry as well as its files.
+            rootfd = os.open(registry_root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+            try:
+                os.fsync(rootfd)
+            finally:
+                os.close(rootfd)
         except OSError as exc:
             raise AdmissionBlocked("STAGING_WRITE_FAILED") from exc
     return record
@@ -366,7 +383,6 @@ def verify_bundle(*, registry_root: Path, source_id: str,
     ):
         if sha(contents) != record.get(name + "_sha256"):
             raise AdmissionBlocked("STAGED_" + name.upper() + "_DRIFT")
-    capture = _json_unique(stored_capture)
     # Revalidate all captured fields, not only the bytes in the receipt.
     parsed, _ = _read_capture(entry / "capture.json", record["capture_sha256"])
     _identity_matches(parsed, repository=record["github_repository"],
@@ -377,9 +393,13 @@ def verify_bundle(*, registry_root: Path, source_id: str,
         raise AdmissionBlocked("STAGED_PROVIDER_URL_MISMATCH")
     if stored_raw != parsed["body"].encode("utf-8"):
         raise AdmissionBlocked("STAGED_BODY_MISMATCH")
-    snapshot = _json_unique(stored_snapshot)
-    if snapshot.get("source_id") != source_id:
-        raise AdmissionBlocked("STAGED_SOURCE_ID_MISMATCH")
+    # A valid digest alone cannot establish snapshot schema, lexical source
+    # binding or the absence of forged Human approval provenance.
+    checked = validate_snapshot_against_raw(
+        raw=stored_raw, snapshot_raw=stored_snapshot, source_id=source_id,
+    )
+    if checked["snapshot_sha256"] != record["snapshot_sha256"]:
+        raise AdmissionBlocked("STAGED_SNAPSHOT_DRIFT")
     if (current_capture is None) != (expected_current_capture_sha256 is None):
         raise AdmissionBlocked("CURRENT_CAPTURE_PIN_REQUIRED")
     if current_capture is not None:
@@ -388,7 +408,9 @@ def verify_bundle(*, registry_root: Path, source_id: str,
                           issue_number=record["github_issue_number"],
                           node_id=record["github_node_id"],
                           updated_at=record["github_updated_at"])
-        if sha(observation["body"].encode("utf-8")) != record["raw_sha256"]:
+        # Compare every normalized provider field, not only body and revision.
+        # The observation is still operator supplied, not GitHub authenticated.
+        if observation != parsed:
             raise AdmissionBlocked("SOURCE_STALE")
     return {
         "status": "STAGED_VERIFIED_INACTIVE",

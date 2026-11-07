@@ -732,3 +732,159 @@ def test_bool_github_issue_number_cannot_hide_in_receipt(inputs):
     p.chmod(0o400)
     verify_blocked(dict(registry_root=inputs["registry_root"],
                         source_id=inputs["source_id"]), "REGISTRY_SCHEMA")
+
+
+def _rewrite_snapshot_and_receipt(entry: Path, modifier) -> None:
+    """Self-consistent operator tampering; hashes must NOT replace validation."""
+    snapshot_path = entry / "snapshot.json"
+    receipt_path = entry / "receipt.json"
+    snapshot = json.loads(snapshot_path.read_text())
+    modifier(snapshot)
+    raw = (json.dumps(snapshot, sort_keys=True, ensure_ascii=False,
+                      separators=(",", ":")) + "\n").encode("utf-8")
+    snapshot_path.chmod(0o600)
+    snapshot_path.write_bytes(raw)
+    snapshot_path.chmod(0o400)
+    receipt = json.loads(receipt_path.read_text())
+    receipt["snapshot_sha256"] = digest(raw)
+    receipt_path.chmod(0o600)
+    receipt_path.write_text(
+        json.dumps(receipt, sort_keys=True, ensure_ascii=False,
+                   separators=(",", ":")) + "\n"
+    )
+    receipt_path.chmod(0o400)
+
+
+@pytest.mark.parametrize("mutation,code", [
+    ("approval", "APPROVAL_PROVENANCE_UNSAFE"),
+    ("claim", "UNVERIFIED_SOURCE_QUOTE"),
+    ("schema", "SOURCE_SCHEMA_REJECTED"),
+])
+def test_registry_verify_rejects_self_consistent_invalid_snapshot(
+    inputs, mutation, code
+):
+    _, entry = stage(inputs)
+    def alter(snapshot):
+        if mutation == "approval":
+            snapshot["approval_provenance"] = "Human approved"
+        elif mutation == "claim":
+            snapshot["source_claims"][0]["text"] = (
+                "The following invented claim never appeared in the original Issue"
+            )
+        else:
+            snapshot["draft_scope"] = "live-and-executable"
+    _rewrite_snapshot_and_receipt(entry, alter)
+    verify_blocked(dict(registry_root=inputs["registry_root"],
+                        source_id=inputs["source_id"]), code)
+    # A poisoned but self-consistent bundle MUST also stop successor staging.
+    r2 = revision_inputs(inputs)
+    blocked(r2, code)
+
+
+def test_current_capture_title_change_same_revision_is_stale(inputs):
+    stage(inputs)
+    altered = save_capture(inputs, lambda x: x.update(title=x["title"] + " edited"))
+    verify_blocked(dict(registry_root=inputs["registry_root"],
+                        source_id=inputs["source_id"],
+                        current_capture=inputs["capture_file"],
+                        expected_current_capture_sha256=altered["expected_capture_sha256"]),
+                   "SOURCE_STALE")
+
+
+@pytest.mark.parametrize("value", [True, 13.0, "13"])
+def test_operator_library_issue_number_is_strict_integer(inputs, value):
+    blocked(inputs | {"issue_number": value, "stage": True},
+            "INVALID_PROVIDER_IDENTITY")
+    assert list(inputs["registry_root"].iterdir()) == []
+
+
+def test_registry_root_is_fsynced_after_successful_stage(inputs, monkeypatch):
+    import source_admission_r1 as module
+    original = module.os.fsync
+    root_stat = inputs["registry_root"].stat()
+    seen_root = []
+    def observing_fsync(fd):
+        stats = os.fstat(fd)
+        if (stats.st_dev, stats.st_ino) == (root_stat.st_dev, root_stat.st_ino):
+            seen_root.append(True)
+        return original(fd)
+    monkeypatch.setattr(module.os, "fsync", observing_fsync)
+    stage(inputs)
+    assert seen_root == [True]
+
+
+@pytest.mark.parametrize("bad_title", ["\ud800", "invalid\u2028title", "test\x7f", "bad\x85name"])
+def test_capture_title_invalid_unicode_is_rejected(inputs, bad_title):
+    p = inputs["capture_file"]
+    obj = json.loads(p.read_text())
+    obj["title"] = bad_title
+    # JSON escapes allow a lone surrogate to reach the validator intact.
+    p.write_bytes((json.dumps(obj, ensure_ascii=True, sort_keys=True) + "\n").encode())
+    blocked(inputs | {"expected_capture_sha256": digest(p.read_bytes())},
+            "INVALID_CAPTURE_TEXT")
+
+
+@pytest.mark.parametrize("bad_repo", ["../..", "-bad/example", "owner/.."])
+def test_capture_repo_path_components_must_be_canonical(inputs, bad_repo):
+    def mutate(obj):
+        obj["repository"] = bad_repo
+        obj["html_url"] = f"https://github.com/{bad_repo}/issues/13"
+        obj["api_url"] = f"https://api.github.com/repos/{bad_repo}/issues/13"
+    altered = save_capture(inputs, mutate)
+    blocked(altered | {"repository": bad_repo}, "INVALID_PROVIDER_IDENTITY")
+
+
+def test_alias_with_repository_case_change_is_rejected(inputs):
+    stage(inputs)
+    snapshot = json.loads(inputs["curated_snapshot"].read_text())
+    snapshot["source_id"] = "BP-GH-CASE-ALIAS/r1"
+    inputs["curated_snapshot"].write_text(json.dumps(snapshot, ensure_ascii=False) + "\n")
+    def mutate(obj):
+        obj["repository"] = "UPISCIUM/chatgpt-skills"
+        obj["node_id"] = "I_DIFFERENT_PROVIDER_NODE_5"
+        obj["html_url"] = "https://github.com/UPISCIUM/chatgpt-skills/issues/13"
+        obj["api_url"] = "https://api.github.com/repos/UPISCIUM/chatgpt-skills/issues/13"
+    altered = save_capture(inputs, mutate)
+    blocked(altered | {
+        "repository": "UPISCIUM/chatgpt-skills",
+        "node_id": "I_DIFFERENT_PROVIDER_NODE_5",
+        "source_id": snapshot["source_id"],
+        "expected_snapshot_sha256": digest(inputs["curated_snapshot"].read_bytes()),
+    }, "PROVIDER_IDENTITY_ALREADY_BOUND")
+
+
+def test_nested_receipt_under_size_limit_is_structurally_blocked(inputs):
+    _, entry = stage(inputs)
+    raw = b"[" * 1200 + b"]" * 1200
+    assert len(raw) < 16384
+    receipt = entry / "receipt.json"
+    receipt.chmod(0o600)
+    receipt.write_bytes(raw)
+    receipt.chmod(0o400)
+    # JSON recursion behavior differs across supported Python interpreters.
+    # Both outcomes must be structured BLOCKED errors without traceback.
+    with pytest.raises(AdmissionBlocked) as error:
+        verify_bundle(registry_root=inputs["registry_root"],
+                      source_id=inputs["source_id"])
+    assert str(error.value) in {"SNAPSHOT_NOT_OBJECT", "INVALID_SNAPSHOT_JSON"}
+
+
+def test_unknown_schema_scratch_leftover_is_not_silently_skipped(inputs):
+    # R0 and R1 now create schema scratch outside the persistent registry.
+    leftover = inputs["registry_root"] / ".r6-schema-check-dangling"
+    leftover.mkdir(mode=0o700)
+    blocked(inputs, "REGISTRY_UNKNOWN_ENTRY")
+
+
+@pytest.mark.parametrize("separator", ["\u2028", "\x85"])
+def test_current_capture_body_unicode_separator_is_rejected(inputs, separator):
+    stage(inputs)
+    changed = save_capture(inputs, lambda obj: obj.update(
+        body=obj["body"] + "Denied" + separator + "except with approval"
+    ))
+    verify_blocked(dict(
+        registry_root=inputs["registry_root"],
+        source_id=inputs["source_id"],
+        current_capture=inputs["capture_file"],
+        expected_current_capture_sha256=changed["expected_capture_sha256"],
+    ), "RAW_SOURCE_CONTROL_CHAR")

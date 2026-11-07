@@ -1,6 +1,6 @@
 # Arca #13 — Source Admission R1: GitHub Issue offline capture and inactive registry
 
-Status: **source-only implementation in an isolated, uncommitted worktree**. Requires independent review and separate Human authorization before any Commit, Push, PR, Plugin update, source activation, real Issue filing, Task dispatch, Release or Tunnel change.
+Status: **source-only R1 implementation tracked in Draft PR #18; not merged or activated**. Separate Human authorization is required before any correction Commit, Push, PR update, Ready, Merge, Plugin update, source activation, real Issue filing, Task dispatch, Release or Tunnel change.
 
 ## Purpose
 
@@ -41,7 +41,7 @@ All provider fields are *operator supplied* in R1. Type/identity/URL consistency
 
 ### 2. Reviewed source snapshot
 
-Existing `arca.issue-harness.snapshot.v1` with `BP-.../rN` source ID, fixed `draft-only` scope, exact declared Claim/non-goal/Human decision lines, `prohibited_actions` and **exact** `approval_provenance="operator-curated lexical transcription; NOT independently verified"`. R0 checks source line presence and source schema. No automatic summarization or truncation of multi-line Markdown occurs; an unrepresentable Issue must fail and be explicitly reviewed/restructured. Source-claim IDs and the completeness of lists are not independently authenticated.
+Existing `arca.issue-harness.snapshot.v1` with `BP-.../rN` source ID, fixed `draft-only` scope, exact declared Claim/non-goal/Human decision lines, `prohibited_actions` and **exact** `approval_provenance="operator-curated lexical transcription; NOT independently verified"`. R0 checks literal CR/LF-delimited source lines, approval provenance and the existing R6 schema. Unicode visual line separators (U+2028/U+2029), C1 controls and disallowed C0 controls are rejected rather than silently split. R1 rechecks all of these rules when verifying a staged bundle. No automatic summarization or truncation of multi-line Markdown occurs; an unrepresentable Issue must fail and be explicitly reviewed/restructured. Source-claim IDs and the completeness of lists are not independently authenticated.
 
 ### 3. Pinned digest/identity inputs
 
@@ -96,11 +96,11 @@ An operator-only `stage` creates `REGISTRY/BP-...__rN/` with mode `0700`, exactl
 
 The receipt contains `STAGED_INACTIVE_OPERATOR_REVIEW_REQUIRED`, source ID, repository, Issue number, Node ID, updated_at, canonical GitHub URL, three hashes, and `origin_authenticated=false`, `semantic_approval_verified=false`, `activation=NOT_ACTIVE_NOT_PUBLISHED`, `effect_authority=NONE`. It is a local consistency record, **not a signed authorization or authentic provenance proof**. It must never be interpreted as a Human approval receipt.
 
-The registry root directory is held under an **exclusive Linux advisory `flock`** during stage: alias/revision scans through receipt publication and fsync are serialized between cooperating operator processes. The directory is created exclusively. Existing `source_id` cannot be overwritten. For the **same provider Node ID**, R1 requires the same source ID prefix, sequential `rN` versions, strictly increasing `updated_at`, and a previously intact bundle; aliases, version gaps and conflicting IDs are rejected. GitHub `updated_at` is not sufficient alone for actual provenance.
+The registry root directory is held under an **exclusive Linux advisory `flock`** during stage: alias/revision scans through receipt publication, entry fsync and registry-root fsync are serialized between cooperating operator processes. The directory is created exclusively. Existing `source_id` cannot be overwritten. For the **same provider Node ID**, R1 requires the same source ID prefix, sequential `rN` versions, strictly increasing `updated_at`, and a previously intact bundle; aliases, version gaps and conflicting IDs are rejected. GitHub `updated_at` is not sufficient alone for actual provenance.
 
-`verify_bundle` refuses missing/extra files, symlinks, nonprivate modes, malformed/noncanonical receipt, authority mutation, Digest drift, provider identity mismatch, revision mismatch and optionally an altered *operator-supplied* latest capture. It does **not** poll GitHub and **cannot prove that the supplied latest capture was actually fetched**.
+`verify_bundle` refuses missing/extra files, symlinks, nonprivate modes, malformed/noncanonical receipt, authority mutation, Digest drift, provider identity mismatch, **snapshot provenance/schema/whole-line source binding violations**, revision mismatch and optionally an altered *operator-supplied* latest capture (including title changes). It does **not** poll GitHub and **cannot prove that the supplied latest capture was actually fetched**.
 
-The staging operation is fail-closed but not an atomic multi-file transaction. Advisory `flock` cannot prevent a non-cooperating same-user process from editing the registry; Linux and a local filesystem supporting directory advisory locks are R1 prerequisites. A process interruption can leave a partial, nonusable bundle; `receipt.json` is written last, verification refuses incomplete bundles and later additions fail until explicitly examined. Same-user write access can defeat local hashes; deployment requires separate OS/environment constraints and trusted evidence.
+The staging operation is fail-closed but not an atomic multi-file transaction. If root fsync fails after receipt creation, `stage` returns `STAGING_WRITE_FAILED` even though an intact but durability-uncertain bundle may remain; inspect the entry and verify it before any manual recovery. Never hand-author a receipt to repair a partial bundle. Advisory `flock` cannot prevent a non-cooperating same-user process from editing the registry; Linux and a local filesystem supporting directory advisory locks are R1 prerequisites. A process interruption can leave a partial, nonusable bundle; `receipt.json` is written last, verification refuses incomplete bundles and later additions fail until explicitly examined. Same-user write access can defeat local hashes; deployment requires separate OS/environment constraints and trusted evidence.
 
 ## Scope boundaries and known limitations
 
@@ -110,12 +110,12 @@ The staging operation is fail-closed but not an atomic multi-file transaction. A
 - No automatic active snapshot switch or changes to `~/.claude-personal`.
 - `SOURCE_DRIFT` is checked relative to the pinned digest supplied to R6. It cannot prove the operator's pin was authentic.
 - Provider API response may describe a PR or edited Issue; future trusted Host adapter must reject wrong resource types and re-fetch exact current revision at acceptance time.
-- In R1, root directory symlink/race checks are best effort (no openat2 or immutable signed store). Source directory bytecode/cache pollution is prevented during tests with `PYTHONDONTWRITEBYTECODE=1`.
+- In R1, root directory symlink/race checks are best effort (no openat2 or immutable signed store). Schema checks use disposable, private writable scratch outside the registry, including for `verify` (which writes no persistent registry state); source directory bytecode/cache pollution is prevented during tests with `PYTHONDONTWRITEBYTECODE=1`.
 
 ## Test and review gate
 
 Source-only isolated tests use synthetic captures. R0 regression tests are reused in-tree; Core and R1 tests run with the merged R6 harness unchanged. A dedicated test uses real official MCP SDK v2 subprocess stdio with a **disposable explicit snapshot copy**; that test-only copy is not a plugin activation API.
 
-Before advancing: local full suite, explicit official SDK v2 tests (no skipped transport tests), independent source/security review, exact changed-file inventory, then separately approved Commit/Push/Draft PR. Ready/Merge and Adam installed Claude Plugin changes require **separate approvals**.
+Before advancing: local full suite, explicit official SDK v2 tests (no skipped transport tests), independent source/security review, exact changed-file inventory, then separately approved correction Commit/Push to the existing Draft PR. Ready/Merge and Adam installed Claude Plugin changes require **separate approvals**.
 
 R1 exits with `PREFLIGHT_PASS_NOT_STAGED`, `STAGED_INACTIVE_OPERATOR_REVIEW_REQUIRED` or `STAGED_VERIFIED_INACTIVE` and always `origin_authenticated=false` and `semantic_approval_verified=false`. Invalid inputs return `BLOCKED` in the CLI with a stable code. **R1 does not provide a production source authenticator.**
