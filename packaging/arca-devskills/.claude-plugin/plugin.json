@@ -1,0 +1,10 @@
+{
+  "name": "arca-devskills",
+  "displayName": "Arca DevSkills",
+  "version": "0.1.0-rc.0",
+  "description": "Human-aligned requirements, GitHub Issue specifications and original-goal acceptance for KAGARI-based development.",
+  "author": {
+    "name": "upiscium"
+  },
+  "repository": "https://github.com/upiscium/ChatGPT-Skills"
+}
